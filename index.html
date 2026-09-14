@@ -307,52 +307,112 @@ p{margin:0}
 .card__body p{color:var(--ink-soft);font-size:.98rem;line-height:1.6}
 @media (max-width:880px){.known{grid-template-columns:1fr;gap:1.4rem}}
 
-/* ---------------------------- the craft ---------------------------- */
-.craft{display:grid;grid-template-columns:auto 1fr 1fr;gap:clamp(1.6rem,4vw,3.6rem);align-items:start}
-.craft__line{width:34px;align-self:stretch;position:sticky;top:22vh}
-.craft__line svg{width:34px;height:min(60vh,440px);overflow:visible}
-.craft__line path{
-  fill:none;stroke:var(--gold-deep);stroke-width:1.4;stroke-linecap:round;
-  stroke-dasharray:var(--len,1200);stroke-dashoffset:var(--len,1200);
+/* ---------------------------- the craft ----------------------------
+   One drink taken apart layer by layer. The section is a plain static
+   layout by default (headline, diagram image, panels as a list). JS adds
+   .is-live to turn it into a 400vh sticky scroll with the 3D cup. Reduced
+   motion, no WebGL, and a failed script all stay on the static layout.
+   ------------------------------------------------------------------ */
+.craft{position:relative;background:var(--marble-200);color:var(--ink-dark);padding:clamp(4.5rem,9vw,8rem) 0}
+.craft .label{color:var(--gold-deep)}
+.craft__stage{
+  position:relative;width:var(--shell);margin-inline:auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,3.5rem);align-items:start;
 }
-.craft__copy{display:flex;flex-direction:column;gap:1.15rem;max-width:52ch}
-.craft__copy p{color:var(--ink-dark-soft);font-size:1.05rem;line-height:1.72}
-.craft__copy p strong{color:var(--ink-dark);font-weight:600}
-.craft__shots{display:flex;flex-direction:column;gap:1.1rem}
-.craft__shots img{width:100%;height:auto;border-radius:4px;object-fit:cover;background:var(--marble)}
-.craft__shots img:first-child{aspect-ratio:16/10}
-.craft__shots img:last-child{aspect-ratio:4/5}
-@media (max-width:980px){
-  .craft{grid-template-columns:auto 1fr;gap:1.6rem}
-  .craft__shots{grid-column:1/-1;flex-direction:row}
-  .craft__shots img{width:50%}
-}
-@media (max-width:620px){
-  .craft{grid-template-columns:1fr}
-  .craft__line{display:none}
-  .craft__shots{flex-direction:column}
-  .craft__shots img{width:100%}
+.craft__glow,.craft__canvas,.craft__leader{display:none}
+.craft__rail{display:none}
+
+/* the headline, left */
+.craft__head{grid-column:1/-1;display:flex;flex-direction:column;gap:.9rem;max-width:30rem}
+.craft__head h2{font-size:clamp(1.9rem,4vw,3.1rem)}
+.craft__hair{display:block;width:3.5rem;height:1px;background:#c9a14a}
+.craft__sub,.craft__close{color:var(--ink-dark-soft);font-size:1.05rem;line-height:1.6}
+.craft__close a{color:#c9a14a;text-decoration:none;border-bottom:1px solid #c9a14a;margin-left:.45rem;white-space:nowrap}
+.craft__close a:hover{color:var(--gold-deep);border-color:var(--gold-deep)}
+
+/* the exploded diagram as a still, used by the static layout only */
+.craft__static{order:1}
+.craft__static img{width:100%;height:auto}
+
+/* the five panels: same structure every time, no card, no border */
+.craft__panels{order:2;display:flex;flex-direction:column;gap:1.8rem;width:22rem;max-width:100%}
+.panel{text-align:left}
+.panel h3{font-size:clamp(1.8rem,3.2vw,2.5rem);font-weight:600;line-height:1;margin-bottom:.75rem}
+.panel__what{font-size:1.05rem;color:var(--ink-dark);line-height:1.55}
+.panel ul{list-style:none;margin:.9rem 0 0;padding:0;display:flex;flex-direction:column;gap:.3rem}
+.panel li{font-size:.97rem;color:var(--ink-dark-soft);line-height:1.5}
+.panel__why{margin-top:.9rem;font-family:var(--display);font-style:italic;font-weight:400;font-size:1.02rem;line-height:1.5;color:var(--ink-dark)}
+@media (max-width:880px){
+  .craft__stage{grid-template-columns:1fr}
 }
 
-/* the interactive moment: ingredient names reveal their origin */
-.ing{margin-top:1.9rem;display:flex;flex-direction:column;gap:.9rem}
-.ing__hint{font-family:var(--mono);font-weight:300;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-deep)}
-.ing__row{display:flex;flex-wrap:wrap;gap:.6rem}
-.ing__item{
-  font-family:var(--body);font-size:.95rem;font-weight:600;color:var(--ink-dark);
-  background:transparent;border:1px solid rgba(14,5,6,.22);border-radius:999px;
-  padding:.55rem 1.1rem;min-height:44px;cursor:pointer;
-  display:inline-flex;align-items:center;gap:.5rem;
-  transition:border-color .4s var(--ease),background .4s var(--ease),color .4s var(--ease);
+/* ================= live mode: the sticky scroll with the cup ============== */
+.craft.is-live{height:400vh;padding:0}
+.craft.is-live .craft__stage{
+  position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;
+  display:block;width:auto;margin:0;
 }
-.ing__item:hover,.ing__item.is-open{border-color:var(--gold-deep);background:rgba(154,130,83,.13)}
-.ing__origin{
-  display:inline-block;max-width:0;overflow:hidden;white-space:nowrap;
-  font-family:var(--mono);font-weight:300;font-size:.76rem;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--gold-deep);opacity:0;
-  transition:max-width .55s var(--ease-out),opacity .4s var(--ease),margin .55s var(--ease-out);
+.craft.is-live .craft__static{display:none}
+.craft.is-live .craft__glow{
+  display:block;position:absolute;left:50%;top:50%;width:min(72vh,72vw);aspect-ratio:1;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(71,92,77,.25),rgba(71,92,77,.16) 50%,rgba(71,92,77,0) 100%);
 }
-.ing__item:hover .ing__origin,.ing__item.is-open .ing__origin{max-width:12rem;opacity:1;margin-left:.1rem}
+.craft.is-live .craft__canvas{display:block;position:absolute;left:0;top:0;width:100%;height:100%}
+.craft.is-live .craft__rail{
+  display:block;position:absolute;left:max(2.4vw,14px);top:0;width:34px;height:100%;
+  overflow:visible;pointer-events:none;
+}
+.craft__rail path{fill:none;stroke:var(--gold-deep);stroke-width:1.4;stroke-linecap:round}
+.craft.is-live .craft__leader{
+  display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;
+}
+.craft__leader path{fill:none;stroke:#c9a14a;stroke-width:1.25;stroke-linecap:round}
+.craft__leader circle{fill:#c9a14a}
+
+.craft.is-live .craft__head{
+  position:absolute;left:max(5vw,1.5rem);top:50%;transform:translateY(-50%);
+  width:22rem;max-width:calc(50% - 2rem);opacity:0;pointer-events:none;will-change:opacity;
+}
+.craft.is-live .craft__head.is-on{pointer-events:auto}
+.craft.is-live .craft__close{opacity:0;transform:translateY(10px);will-change:opacity,transform}
+
+.craft.is-live .craft__panels{
+  position:absolute;right:max(5vw,1.5rem);top:50%;width:22rem;max-width:calc(50% - 2rem);height:0;
+  display:block;
+}
+.craft.is-live .panel{
+  position:absolute;left:0;top:0;width:100%;opacity:0;visibility:hidden;
+  transform:translateY(calc(-50% + var(--rise,0px)));will-change:opacity,transform;
+}
+.craft.is-live .panel.is-on{visibility:visible}
+
+/* phones and anything without hover: cup in the top 55vh, words in the rest */
+@media (max-width:899px),(hover:none){
+  .craft.is-live .craft__canvas{height:55%}
+  .craft.is-live .craft__glow{top:27.5%;width:min(50vh,84vw)}
+  .craft.is-live .craft__rail{left:10px}
+  .craft.is-live .craft__head{
+    left:1.25rem;right:1.25rem;top:auto;bottom:0;height:45%;width:auto;max-width:none;
+    transform:none;padding-top:1.4rem;gap:.7rem;
+  }
+  .craft.is-live .craft__head h2{font-size:clamp(1.8rem,7vw,2.4rem)}
+  .craft.is-live .craft__sub,.craft.is-live .craft__close{font-size:.98rem}
+  .craft.is-live .craft__panels{
+    left:1.25rem;right:1.25rem;top:auto;bottom:0;height:45%;width:auto;max-width:none;
+  }
+  .craft.is-live .panel{top:1.4rem;transform:translateY(var(--rise,0px))}
+  .craft.is-live .panel h3{font-size:1.9rem;margin-bottom:.5rem}
+  .craft.is-live .panel__what{font-size:.98rem}
+  .craft.is-live .panel li{font-size:.92rem}
+  .craft.is-live .panel__why{font-size:.96rem;margin-top:.7rem}
+}
+
+/* the kunafa, leading Known For */
+.known__lead{margin:0 0 clamp(2.2rem,4vw,3.4rem);display:flex;flex-direction:column;gap:.9rem}
+.known__lead img{width:100%;height:auto;aspect-ratio:21/9;object-fit:cover;object-position:center 58%;border-radius:4px;background:var(--green-600)}
+.known__lead figcaption{font-family:var(--display);font-size:clamp(1.05rem,1.6vw,1.3rem);color:var(--marble-100)}
+@media (max-width:620px){.known__lead img{aspect-ratio:4/3}}
 
 /* ------------------------------ visit ------------------------------ */
 .visit{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(1.6rem,4vw,3.2rem);align-items:start}
@@ -466,7 +526,6 @@ p{margin:0}
 }
 .visit__map-cta{color:var(--gold);border-bottom:1px solid rgba(201,178,127,.45);padding-bottom:2px}
 .visit__map iframe{position:relative;z-index:1}
-.craft__shots img:last-child{aspect-ratio:3/4}
 
 /* ---------------- the phone hero: a full width band, then the words -------- */
 @media (max-width:760px){
@@ -489,7 +548,6 @@ p{margin:0}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
   .rise{opacity:1;transform:none}
-  .craft__line path{stroke-dashoffset:0}
 }
 </style>
 </head>
@@ -570,6 +628,11 @@ p{margin:0}
 <!-- ======================= WHAT WE'RE KNOWN FOR ======================== -->
 <section class="sec sec--dark" id="known">
   <div class="shell">
+    <figure class="known__lead rise">
+      <img src="assets/known-kunafa.webp" width="1360" height="765" loading="lazy" decoding="async"
+           alt="A round kunafa on a gold board, crisp golden kataifi pastry with a mound of crushed green pistachio in the centre, on a marble surface.">
+      <figcaption>The kunafa. Crisp on the outside, pistachio on top.</figcaption>
+    </figure>
     <div class="sec__head rise">
       <span class="label">What we're known for</span>
       <h2>The ones people come back for.</h2>
@@ -606,49 +669,98 @@ p{margin:0}
 </section>
 
 <!-- ============================== THE CRAFT ============================= -->
-<section class="sec sec--light" id="craft">
-  <div class="shell">
-    <div class="sec__head rise">
+<!-- One drink, taken apart layer by layer. This is what the owner tells
+     people at the counter, made visible. Static layout by default; JS adds
+     .is-live for the scroll-driven 3D cup when the browser can carry it. -->
+<section class="craft" id="craft">
+  <div class="craft__stage" id="craftStage">
+    <div class="craft__glow" aria-hidden="true"></div>
+    <canvas class="craft__canvas" id="craftCanvas" aria-hidden="true"></canvas>
+
+    <!-- the gold line that draws beside the text, now the full height of the section -->
+    <svg class="craft__rail" viewBox="0 0 34 1000" preserveAspectRatio="none" aria-hidden="true">
+      <path id="craftRail" d="M17 0 V220 C17 290 5 320 5 390 C5 460 29 490 29 560 C29 630 17 660 17 730 V1000"></path>
+    </svg>
+
+    <!-- the leader line from the lit layer to its panel -->
+    <svg class="craft__leader" id="craftLeader" aria-hidden="true">
+      <circle id="leaderDot" r="3" cx="-10" cy="-10"></circle>
+      <path id="leaderPath" d=""></path>
+    </svg>
+
+    <div class="craft__head" id="craftHead">
       <span class="label">The craft</span>
       <h2>We make it here.</h2>
+      <span class="craft__hair" aria-hidden="true"></span>
+      <p class="craft__sub">Take the matcha apart and you can taste every decision.</p>
+      <p class="craft__close" id="craftClose">Then we hand it to you.<a href="#known">See the menu</a></p>
     </div>
-    <div class="craft">
-      <!-- the whisper: a thin gold line that draws itself as you read -->
-      <div class="craft__line" aria-hidden="true">
-        <svg viewBox="0 0 34 440" preserveAspectRatio="none">
-          <path id="craftLine" d="M17 0 V96 C17 128 5 140 5 170 C5 200 29 212 29 244 C29 276 17 288 17 320 V440"></path>
-        </svg>
-      </div>
 
-      <!-- OWNER: this is a draft of your story in your voice. Read it once and
-           correct anything that is not exactly how you do it. Nothing here is
-           published as fact until you say it is. -->
-      <div class="craft__copy rise">
-        <p><strong>The gelato is made in this building.</strong> Not trucked in frozen from somewhere else. That is the whole reason the texture is what it is when you get it.</p>
-        <p>Fresh has a short life, so we make what the day needs and we make it again tomorrow. What is in the case in the morning is what went in that morning.</p>
-        <p>The ingredients are the part people taste without knowing why. Real pistachio, real chocolate, real matcha. You can taste the spot where a shortcut would have been.</p>
-        <p>The pastry is the same story. Kataifi pulled apart by hand, layered, baked until the edges go, then the pistachio goes on last so it stays green.</p>
+    <!-- the exploded diagram as a still, for reduced motion and browsers without WebGL -->
+    <figure class="craft__static">
+      <img src="assets/craft-exploded.webp" width="1200" height="1400" loading="lazy" decoding="async"
+           alt="Diagram of a matcha drink pulled apart into its layers, bottom to top: an amber syrup disc inside a clear cup, a tan milk layer, a green matcha layer, ice cubes, and a pale foam dome.">
+    </figure>
 
-        <!-- the interactive moment -->
-        <div class="ing">
-          <span class="ing__hint">Tap an ingredient</span>
-          <div class="ing__row" id="ingRow">
-            <!-- OWNER: confirm where each one actually comes from, one word each -->
-            <button class="ing__item" type="button" aria-expanded="false">Pistachio<span class="ing__origin">T&uuml;rkiye</span></button>
-            <button class="ing__item" type="button" aria-expanded="false">Kataifi<span class="ing__origin">Nablus</span></button>
-            <button class="ing__item" type="button" aria-expanded="false">Matcha<span class="ing__origin">Uji</span></button>
-            <button class="ing__item" type="button" aria-expanded="false">Chocolate<span class="ing__origin">Belgium</span></button>
-            <button class="ing__item" type="button" aria-expanded="false">Milk<span class="ing__origin">Texas</span></button>
-          </div>
-        </div>
-      </div>
+    <!-- OWNER: every bracketed line below is a placeholder. These are the
+         facts you tell people at the counter. Nothing here is published as
+         a claim about your food until you have written it in yourself. -->
+    <div class="craft__panels" id="craftPanels">
+      <article class="panel" data-layer="0">
+        <h3>Syrup</h3>
+        <p class="panel__what">The sweetener, poured in first so it sits under everything else.</p>
+        <ul>
+          <li>[syrup type and where it comes from]</li>
+          <li>[how it is made or prepared]</li>
+          <li>[what it does in the cup]</li>
+        </ul>
+        <p class="panel__why"><em>[why it matters to the taste]</em></p>
+      </article>
 
-      <div class="craft__shots rise">
-        <img src="assets/craft-kunafa.webp" width="1360" height="765" loading="lazy" decoding="async"
-             alt="A round kunafa on a gold board, crisp golden kataifi pastry with a mound of crushed green pistachio in the centre, on a marble surface.">
-        <img src="assets/craft-gelato.webp" width="765" height="1020" loading="lazy" decoding="async"
-             alt="A hand holding a cup of pale green pistachio gelato at the Dubai and Dips counter, next to a branded iced latte and a Dubai and Dips paper bag.">
-      </div>
+      <article class="panel" data-layer="1">
+        <h3>Milk</h3>
+        <p class="panel__what">The base of the drink, poured cold over the syrup.</p>
+        <ul>
+          <li>[milk type and where it comes from]</li>
+          <li>[how it is prepared]</li>
+          <li>[what it does in the cup]</li>
+        </ul>
+        <p class="panel__why"><em>[why it matters to the taste]</em></p>
+      </article>
+
+      <article class="panel" data-layer="2">
+        <h3>Matcha</h3>
+        <p class="panel__what">Powdered green tea, whisked and poured over the milk.</p>
+        <ul>
+          <li>[matcha grade and origin]</li>
+          <li>[how it is whisked or prepared]</li>
+          <li>[what it does in the cup]</li>
+        </ul>
+        <p class="panel__why"><em>[why it matters to the taste]</em></p>
+      </article>
+
+      <article class="panel" data-layer="3">
+        <h3>Ice</h3>
+        <p class="panel__what">Added after the matcha, so the drink is cold all the way down.</p>
+        <ul>
+          <li>[ice type or size]</li>
+          <li>[how it is prepared]</li>
+          <li>[what it does in the cup]</li>
+        </ul>
+        <p class="panel__why"><em>[why it matters to the taste]</em></p>
+      </article>
+
+      <article class="panel" data-layer="4">
+        <h3>Foam</h3>
+        <!-- OWNER: is this cold foam or whipped cream on the real drink? -->
+        <p class="panel__what">The topping, spooned on last.</p>
+        <ul>
+          <li>[what the foam is made from]</li>
+          <li>[how it is prepared]</li>
+          <li>[what it does in the cup]</li>
+        </ul>
+        <p class="panel__why"><em>[why it matters to the taste]</em></p>
+      </article>
     </div>
   </div>
 </section>
@@ -1025,46 +1137,6 @@ p{margin:0}
   }
 
   /* ---------------------------------------------------------------
-     The gold line that draws itself beside the craft copy
-     --------------------------------------------------------------- */
-  var line = document.getElementById('craftLine');
-  var craft = document.getElementById('craft');
-  if (line && craft && !reducedMotion()) {
-    var len = line.getTotalLength();
-    line.style.setProperty('--len', len);
-    var drawing = false;
-    function drawLine() {
-      var rect = craft.getBoundingClientRect();
-      var span = rect.height + window.innerHeight * 0.5;
-      var p = (window.innerHeight * 0.85 - rect.top) / span;
-      p = p < 0 ? 0 : p > 1 ? 1 : p;
-      var off = Math.round(len * (1 - p) * 10) / 10;
-      if (off !== +line.dataset.off) {            // write only on change
-        line.dataset.off = off;
-        line.style.strokeDashoffset = off;
-      }
-      drawing = false;
-    }
-    window.addEventListener('scroll', function () {
-      if (!drawing) { drawing = true; requestAnimationFrame(drawLine); }
-    }, { passive: true });
-    drawLine();
-  }
-
-  /* ---------------------------------------------------------------
-     The interactive moment: an ingredient shows where it comes from
-     --------------------------------------------------------------- */
-  var row = document.getElementById('ingRow');
-  if (row) {
-    row.addEventListener('click', function (e) {
-      var btn = e.target.closest('.ing__item');
-      if (!btn) return;
-      var open = btn.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-  }
-
-  /* ---------------------------------------------------------------
      Nav, form, year
      --------------------------------------------------------------- */
   var nav = document.getElementById('nav'), stuck = false;
@@ -1090,6 +1162,360 @@ p{margin:0}
 
   document.getElementById('year').textContent = new Date().getFullYear();
 })();
+</script>
+
+<!-- Three.js r128, deferred. If it never arrives the section stays static. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer onerror="window.__threeFailed=true"></script>
+
+<script>
+/* ===================================================================
+   The craft: one cup, taken apart by scroll.
+   Progress 0..1 is the only input. apply(p) drives the layers, the
+   camera, the leader line, the headline and the panels. No timers, no
+   tweens. A rAF loop lerps toward the scroll target and rests when it
+   gets there, the same seek-gate pattern as the hero.
+   =================================================================== */
+window.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+
+  var section = document.getElementById('craft');
+  var stage   = document.getElementById('craftStage');
+  var canvas  = document.getElementById('craftCanvas');
+  var head    = document.getElementById('craftHead');
+  var close   = document.getElementById('craftClose');
+  var panels  = [].slice.call(document.querySelectorAll('#craftPanels .panel'));
+  var leaderP = document.getElementById('leaderPath');
+  var leaderD = document.getElementById('leaderDot');
+  var rail    = document.getElementById('craftRail');
+  if (!section || !canvas) return;
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasGL = (function () {
+    try { var c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl'))); }
+    catch (e) { return false; }
+  })();
+  // Every gate lands on the same complete static layout.
+  if (reduced || !hasGL || window.__threeFailed || !window.THREE) return;
+
+  section.classList.add('is-live');
+
+  // the scene is built once the page is idle, off the hero's critical path;
+  // until then the section is a sticky cream stage with nothing to render
+  var start = function () {
+  if (window.performance && performance.mark) performance.mark('craft-init-start');
+
+  /* ---------------------------- helpers ---------------------------- */
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var lerp  = function (a, b, t) { return a + (b - a) * t; };
+  var ease  = function (t) { t = clamp(t, 0, 1); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+  var ramp  = function (t, a, b) { return clamp((t - a) / (b - a), 0, 1); };
+  var seed = 7;
+  var rnd = function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  var mobile = function () { return window.innerWidth < 900 || window.matchMedia('(hover: none)').matches; };
+
+  function jitter(geo, amt, keepBottom) {
+    var pos = geo.attributes.position, i, y;
+    for (i = 0; i < pos.count; i++) {
+      y = pos.getY(i);
+      var onBottom = keepBottom && Math.abs(y) < 1e-4;
+      pos.setXYZ(i, pos.getX(i) + (rnd() - .5) * amt, onBottom ? 0 : y + (rnd() - .5) * amt, pos.getZ(i) + (rnd() - .5) * amt);
+    }
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+  }
+  function gradientTex(top, bottom, blend) {
+    var c = document.createElement('canvas'); c.width = 4; c.height = 128;
+    var g = c.getContext('2d'), grad = g.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, top); grad.addColorStop(1 - blend, top); grad.addColorStop(1, bottom);
+    g.fillStyle = grad; g.fillRect(0, 0, 4, 128);
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t;
+  }
+  function desat(hex, k) {           // mix a colour toward its own grey by k
+    var c = new THREE.Color(hex), l = c.r * .2126 + c.g * .7152 + c.b * .0722;
+    return c.lerp(new THREE.Color(l, l, l), k);
+  }
+
+  /* --------------------------- renderer ---------------------------- */
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  renderer.setClearColor(0x000000, 0);
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(32, 1, 0.1, 60);
+
+  // a small lit room, baked once into an environment map so the plastic has something to refract
+  var pmrem = new THREE.PMREMGenerator(renderer);
+  (function () {
+    var room = new THREE.Scene();
+    room.add(new THREE.Mesh(new THREE.BoxGeometry(24, 24, 24), new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: 0x8c9488, roughness: 1 })));
+    function panel(w, h, x, y, z, hex, k) {
+      var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: hex }));
+      m.material.color.multiplyScalar(k); m.position.set(x, y, z); m.lookAt(0, 0, 0); room.add(m);
+    }
+    panel(7, 7, -7, 8, 5, 0xfff3df, 4.5);   // warm key, upper left
+    panel(9, 4, 8, 3, -2, 0xe3ebf0, 2.6);   // cool fill, right
+    panel(12, 2, 0, 11, 0, 0xffffff, 6);    // ceiling strip
+    panel(4, 9, 0, 1, -11.5, 0xa9c2a2, 1.4);// green wall behind
+    scene.environment = pmrem.fromScene(room, 0.04).texture;
+    room.traverse(function (o) { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+  })();
+  scene.add(new THREE.HemisphereLight(0xfbf7ef, 0x7f8c76, 0.55));
+  var key = new THREE.DirectionalLight(0xfff1da, 1.15); key.position.set(-4, 7, 5); scene.add(key);
+
+  /* --------------------------- the cup ----------------------------- */
+  var group = new THREE.Group(); scene.add(group);
+
+  var plastic = new THREE.MeshPhysicalMaterial({
+    color: 0xf3f5f1, metalness: 0, roughness: 0.08, transmission: 0.92, thickness: 0.35, ior: 1.45,
+    clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.2, transparent: true, opacity: 1,
+    side: THREE.DoubleSide, depthWrite: false
+  });
+  var CUP_H = 2.6, CUP_RT = 1.0, CUP_RB = 0.82, CUP_Y0 = -1.3;
+  var cup = new THREE.Group();
+  cup.add(new THREE.Mesh(new THREE.CylinderGeometry(CUP_RT, CUP_RB, CUP_H, 56, 1, true), plastic));
+  var floor = new THREE.Mesh(new THREE.CircleGeometry(CUP_RB, 48), plastic); floor.rotation.x = -Math.PI / 2; floor.position.y = CUP_Y0 + 0.02; cup.add(floor);
+  var lip = new THREE.Mesh(new THREE.TorusGeometry(CUP_RT, 0.035, 8, 56), plastic); lip.rotation.x = Math.PI / 2; lip.position.y = CUP_Y0 + CUP_H; cup.add(lip);
+  cup.traverse(function (o) { o.renderOrder = 20; });   // after everything it holds
+  group.add(cup);
+
+  // the layers, bottom to top: syrup, milk, matcha, ice, foam
+  var S_H = 0.14, M_H = 1.05, T_H = 1.15;
+  var syrupY = CUP_Y0 + 0.02 + S_H / 2;
+  var milkY  = CUP_Y0 + 0.02 + S_H + M_H / 2;
+  var matchaY = milkY + M_H / 2 + T_H / 2;
+  var foamY  = matchaY + T_H / 2;
+  function rAt(y) { return CUP_RB + (y - CUP_Y0) / CUP_H * (CUP_RT - CUP_RB) - 0.03; }
+
+  var syrupMat = new THREE.MeshPhysicalMaterial({ color: 0xb8792d, roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 1.1, opacity: 1 });
+  var syrup = new THREE.Mesh(new THREE.CylinderGeometry(rAt(syrupY + S_H / 2), rAt(syrupY - S_H / 2), S_H, 56), syrupMat);
+  syrup.position.y = syrupY;
+
+  var milkMat = new THREE.MeshPhysicalMaterial({ color: 0xcdad86, roughness: 0.55, clearcoat: 0.15, opacity: 1 });
+  var milk = new THREE.Mesh(new THREE.CylinderGeometry(rAt(milkY + M_H / 2), rAt(milkY - M_H / 2), M_H, 56), milkMat);
+  milk.position.y = milkY;
+
+  // matcha, with the blended band on its underside where it meets the milk
+  var matchaTexLit = gradientTex('#7f9c4c', '#b9b47c', 0.3);
+  var matchaTexDim = gradientTex('#8b9573', '#b1ae95', 0.3);
+  var matchaMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: matchaTexLit, roughness: 0.5, clearcoat: 0.25, clearcoatRoughness: 0.3, opacity: 1 });
+  var matcha = new THREE.Mesh(new THREE.CylinderGeometry(rAt(matchaY + T_H / 2), rAt(matchaY - T_H / 2), T_H, 56), matchaMat);
+  matcha.position.y = matchaY;
+
+  // ice: chunks sitting through the matcha and milk, each with its own jitter
+  var iceMat = new THREE.MeshPhysicalMaterial({ color: 0xd3e6d8, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.7, reflectivity: 1, opacity: 1 });
+  var ice = new THREE.Group(), iceRest = [], iceGeos = [];
+  for (var i = 0; i < 9; i++) {
+    var g = new THREE.IcosahedronGeometry(0.17 + rnd() * 0.09, 1); jitter(g, 0.07, false); iceGeos.push(g);
+    var m = new THREE.Mesh(g, iceMat);
+    var a = rnd() * Math.PI * 2, r = 0.12 + rnd() * 0.5, y = milkY - 0.25 + rnd() * 1.55;
+    m.position.set(Math.cos(a) * r, y, Math.sin(a) * r);
+    m.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3);
+    iceRest.push(m.position.clone()); ice.add(m);
+  }
+
+  // foam: a low dome, its edge roughened so it is not a perfect circle
+  var foamGeo = new THREE.SphereGeometry(rAt(foamY) - 0.02, 44, 22, 0, Math.PI * 2, 0, Math.PI / 2);
+  foamGeo.scale(1, 0.62, 1); jitter(foamGeo, 0.045, true);
+  var foamMat = new THREE.MeshPhysicalMaterial({ color: 0xe9efdc, roughness: 0.9, clearcoat: 0, opacity: 1, side: THREE.DoubleSide });
+  var foam = new THREE.Mesh(foamGeo, foamMat); foam.position.y = foamY - 0.01;
+
+  group.add(syrup, milk, matcha, ice, foam);
+
+  var layers = [
+    { mesh: syrup,  mat: syrupMat,  base: 0xb8792d, restY: syrupY,  lift: 0,    r: rAt(syrupY),  h: S_H },
+    // ice colour matches its material above
+    { mesh: milk,   mat: milkMat,   base: 0xd9c3a4, restY: milkY,   lift: 3.04, r: rAt(milkY),   h: M_H },
+    { mesh: matcha, mat: matchaMat, base: null,     restY: matchaY, lift: 3.64, r: rAt(matchaY), h: T_H },
+    { mesh: ice,    mat: iceMat,    base: 0xd3e6d8, restY: 0,       lift: 5.75, r: 0.9,          h: 0.9 },
+    { mesh: foam,   mat: foamMat,   base: 0xe9efdc, restY: foamY - 0.01, lift: 6.0, r: rAt(foamY), h: 0.6 }
+  ];
+  layers.forEach(function (L) {
+    L.lit = L.base !== null ? new THREE.Color(L.base) : null;
+    L.dim = L.base !== null ? desat(L.base, 0.35) : null;
+    L.lastOp = -1; L.lastK = -1;
+  });
+
+  /* ------------------------------ camera --------------------------- */
+  var camA = { pos: new THREE.Vector3(0, 0.7, 8.7), at: new THREE.Vector3(0, 0.2, 0) };
+  var camB = { pos: new THREE.Vector3(0, 7.55, 18.6), at: new THREE.Vector3(0, 3.65, 0) }; // about 12 degrees down
+  var camM = { pos: new THREE.Vector3(0, 8.1, 20.8), at: new THREE.Vector3(0, 3.7, 0) };  // phones: a little further back
+  var camAm = { pos: new THREE.Vector3(0, 0.7, 10.6), at: new THREE.Vector3(0, 0.2, 0) };
+  var tmpV = new THREE.Vector3();
+
+  /* ----------------------- state written on change ------------------ */
+  var last = { headOp: -1, closeOp: -1, closeY: -1, railOff: -1, leaderLen: -1, leaderOff: -1, leaderD: '', leaderOn: null, panel: -1, panelOp: [], panelRise: [], w: 0, h: 0 };
+  panels.forEach(function () { last.panelOp.push(-1); last.panelRise.push(-1); });
+  var railLen = rail.getTotalLength();
+  rail.style.strokeDasharray = railLen; rail.style.strokeDashoffset = railLen;
+  var q2 = function (v) { return Math.round(v * 100) / 100; };
+  var anchorCache = { idx: -1, x: 0, y: 0, w: 0 };
+
+  function size() {
+    var w = canvas.clientWidth || stage.clientWidth, h = canvas.clientHeight || stage.clientHeight;
+    if (w === last.w && h === last.h) return;
+    last.w = w; last.h = h;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    anchorCache.idx = -1;
+  }
+
+  function panelAnchor(i) {           // where the leader line lands, cached per window and per size
+    if (anchorCache.idx === i && anchorCache.w === last.w) return anchorCache;
+    var h3 = panels[i].querySelector('h3').getBoundingClientRect(), st = stage.getBoundingClientRect();
+    anchorCache.idx = i; anchorCache.w = last.w;
+    anchorCache.x = h3.left - st.left; anchorCache.y = h3.top - st.top + h3.height * 0.5;
+    if (mobile()) { anchorCache.x = h3.left - st.left + 6; anchorCache.y = h3.top - st.top; }
+    return anchorCache;
+  }
+
+  /* --------------------------- apply(progress) ---------------------- */
+  function apply(p) {
+    var isM = mobile();
+    size();
+
+    // 1. explode amount per layer, and the camera
+    var e = ease(ramp(p, 0.10, 0.20));                 // out
+    var explode = [0, e, e, e, e];
+    if (p > 0.80) {                                    // back, milk first and foam last
+      var backStart = [0, 0.80, 0.815, 0.83, 0.845];
+      for (var k = 1; k < 5; k++) explode[k] = 1 - ease(ramp(p, backStart[k], backStart[k] + 0.06));
+    }
+    var camT = ease(ramp(p, 0.10, 0.20)) * (1 - ease(ramp(p, 0.80, 0.92)));
+    var A = isM ? camAm : camA, B = isM ? camM : camB;
+    camera.position.lerpVectors(A.pos, B.pos, camT);
+    tmpV.lerpVectors(A.at, B.at, camT); camera.lookAt(tmpV);
+    group.rotation.y = -0.55 + ease(ramp(p, 0, 0.10)) * 0.75;
+
+    // 2. which layer is lit, and how much
+    var u = clamp((p - 0.20) / 0.12, 0, 5);
+    var dimAmt = ease(ramp(p, 0.18, 0.20)) * (1 - ease(ramp(p, 0.80, 0.83)));
+    var win = clamp(Math.floor(u), 0, 4), w = clamp(u - win, 0, 1);
+    var inWin = p >= 0.20 && p < 0.80;
+
+    for (k = 0; k < 5; k++) {
+      var L = layers[k];
+      var lit = clamp((0.62 - Math.abs(u - (k + 0.5))) / 0.12, 0, 1);
+      var dimK = q2(dimAmt * (1 - lit));                // 0 = full, 1 = fully dropped back
+      var y = L.restY + L.lift * explode[k];
+      if (k === 3) {                                    // ice fans outward and flattens as it lifts
+        for (var c = 0; c < ice.children.length; c++) {
+          var m0 = ice.children[c], r0 = iceRest[c], fan = 1 + 0.45 * explode[3];
+          m0.position.set(r0.x * fan, lerp(r0.y, 5.95 + (r0.y - milkY - 0.5) * 0.42, explode[3]), r0.z * fan);
+        }
+      } else {
+        L.mesh.position.y = y;
+      }
+      if (dimK !== L.lastK) {
+        L.lastK = dimK;
+        var op = q2(1 - 0.65 * dimK);
+        if (op !== L.lastOp) {
+          L.lastOp = op; L.mat.opacity = op;
+          var tr = op < 1; if (tr !== L.mat.transparent) L.mat.transparent = tr;
+        }
+        if (L.lit) L.mat.color.copy(L.lit).lerp(L.dim, dimK);
+        else { var wantDim = dimK > 0.5 ? matchaTexDim : matchaTexLit; if (L.mat.map !== wantDim) { L.mat.map = wantDim; L.mat.needsUpdate = false; } }
+      }
+    }
+
+    // 3. headline and closing line
+    var headOp = q2(p < 0.5 ? 1 - ease(ramp(p, 0.10, 0.16)) : ease(ramp(p, 0.86, 0.92)));
+    if (headOp !== last.headOp) { last.headOp = headOp; head.style.opacity = headOp; head.classList.toggle('is-on', headOp > 0.5); }
+    var closeT = ease(ramp(p, 0.92, 0.97)), closeOp = q2(closeT), closeY = Math.round((1 - closeT) * 10 * 2) / 2;
+    if (closeOp !== last.closeOp) { last.closeOp = closeOp; close.style.opacity = closeOp; }
+    if (closeY !== last.closeY) { last.closeY = closeY; close.style.transform = 'translateY(' + closeY + 'px)'; }
+
+    // 4. the rail draws with progress
+    var railOff = Math.round(railLen * (1 - p) * 2) / 2;
+    if (railOff !== last.railOff) { last.railOff = railOff; rail.style.strokeDashoffset = railOff; }
+
+    // 5. one panel per window, in over the first quarter, out over the last 15 percent, never two at once
+    var vis = inWin ? (w < 0.25 ? w / 0.25 : w > 0.85 ? (1 - w) / 0.15 : 1) : 0;
+    vis = q2(ease(vis));
+    for (k = 0; k < 5; k++) {
+      var op2 = (inWin && k === win) ? vis : 0;
+      var rise = Math.round((1 - op2) * 18 * 2) / 2;
+      if (op2 !== last.panelOp[k]) {
+        last.panelOp[k] = op2; panels[k].style.opacity = op2; panels[k].classList.toggle('is-on', op2 > 0);
+        panels[k].setAttribute('aria-hidden', op2 > 0 ? 'false' : 'true');
+      }
+      if (op2 > 0 && rise !== last.panelRise[k]) { last.panelRise[k] = rise; panels[k].style.setProperty('--rise', rise + 'px'); }
+    }
+
+    // 6. the leader line, from the lit layer to the panel edge; drawn by progress, not time
+    var leaderOn = inWin && vis > 0;
+    if (leaderOn) {
+      var L2 = layers[win], edge = tmpV;
+      // a point on the lit layer's right-hand edge, in world space, then on screen
+      var ly = win === 3 ? 5.95 : L2.restY + L2.lift * explode[win] + (win === 4 ? 0.2 : 0);
+      group.updateMatrixWorld(); camera.updateMatrixWorld();
+      edge.set(L2.r * 0.9, ly, 0).applyMatrix4(group.matrixWorld).project(camera);
+      var cw = last.w, ch = last.h;
+      var ax = (edge.x * 0.5 + 0.5) * cw, ay = (-edge.y * 0.5 + 0.5) * ch;
+      var an = panelAnchor(win), d, len;
+      if (isM) { d = 'M' + ax.toFixed(1) + ' ' + ay.toFixed(1) + ' V ' + (ay + 26).toFixed(1); len = 26; }
+      else { var mx = ax + (an.x - ax) * 0.5; d = 'M' + ax.toFixed(1) + ' ' + ay.toFixed(1) + ' H ' + mx.toFixed(1) + ' V ' + an.y.toFixed(1) + ' H ' + an.x.toFixed(1); len = Math.abs(mx - ax) + Math.abs(an.y - ay) + Math.abs(an.x - mx); }
+      if (d !== last.leaderD) {
+        last.leaderD = d; leaderP.setAttribute('d', d);
+        leaderD.setAttribute('cx', ax.toFixed(1)); leaderD.setAttribute('cy', ay.toFixed(1));
+        len = Math.round(len * 2) / 2;
+        if (len !== last.leaderLen) { last.leaderLen = len; leaderP.style.strokeDasharray = len; }
+      }
+      var off = Math.round(last.leaderLen * (1 - vis) * 2) / 2;
+      if (off !== last.leaderOff) { last.leaderOff = off; leaderP.style.strokeDashoffset = off; }
+      leaderD.style.opacity = vis >= 0.98 ? 1 : 0;
+    }
+    if (leaderOn !== last.leaderOn) { last.leaderOn = leaderOn; leaderP.style.opacity = leaderOn ? 1 : 0; leaderD.style.opacity = leaderOn ? 1 : 0; if (!leaderOn) last.leaderD = ''; }
+
+    renderer.render(scene, camera);
+  }
+
+  /* --------------------- progress in, rAF that rests ----------------- */
+  var current = -1, target = 0, running = false, visible = false;
+  function progress() {
+    var rect = section.getBoundingClientRect(), span = section.offsetHeight - stage.offsetHeight;
+    return span > 0 ? clamp(-rect.top / span, 0, 1) : 0;
+  }
+  function tick() {
+    target = progress();
+    if (current < 0) current = target;
+    current += (target - current) * 0.16;
+    if (Math.abs(target - current) < 0.0006) current = target;
+    apply(current);
+    if (visible && Math.abs(target - current) > 0.0006) requestAnimationFrame(tick); else running = false;
+  }
+  function wake() { if (visible && !running) { running = true; requestAnimationFrame(tick); } }
+  window.addEventListener('scroll', wake, { passive: true });
+  window.addEventListener('resize', function () { last.w = -1; anchorCache.idx = -1; current = -1; wake(); }, { passive: true });
+
+  // render only while the section is anywhere near the screen
+  var io = new IntersectionObserver(function (es) {
+    visible = es[0].isIntersecting;
+    if (visible) { current = -1; wake(); }
+  }, { rootMargin: '30% 0px 30% 0px' });
+  io.observe(section);
+  size(); apply(progress());
+  if (window.performance && performance.mark) { performance.mark('craft-init-end'); performance.measure('craft-init', 'craft-init-start', 'craft-init-end'); }
+
+  /* ------------------------------ dispose --------------------------- */
+  function dispose() {
+    io.disconnect(); visible = false;
+    window.removeEventListener('scroll', wake);
+    scene.traverse(function (o) { if (o.geometry) o.geometry.dispose(); });
+    [plastic, syrupMat, milkMat, matchaMat, iceMat, foamMat].forEach(function (m) { m.dispose(); });
+    [matchaTexLit, matchaTexDim].forEach(function (t) { t.dispose(); });
+    if (scene.environment) scene.environment.dispose();
+    pmrem.dispose(); renderer.dispose();
+  }
+  // if the section is ever removed from the page, let the GPU memory go with it
+  new MutationObserver(function () { if (!document.body.contains(section)) dispose(); }).observe(document.body, { childList: true, subtree: true });
+
+  window.__craft = { apply: apply, dispose: dispose, layers: layers, renderer: renderer, scene: scene, camera: camera, matchaLit: matchaTexLit };
+  };
+  if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2500 }); else setTimeout(start, 600);
+});
 </script>
 
 <!-- Search engines: the shop, its hours, and where it is.
