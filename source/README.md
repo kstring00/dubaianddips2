@@ -5,8 +5,8 @@ The originals the site was built from. Nothing in here is served: the site is
 
 | File | What it is | Where it ended up |
 | --- | --- | --- |
-| `herovideo.mp4` | 1920x1080, 5.04s, 24fps, no audio. The Higgsfield push-in. | `assets/hero.mp4` (scrub encode), `assets/hero-poster.jpg`, `assets/hero-poster-mobile.jpg`, `assets/hero-end.webp` |
-| `herodd.jpg` | The still the video was generated from. | Superseded by frames pulled from the video, which are higher resolution. |
+| `herovideo.mp4` | 1920x1080, 5.04s, 24fps, no audio. The Higgsfield push-in. | Retired with the video hero. `assets/hero-poster.jpg` and `assets/hero-poster-mobile.jpg` stay for the share card. |
+| `herodd.jpg` | The room photo, 1360x765. The hero walks into it. | `assets/hero-room-1200.webp`, `hero-room-1920.webp`, `hero-room-2200.webp` (quality 80, the two larger ones are upscaled from 1360), and `hero-room-blur.webp` (1200 wide, pre-blurred for the foreground band). Stage B cut-outs would go in `assets/layers/`. |
 | `biscoff.jpg` | Biscoff frappe studio shot. | `assets/known-biscoff.webp` |
 | `ddd.jpg` | Pistachio and chocolate frappe studio shot. | `assets/known-pistachio.webp` |
 | `foodd-lineup.jpg` | The six drink lineup. | `assets/known-lineup.webp` |
