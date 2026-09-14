@@ -9,7 +9,7 @@ The originals the site was built from. Nothing in here is served: the site is
 | `herodd.jpg` | The still the video was generated from. | Superseded by frames pulled from the video, which are higher resolution. |
 | `biscoff.jpg` | Biscoff frappe studio shot. | `assets/known-biscoff.webp` |
 | `ddd.jpg` | Pistachio and chocolate frappe studio shot. | `assets/known-pistachio.webp` |
-| `foodd&d.jpg` | The six drink lineup. | `assets/known-lineup.webp` |
+| `foodd-lineup.jpg` | The six drink lineup. | `assets/known-lineup.webp` |
 | `safforn.jpg` | Kunafa on a gold board. | `assets/craft-kunafa.webp` |
 | `unnamed.jpg` | Counter shot: pistachio gelato, branded cup and bag. | `assets/craft-gelato.webp` |
 | `Untitled.png` | Not used. | Not shipped. |
