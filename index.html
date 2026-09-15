@@ -57,6 +57,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.05;margin:0;le
 p{margin:0}
 .shell{width:var(--shell);margin-inline:auto}
 .label{font-family:var(--mono);font-weight:300;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 .skip{position:absolute;left:-9999px;top:0;z-index:200}
 .skip:focus{left:1rem;top:1rem;background:var(--gold);color:var(--walnut);padding:.6rem 1rem;border-radius:999px}
 
@@ -181,49 +182,68 @@ p{margin:0}
 .visit__cta{display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;align-items:center;margin-top:.4rem}
 @media(max-width:880px){.visit{grid-template-columns:1fr}}
 
-/* ============================= REVIEWS =============================
-   The counter. A marble slab in perspective under the pendant light, and
-   each review is a plate set down on it. Next serves the next plate. */
-.counter{background:var(--green-900);overflow:hidden;padding-bottom:0}
-.counter__room{position:relative;margin-top:clamp(.5rem,2vw,1.5rem);padding-bottom:clamp(6.2rem,10.5vw,9.4rem)}
-.counter__room::before{content:"";position:absolute;left:50%;top:-30%;width:70vw;height:80%;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 0%,rgba(226,205,157,.16) 0%,rgba(226,205,157,.05) 40%,transparent 70%);pointer-events:none}
-.counter__slab{position:absolute;left:-10vw;right:-10vw;bottom:clamp(3.4rem,6vw,4.6rem);height:clamp(90px,12vw,150px);transform:perspective(900px) rotateX(58deg);transform-origin:50% 100%;border-top:1px solid rgba(255,255,255,.5);
-  background:
-    repeating-linear-gradient(112deg,transparent 0 120px,rgba(96,108,96,.18) 121px 123px,transparent 124px 260px),
-    repeating-linear-gradient(64deg,transparent 0 170px,rgba(122,108,92,.16) 171px 172px,transparent 173px 340px),
-    repeating-linear-gradient(140deg,transparent 0 60px,rgba(255,255,255,.18) 61px 62px,transparent 63px 140px),
-    linear-gradient(180deg,#ece6db 0%,#d8cfc2 100%);
-  box-shadow:0 -30px 60px rgba(226,205,157,.06),0 10px 30px rgba(0,0,0,.4)}
-.counter__edge{position:absolute;left:-10vw;right:-10vw;bottom:0;height:clamp(3.4rem,6vw,4.6rem);background:linear-gradient(180deg,#b6ab9c 0%,#7d7266 38%,#4b433a 100%);border-top:1px solid rgba(255,255,255,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 18px 35px rgba(0,0,0,.55)}
-.counter__stage{position:relative;z-index:2}
-.counter__track{display:flex;align-items:flex-end;gap:28px;padding:1.5rem 0 0;transition:transform .8s var(--ease-out);will-change:transform}
-.plate{position:relative;flex:0 0 min(31vw,420px);min-height:320px;margin:0;padding:2.1rem 2rem 1.9rem;display:flex;flex-direction:column;border:1px solid rgba(201,178,127,.5);border-radius:18px;background:linear-gradient(150deg,rgba(45,58,46,.92),rgba(24,33,26,.96));box-shadow:0 30px 60px rgba(0,0,0,.35),0 12px 24px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05);transform:translateY(12px) scale(.94);opacity:.55;transition:transform .8s var(--ease-out),opacity .6s ease,box-shadow .6s ease}
-.plate::after{content:"";position:absolute;left:10%;right:10%;bottom:-18px;height:26px;border-radius:50%;background:rgba(0,0,0,.45);filter:blur(12px);z-index:-1}
-.plate.is-active{transform:none;opacity:1;box-shadow:0 40px 90px rgba(0,0,0,.45),0 24px 34px rgba(0,0,0,.3),0 0 0 1px rgba(201,178,127,.12),inset 0 1px 0 rgba(255,255,255,.06)}
-.plate__stars{color:#dbbc73;letter-spacing:.22em;font-size:.95rem;margin-bottom:1rem}
-.plate blockquote{margin:0;font-family:var(--display);font-size:clamp(1.2rem,1.5vw,1.6rem);line-height:1.38;color:#f0e8dc}
-.plate figcaption{margin-top:auto;padding-top:1.4rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
-.plate figcaption small{display:block;margin-top:.25rem;font-size:.66rem;letter-spacing:.06em;text-transform:none;color:rgba(232,225,215,.5)}
-/* Setting the plates down: first time the counter scrolls in, and every
-   time a plate becomes the active one. */
-.js .counter.is-in .plate{animation:serve .9s var(--ease-out) both;animation-delay:calc(var(--i) * .11s)}
-.js .counter.is-in .plate.is-served{animation:serve .75s var(--ease-out)}
-@keyframes serve{0%{transform:translate3d(90px,-34px,0) rotate(1.6deg);opacity:0}100%{transform:translateY(12px) scale(.94);opacity:.55}}
-@keyframes serveActive{0%{transform:translate3d(90px,-34px,0) rotate(1.6deg);opacity:0}100%{transform:none;opacity:1}}
-.js .counter.is-in .plate.is-active{animation-name:serveActive}
-.counter__head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap}
-.counter__head .sec__head{margin-bottom:0}
-.counter__nav{display:flex;align-items:center;gap:1.4rem;padding-bottom:.4rem}
-.counter__count{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;color:rgba(201,178,127,.8)}
-.counter__dots{display:flex;gap:.45rem;align-items:center}
-.counter__dots button{width:8px;height:8px;border:0;padding:0;border-radius:50%;background:rgba(232,225,215,.18);cursor:pointer;transition:transform .25s ease,background .25s ease}
-.counter__dots button.is-active{background:var(--gold);transform:scale(1.25)}
-.counter__arrows{display:flex;gap:.6rem}
-.counter__arrows button{appearance:none;width:44px;height:44px;border:1px solid rgba(201,178,127,.7);background:rgba(10,17,12,.4);color:var(--gold-bright);border-radius:999px;cursor:pointer;font-size:1.35rem;line-height:1;display:grid;place-items:center;transition:transform .3s var(--ease-out),background .3s var(--ease)}
-.counter__arrows button:hover{transform:translateY(-2px);background:rgba(201,178,127,.12)}
+/* ============================== REVIEWS ==============================
+   The ticket rail. Reviews are order tickets on a receipt rail: cream
+   paper in a dark room, clipped to a wire, hanging at slightly different
+   depths. The rail is a real horizontal scroll container, so touch
+   momentum, keyboard scrolling and focus-into-view come from the browser
+   for free. site.js eases the scroll position laterally as the section
+   passes the viewport, and gives each ticket a rotation that lags the
+   one before it, so the row moves like paper on a line. */
+.revs{background:var(--green-900);overflow:hidden}
+.revs__head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.revs__head .sec__head{margin-bottom:0}
+.revs__nav{display:flex;align-items:center;gap:1.1rem;padding-bottom:.3rem}
+.revs__count{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;color:var(--gold)}
+.revs__arrows{display:flex;gap:.55rem}
+.revs__arrows button{appearance:none;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(201,178,127,.4);border-radius:999px;background:transparent;color:var(--gold);font-size:1.3rem;line-height:1;cursor:pointer;transition:background .3s var(--ease),border-color .3s var(--ease)}
+.revs__arrows button:hover{background:rgba(201,178,127,.12);border-color:var(--gold)}
+.revs__arrows button[disabled]{opacity:.35;cursor:default}
+
+/* The wire the tickets clip to, and the light pooling on them from above. */
+.revs__stage{position:relative;margin-top:clamp(2rem,4vw,3rem)}
+.revs__stage::before{content:"";position:absolute;z-index:0;left:0;right:0;top:-1.5rem;height:70%;pointer-events:none;background:radial-gradient(ellipse 55% 100% at 50% 0,rgba(226,205,157,.14),rgba(226,205,157,.04) 45%,transparent 72%)}
+.revs__wire{position:absolute;z-index:1;left:0;right:0;top:26px;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(201,178,127,.6) 6%,rgba(201,178,127,.6) 94%,transparent);box-shadow:0 1px 3px rgba(0,0,0,.5)}
+
+.rail{position:relative;z-index:1;overflow-x:auto;overflow-y:hidden;scroll-behavior:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;padding:26px 0 54px;cursor:grab}
+.rail::-webkit-scrollbar{display:none}
+.rail.is-dragging{cursor:grabbing}
+.rail:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:2px}
+.rail__row{display:flex;align-items:flex-start;gap:clamp(1rem,2vw,1.7rem);width:max-content;margin:0;padding:0 var(--gutter);list-style:none}
+
+.ticket{position:relative;flex:0 0 auto;width:clamp(264px,23vw,318px);padding-top:var(--hang);transform:rotate(var(--rot))}
+.ticket::before{content:"";position:absolute;left:50%;top:0;width:1px;height:var(--hang);background:rgba(201,178,127,.42)}
+.ticket__paper{position:relative;display:flex;flex-direction:column;gap:.8rem;min-height:290px;padding:1.5rem 1.3rem 1.15rem;border:1px solid transparent;border-radius:2px;color:#2a231c;
+  background-color:#efe7d9;
+  background-image:repeating-linear-gradient(91deg,rgba(120,98,66,.045) 0 1px,transparent 1px 5px),linear-gradient(180deg,#f4eee3 0%,#e7dcca 100%);
+  box-shadow:0 20px 34px rgba(0,0,0,.46),0 4px 10px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.85);
+  transition:transform .45s var(--ease-out),box-shadow .45s var(--ease-out),border-color .3s var(--ease)}
+/* punched holes along the top edge, in the section's own green */
+.ticket__paper::before{content:"";position:absolute;left:0;right:0;top:-1px;height:8px;background-image:radial-gradient(circle 5px at 7px 0,var(--green-900) 0 5px,transparent 5.5px);background-size:14px 8px;background-repeat:repeat-x}
+.ticket__paper:hover,.ticket:focus-within .ticket__paper{transform:translateY(-8px) rotate(var(--hov));border-color:rgba(201,178,127,.9);box-shadow:0 30px 48px rgba(0,0,0,.5),0 6px 14px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.9)}
+
+.ticket__top{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:#5c5145}
+.ticket__stars{color:#8a6f3f;letter-spacing:.2em;font-size:.95rem;line-height:1}
+.ticket blockquote{margin:0;font-family:var(--display);font-weight:500;font-size:1.06rem;line-height:1.44;color:#2a231c}
+.ticket__who{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;color:#4a4038}
+.ticket__order{display:flex;align-items:center;gap:.75rem;margin-top:auto;padding-top:.85rem;min-height:44px;border-top:1px dashed rgba(90,74,54,.38);text-decoration:none;color:inherit}
+.ticket__order img{flex:0 0 auto;width:52px;height:52px;border-radius:2px;object-fit:cover;transition:transform .45s var(--ease-out)}
+.ticket__order:hover img,.ticket__order:focus-visible img{transform:scale(1.08)}
+.ticket__ordered{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:#6b5f50}
+.ticket__item{display:inline-block;margin-top:.15rem;font-weight:600;font-size:.95rem;line-height:1.25;color:#2a231c;border-bottom:1px solid rgba(138,111,63,.55)}
+
+.rail__end{flex:0 0 auto;align-self:center;display:flex;padding:0 clamp(1.4rem,4vw,3.5rem)}
+.rail__end a{display:inline-flex;align-items:center;gap:.55rem;min-height:44px;white-space:nowrap;font-size:.95rem;text-decoration:none;color:var(--gold);border-bottom:1px solid rgba(201,178,127,.4)}
+.rail__end a:hover{color:var(--gold-bright);border-bottom-color:var(--gold-bright)}
+
 @media(max-width:899px){
-  .plate{flex-basis:78vw;min-height:300px;padding:1.7rem 1.5rem 1.6rem}
-  .counter__track{gap:16px}
+  .revs__nav{width:100%;justify-content:space-between}
+  .ticket{width:min(80vw,320px)}
+  .ticket__paper{min-height:0}
+  .ticket blockquote{font-size:1.05rem}
+  .ticket__who{font-size:.8rem}
+  .rail.is-touched{scroll-snap-type:x proximity}
+  .rail.is-touched .ticket{scroll-snap-align:center}
 }
 
 /* ============================= CONTACT ============================= */
@@ -348,9 +368,16 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
   .craft__list{display:grid;order:3;gap:1.2rem;margin:0;padding:0;list-style:none;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
   .craft__list h3{font-size:1.25rem;margin-bottom:.4rem}
   .craft__list p{color:var(--ink-soft);font-size:.95rem}
-  .counter__track,.plate,.counter__dots button,.btn,.nav__links a{transition:none}
-  .js .counter.is-in .plate,.js .counter.is-in .plate.is-active{animation:none}
+  .btn,.nav__links a{transition:none}
   .hero__hint span{animation:none}
+  /* Reviews: no rail, no sway. A plain stack of the same tickets. */
+  .rail{overflow:visible;padding:0 0 .5rem;cursor:auto}
+  .rail__row{flex-direction:column;align-items:stretch;width:auto;padding:0 var(--gutter);gap:1.1rem}
+  .ticket{width:auto;max-width:34rem;padding-top:0;transform:none!important}
+  .ticket::before,.revs__wire,.revs__nav{display:none}
+  .ticket__paper,.ticket__order img{transition:none}
+  .ticket__paper:hover,.ticket:focus-within .ticket__paper{transform:none}
+  .rail__end{align-self:flex-start;padding:.6rem var(--gutter) 0}
   .js .sheet.is-open{animation:sheetFade .2s linear}
   @keyframes sheetFade{from{opacity:0}to{opacity:1}}
   .js .sheet__scrim{transition:none}
@@ -712,35 +739,107 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
 </section>
 
 <!-- ============================== REVIEWS ============================== -->
-<section class="sec counter" id="reviews">
-  <div class="shell counter__head">
+<section class="sec revs" id="reviews" aria-labelledby="revs-title">
+  <div class="shell revs__head">
     <div class="sec__head rise">
       <span class="label">Reviews</span>
-      <h2>What people say after.</h2>
+      <h2 id="revs-title">What people say after.</h2>
       <p>Sample reviews for now. Your real Google reviews go here, word for word.</p>
     </div>
-    <div class="counter__nav rise">
-      <span class="counter__count"><span id="reviewCount">01</span> / 05</span>
-      <div class="counter__dots" id="reviewDots"></div>
-      <div class="counter__arrows">
-        <button type="button" data-dir="-1" aria-label="Previous review">&lsaquo;</button>
-        <button type="button" data-dir="1" aria-label="Next review">&rsaquo;</button>
+    <div class="revs__nav rise">
+      <span class="revs__count"><span id="revCount">01</span> / 05</span>
+      <div class="revs__arrows">
+        <button type="button" data-rev="-1" aria-label="Previous review">&lsaquo;</button>
+        <button type="button" data-rev="1" aria-label="Next review">&rsaquo;</button>
       </div>
     </div>
   </div>
-  <div class="counter__room">
-    <div class="counter__slab" aria-hidden="true"></div>
-    <div class="counter__edge" aria-hidden="true"></div>
-    <div class="counter__stage">
-      <div class="counter__track" id="reviewTrack">
-        <figure class="plate" style="--i:0"><span class="plate__stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><blockquote>&ldquo;The pistachio is unreal. Real pistachio, you can taste it, and the texture is exactly right.&rdquo;</blockquote><figcaption>Sarah M.<small>Sample review</small></figcaption></figure>
-        <figure class="plate" style="--i:1"><span class="plate__stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><blockquote>&ldquo;Best matcha I have had in Houston. You can tell nothing in it is a shortcut.&rdquo;</blockquote><figcaption>James T.<small>Sample review</small></figcaption></figure>
-        <figure class="plate" style="--i:2"><span class="plate__stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><blockquote>&ldquo;The staff walked us through the case and built the drink right in front of us. The room is even nicer than the photos.&rdquo;</blockquote><figcaption>Emily R.<small>Sample review</small></figcaption></figure>
-        <figure class="plate" style="--i:3"><span class="plate__stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><blockquote>&ldquo;The Biscoff frappe is ridiculous in the best way. Rich, cold, and somehow still balanced.&rdquo;</blockquote><figcaption>Marcus D.<small>Sample review</small></figcaption></figure>
-        <figure class="plate" style="--i:4"><span class="plate__stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><blockquote>&ldquo;The kind of place you bring someone back to because you want to see their reaction.&rdquo;</blockquote><figcaption>Nina P.<small>Sample review</small></figcaption></figure>
-      </div>
+  <div class="revs__stage">
+    <div class="revs__wire" aria-hidden="true"></div>
+    <div class="rail" id="revRail" tabindex="0" role="region" aria-label="Reviews, scroll sideways">
+      <ul class="rail__row">
+      <li class="ticket" style="--hang:14px;--hov:2.1deg;--rot:-1.3deg">
+        <article class="ticket__paper">
+          <div class="ticket__top"><span>Sample review</span></div>
+          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
+          <blockquote>&ldquo;The pistachio is unreal. Real pistachio, you can taste it, and the texture is exactly right.&rdquo;</blockquote>
+          <p class="ticket__who">Sarah M.</p>
+          <a class="ticket__order" href="/menu/frappes" data-sheet="frappes">
+            <img src="/assets/rev-pistachio-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A pistachio frappe in a clear cup, whipped cream on top with green pistachio sauce drizzled over it.">
+            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Pistachio Frappe</span></span>
+          </a>
+        </article>
+      </li>
+      <li class="ticket" style="--hang:32px;--hov:-2.4deg;--rot:1.6deg">
+        <article class="ticket__paper">
+          <div class="ticket__top"><span>Sample review</span></div>
+          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
+          <blockquote>&ldquo;Best matcha I have had in Houston. You can tell nothing in it is a shortcut.&rdquo;</blockquote>
+          <p class="ticket__who">James T.</p>
+          <a class="ticket__order" href="/menu/matchas" data-sheet="matchas">
+            <img src="/assets/rev-strawberry-matcha.webp" width="260" height="260" loading="lazy" decoding="async" alt="A strawberry matcha in a clear cup, a pink strawberry layer over green matcha with matcha dusted on the foam.">
+            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Strawberry Matcha</span></span>
+          </a>
+        </article>
+      </li>
+      <li class="ticket" style="--hang:20px;--hov:1.8deg;--rot:-0.7deg">
+        <article class="ticket__paper">
+          <div class="ticket__top"><span>Sample review</span></div>
+          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
+          <blockquote>&ldquo;The staff walked us through the case and built the drink right in front of us. The room is even nicer than the photos.&rdquo;</blockquote>
+          <p class="ticket__who">Emily R.</p>
+          <a class="ticket__order" href="/menu/frappes" data-sheet="frappes">
+            <img src="/assets/rev-dubai-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="The Dubai Chocolate Frappe in a clear cup, whipped cream with pistachio and dark chocolate drizzled over the top.">
+            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Dubai Chocolate Frappe</span></span>
+          </a>
+        </article>
+      </li>
+      <li class="ticket" style="--hang:40px;--hov:-1.9deg;--rot:1.1deg">
+        <article class="ticket__paper">
+          <div class="ticket__top"><span>Sample review</span></div>
+          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
+          <blockquote>&ldquo;The Biscoff frappe is ridiculous in the best way. Rich, cold, and somehow still balanced.&rdquo;</blockquote>
+          <p class="ticket__who">Marcus D.</p>
+          <a class="ticket__order" href="/menu/frappes" data-sheet="frappes">
+            <img src="/assets/rev-biscoff-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A Biscoff frappe in a clear cup, cookie butter swirled through it with whipped cream and a whole Biscoff cookie on top.">
+            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Biscoff Frappe</span></span>
+          </a>
+        </article>
+      </li>
+      <li class="ticket" style="--hang:24px;--hov:2.3deg;--rot:-1.7deg">
+        <article class="ticket__paper">
+          <div class="ticket__top"><span>Sample review</span></div>
+          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
+          <blockquote>&ldquo;The kind of place you bring someone back to because you want to see their reaction.&rdquo;</blockquote>
+          <p class="ticket__who">Nina P.</p>
+          <a class="ticket__order" href="/menu/desserts" data-sheet="desserts">
+            <img src="/assets/rev-kunafa.webp" width="260" height="260" loading="lazy" decoding="async" alt="A round kunafa on a gold board, crisp golden pastry with a mound of crushed green pistachio in the middle.">
+            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Kunafa</span></span>
+          </a>
+        </article>
+      </li>
+        <li class="rail__end"><a href="https://www.google.com/maps/search/?api=1&amp;query=Dubai+and+Dips+Clear+Lake+Houston" target="_blank" rel="noopener">Read them all on Google <span aria-hidden="true">&rarr;</span></a></li>
+      </ul>
     </div>
   </div>
+  <!-- Review / AggregateRating structured data, held inert on purpose.
+       The reviews above are samples written for the pitch, and publishing
+       sample reviews as structured data would be lying to Google. Once the
+       real Google reviews are pasted in, change this script's type to
+       "application/ld+json" and fill in the real values. -->
+  <script type="text/x-jsonld-draft" id="reviewSchema">
+  {
+    "@context": "https://schema.org",
+    "@type": "CafeOrCoffeeShop",
+    "name": "Dubai & Dips",
+    "address": {"@type":"PostalAddress","streetAddress":"1234 Bay Area Blvd, Suite 100","addressLocality":"Houston","addressRegion":"TX","postalCode":"77058","addressCountry":"US"},
+    "telephone": "+1-281-555-0147",
+    "aggregateRating": {"@type":"AggregateRating","ratingValue":"REAL_AVERAGE","reviewCount":"REAL_COUNT"},
+    "review": [
+      {"@type":"Review","author":{"@type":"Person","name":"REAL_NAME"},"datePublished":"YYYY-MM-DD","reviewRating":{"@type":"Rating","ratingValue":"5","bestRating":"5"},"reviewBody":"REAL_REVIEW_TEXT"}
+    ]
+  }
+  </script>
 </section>
 
 <!-- ============================== CONTACT ============================== -->

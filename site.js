@@ -295,7 +295,7 @@
       else { try { history.replaceState(null, '', '/'); } catch (e) {} hide(); }
     }
 
-    menu.addEventListener('click', function (e) {
+    document.addEventListener('click', function (e) {
       var link = e.target.closest ? e.target.closest('[data-sheet]') : null;
       if (link && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
         e.preventDefault();
@@ -322,60 +322,145 @@
   }
 
   /* ------------------------------------------------------------ reviews
-     Plates on the counter. The active plate is centered; next serves the
-     next one in from the right. Arrows, dots, keys and swipe all call go(). */
-  var counter = document.getElementById('reviews');
-  if (counter) {
-    var track = document.getElementById('reviewTrack');
-    var plates = [].slice.call(track.children);
-    var count = document.getElementById('reviewCount');
-    var dots = document.getElementById('reviewDots');
-    var index = 1;
-    plates.forEach(function (_, i) {
-      var b = document.createElement('button'); b.type = 'button';
-      b.setAttribute('aria-label', 'Go to review ' + (i + 1));
-      b.addEventListener('click', function () { go(i, true); });
-      dots.appendChild(b);
+     The ticket rail. The rail is a native horizontal scroll container, so
+     touch momentum, trackpad, keyboard scrolling and scroll-into-view on
+     focus all come from the browser. Layered on top:
+       - while the section crosses the viewport, scrollLeft eases toward a
+         target derived from vertical scroll progress, so the tickets
+         travel sideways as you read down the page;
+       - anything the reader does by hand is folded into `offset`, so the
+         rail is never yanked back to where the page scroll wanted it;
+       - each ticket's rotation lags the one before it, which is what makes
+         the row read as paper on a line instead of a row of cards. */
+  var revs = document.getElementById('reviews');
+  var rail = document.getElementById('revRail');
+  if (revs && rail && !reduce) {
+    var tickets = [].slice.call(rail.querySelectorAll('.ticket'));
+    var countEl = document.getElementById('revCount');
+    var prevBtn = revs.querySelector('[data-rev="-1"]');
+    var nextBtn = revs.querySelector('[data-rev="1"]');
+    var baseRot = tickets.map(function (t) {
+      return parseFloat(getComputedStyle(t).getPropertyValue('--rot')) || 0;
     });
-    function offset(i) {
-      var plate = plates[i];
-      return track.parentElement.clientWidth / 2 - (plate.offsetLeft + plate.offsetWidth / 2);
+    var lag = tickets.map(function () { return 0; });
+
+    var offset = 0, lastLeft = 0, vel = 0, raf = 0;
+    var mode = 'auto';            /* auto | drag | fling */
+    var mom = 0, dragX = 0, dragLeft = 0, settleTimer = 0;
+
+    function maxScroll() { return Math.max(0, rail.scrollWidth - rail.clientWidth); }
+    function stepWidth() {
+      if (tickets.length < 2) return tickets[0] ? tickets[0].offsetWidth : 1;
+      return tickets[1].offsetLeft - tickets[0].offsetLeft;
     }
-    function paint(serve) {
-      track.style.transform = 'translate3d(' + offset(index).toFixed(1) + 'px,0,0)';
-      plates.forEach(function (c, i) {
-        var on = i === index;
-        c.classList.toggle('is-active', on);
-        c.classList.remove('is-served');
-        if (on && serve) { void c.offsetWidth; c.classList.add('is-served'); }
-      });
-      [].slice.call(dots.children).forEach(function (d, i) { d.classList.toggle('is-active', i === index); });
-      count.textContent = String(index + 1).padStart(2, '0');
+    /* The rail sits at the first ticket until the section's top reaches the
+       top of the viewport, then does its whole travel over the next stretch
+       of scrolling, finishing while the section is still on screen. */
+    function travel() {
+      var r = revs.getBoundingClientRect();
+      var span = Math.max(240, r.height - window.innerHeight * .25);
+      return clamp(-r.top / span, 0, 1) * maxScroll();
     }
-    function go(i, serve) { index = (i + plates.length) % plates.length; paint(serve); }
-    counter.querySelectorAll('[data-dir]').forEach(function (btn) {
-      btn.addEventListener('click', function () { go(index + parseInt(btn.getAttribute('data-dir'), 10), true); });
+    function syncOffset() { offset = rail.scrollLeft - travel(); }
+
+    function paint() {
+      var i = clamp(Math.round(rail.scrollLeft / stepWidth()), 0, tickets.length - 1);
+      countEl.textContent = String(i + 1).padStart(2, '0');
+      prevBtn.disabled = rail.scrollLeft <= 2;
+      nextBtn.disabled = rail.scrollLeft >= maxScroll() - 2;
+    }
+
+    function frame() {
+      raf = 0;
+      if (mode === 'auto') {
+        var want = clamp(travel() + offset, 0, maxScroll());
+        var d = want - rail.scrollLeft;
+        if (Math.abs(d) > .4) rail.scrollLeft += d * .10;   /* the lag */
+      } else if (mode === 'fling') {
+        rail.scrollLeft += mom;
+        mom *= .93;
+        if (Math.abs(mom) < .5 || rail.scrollLeft <= 0 || rail.scrollLeft >= maxScroll()) {
+          mom = 0; mode = 'auto'; syncOffset();
+        }
+      }
+      /* sway: each ticket trails the rail, and the one before it */
+      var moved = rail.scrollLeft - lastLeft;
+      lastLeft = rail.scrollLeft;
+      vel += (moved - vel) * .25;
+      for (var i = 0; i < tickets.length; i++) {
+        lag[i] += (vel - lag[i]) * (.14 + i * .03);
+        var rot = baseRot[i] + clamp(-lag[i] * .09, -3, 3);
+        tickets[i].style.transform = 'rotate(' + rot.toFixed(2) + 'deg)';
+      }
+      paint();
+      if (mode !== 'auto' || Math.abs(vel) > .05 ||
+          Math.abs(clamp(travel() + offset, 0, maxScroll()) - rail.scrollLeft) > .4) wake();
+    }
+    function wake() { if (!raf) raf = requestAnimationFrame(frame); }
+
+    /* Mouse drag, with a fling on release. Touch uses the native scroller. */
+    rail.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse') { rail.classList.add('is-touched'); mode = 'drag'; return; }
+      if (e.target.closest('a,button')) return;
+      mode = 'drag'; mom = 0; dragX = e.clientX; dragLeft = rail.scrollLeft;
+      rail.classList.add('is-dragging');
+      try { rail.setPointerCapture(e.pointerId); } catch (err) {}
     });
-    counter.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight') { go(index + 1, true); e.preventDefault(); }
-      if (e.key === 'ArrowLeft') { go(index - 1, true); e.preventDefault(); }
+    rail.addEventListener('pointermove', function (e) {
+      if (mode !== 'drag' || e.pointerType !== 'mouse' || !e.buttons) return;
+      var next = dragLeft - (e.clientX - dragX);
+      mom = mom * .6 + (rail.scrollLeft - next) * -.4;
+      rail.scrollLeft = next;
+      e.preventDefault();
+      wake();
     });
-    var touchX = null;
-    track.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
-    track.addEventListener('touchend', function (e) {
-      if (touchX === null) return;
-      var dx = e.changedTouches[0].clientX - touchX;
-      if (Math.abs(dx) > 45) go(index + (dx < 0 ? 1 : -1), true);
-      touchX = null;
+    function release(e) {
+      rail.classList.remove('is-dragging');
+      if (mode !== 'drag') return;
+      if (e && e.pointerType === 'mouse') { mode = 'fling'; }
+      else { mode = 'auto'; clearTimeout(settleTimer); settleTimer = setTimeout(syncOffset, 260); }
+      wake();
+    }
+    rail.addEventListener('pointerup', release);
+    rail.addEventListener('pointercancel', release);
+    rail.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+    /* Arrow keys and the prev/next buttons move one ticket at a time. */
+    function go(dir) {
+      mode = 'drag';
+      rail.scrollTo({ left: clamp(rail.scrollLeft + dir * stepWidth(), 0, maxScroll()), behavior: 'smooth' });
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () { syncOffset(); mode = 'auto'; wake(); }, 550);
+      wake();
+    }
+    revs.querySelectorAll('[data-rev]').forEach(function (b) {
+      b.addEventListener('click', function () { go(parseInt(b.getAttribute('data-rev'), 10)); });
+    });
+    rail.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { go(1); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { go(-1); e.preventDefault(); }
+    });
+    /* Tabbing into a ticket scrolls it into view natively; keep our offset
+       in step so the next vertical scroll does not undo it. */
+    rail.addEventListener('scroll', function () {
+      if (mode === 'auto') return;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () { if (mode !== 'fling') syncOffset(); }, 220);
     }, { passive: true });
-    if ('IntersectionObserver' in window && !reduce) {
-      var rio = new IntersectionObserver(function (entries) {
-        if (entries.some(function (e) { return e.isIntersecting; })) { counter.classList.add('is-in'); rio.disconnect(); }
-      }, { threshold: .25 });
-      rio.observe(counter);
-    } else counter.classList.add('is-in');
-    var rraf = 0;
-    window.addEventListener('resize', function () { if (!rraf) rraf = requestAnimationFrame(function () { rraf = 0; paint(false); }); });
-    paint(false);
+    rail.addEventListener('focusin', function () {
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(syncOffset, 320);
+    });
+
+    window.addEventListener('scroll', wake, { passive: true });
+    window.addEventListener('resize', function () { syncOffset(); wake(); }, { passive: true });
+    paint();
+    wake();
+  } else if (revs) {
+    /* Reduced motion: the stack is CSS-only, but the counter still needs
+       to not lie about a rail that is not there. */
+    var c = document.getElementById('revCount');
+    if (c) c.textContent = '01';
   }
+
 })();
