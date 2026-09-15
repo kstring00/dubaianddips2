@@ -1,0 +1,282 @@
+/* Dubai & Dips. One script for the whole page.
+   Three scroll-driven pieces share one idea: a normalized progress value
+   drives everything, DOM writes happen only when a value changes, and a rAF
+   loop eases toward the scroll target and stops when it settles. */
+(function () {
+  'use strict';
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var phone = window.matchMedia('(max-width: 899px)');
+
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function range(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }
+  function easeInOut(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function scrollY() { return window.scrollY || window.pageYOffset || 0; }
+
+  /* Write a style only when it changes. */
+  function writer() {
+    var cache = {};
+    return function (el, prop, val) {
+      if (!el) return;
+      var key = (el.id || el.className) + '|' + prop;
+      if (cache[key] === val) return;
+      cache[key] = val;
+      el.style[prop] = val;
+    };
+  }
+
+  /* A rAF loop that eases `current` toward a target and calls apply().
+     wake() is bound to scroll; the loop stops on its own once settled. */
+  function loop(getTarget, apply, k) {
+    var current = 0, target = 0, raf = 0;
+    function tick() {
+      raf = 0;
+      target = getTarget();
+      current += (target - current) * k;
+      if (Math.abs(target - current) < .0004) current = target;
+      apply(current);
+      if (current !== target) raf = requestAnimationFrame(tick);
+    }
+    function wake() { if (!raf) raf = requestAnimationFrame(tick); }
+    function reset() { current = target = getTarget(); apply(current); }
+    return { wake: wake, reset: reset };
+  }
+
+  /* Scrub a video by scroll. One seek in flight at a time: while the
+     decoder is busy the wanted time is parked and applied on `seeked`. */
+  function scrubber(video, onReady) {
+    var dur = 0, parked = -1, seekAt = 0;
+    function seek(t) {
+      if (!dur) return;
+      t = clamp(t, 0, dur - .04);
+      /* One seek in flight; a seek that never reports back is abandoned
+         after 600ms so a stalled decoder cannot freeze the scrub. */
+      if (video.seeking && performance.now() - seekAt < 600) { parked = t; return; }
+      if (Math.abs(video.currentTime - t) < 1 / 48) return;
+      seekAt = performance.now();
+      try { video.currentTime = t; } catch (e) {}
+    }
+    video.addEventListener('loadedmetadata', function () {
+      dur = isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+      if (onReady) onReady(dur);
+    });
+    video.addEventListener('seeked', function () {
+      if (parked >= 0) { var t = parked; parked = -1; seek(t); }
+    });
+    return { seek: seek, duration: function () { return dur; } };
+  }
+
+  /* ----------------------------------------------------------- reveals */
+  var rises = document.querySelectorAll('.rise');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+    }, { threshold: .08 });
+    rises.forEach(function (el) { io.observe(el); });
+  } else {
+    rises.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ------------------------------------------------------ form + year */
+  var form = document.getElementById('contactForm'), thanks = document.getElementById('thanks');
+  if (form) form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    form.reset(); form.classList.add('is-sent'); thanks.classList.add('is-on');
+  });
+  var year = document.getElementById('year');
+  if (year) year.textContent = new Date().getFullYear();
+
+  /* ---------------------------------------------------------------- nav */
+  var nav = document.getElementById('nav');
+  var hero = document.getElementById('top');
+  function navStuck() {
+    var edge = hero ? hero.offsetHeight - window.innerHeight - 1 : 0;
+    nav.classList.toggle('is-stuck', scrollY() > edge);
+  }
+
+  /* --------------------------------------------------------------- hero
+     Beats, as a fraction of the hero's scroll travel:
+       .00 to .03   the bar, the wordmark, nothing moves
+       .03 to .64   the film: bar splits, room opens, sign lands
+       .14 to .30   wordmark lifts out as the bar splits
+       .64 to .78   copy lands, scrim comes up
+       .84 to .94   nav fades in
+       .90 to 1.0   exit gradient, the next section takes over */
+  if (hero) {
+    var film = document.getElementById('heroVideo');
+    var set = writer();
+    var open = document.getElementById('heroOpen');
+    var hint = document.getElementById('heroHint');
+    var land = document.getElementById('heroLand');
+    var scrim = document.getElementById('heroScrim');
+    var exit = document.getElementById('heroExit');
+    var rule = document.getElementById('heroRule');
+    var scrub = scrubber(film, function (dur) {
+      if (reduce) scrub.seek(dur);
+    });
+    /* If the film never arrives the poster stays and the copy still lands. */
+    film.addEventListener('error', function () { film.removeAttribute('poster'); film.style.backgroundImage = 'url(assets/hero-poster.webp)'; film.style.backgroundSize = 'cover'; }, true);
+
+    var travel = 1;
+    function layoutHero() { travel = Math.max(1, hero.offsetHeight - window.innerHeight); }
+
+    function applyHero(p) {
+      var d = scrub.duration();
+      if (d) scrub.seek(easeInOut(range(p, .03, .64)) * d);
+
+      var lift = easeInOut(range(p, .14, .30));
+      set(open, 'opacity', (1 - lift).toFixed(3));
+      set(open, 'transform', 'translate3d(0,' + (-28 * lift).toFixed(2) + 'px,0)');
+      set(hint, 'opacity', (1 - easeInOut(range(p, .04, .14))).toFixed(3));
+
+      var in_ = easeOut(range(p, .64, .78));
+      set(land, 'opacity', in_.toFixed(3));
+      set(land, 'transform', 'translate3d(0,' + (40 * (1 - in_)).toFixed(2) + 'px,0)');
+      set(land, 'pointerEvents', in_ > .7 ? '' : 'none');
+      set(scrim, 'opacity', in_.toFixed(3));
+      set(exit, 'opacity', easeInOut(range(p, .90, 1)).toFixed(3));
+      set(rule, 'width', (p * 100).toFixed(2) + '%');
+
+      var navIn = easeInOut(range(p, .84, .94));
+      set(nav, 'opacity', navIn.toFixed(3));
+      set(nav, 'pointerEvents', navIn > .6 ? '' : 'none');
+    }
+
+    if (reduce) {
+      /* Static close state: the room, the copy, the nav. The CSS already
+         collapses the stage; the film seeks to its last frame on load. */
+      film.preload = 'auto'; film.load();
+      window.addEventListener('scroll', navStuck, { passive: true });
+      navStuck();
+    } else {
+      var heroLoop = loop(function () { return clamp(scrollY() / travel, 0, 1); }, applyHero, phone.matches ? .2 : .14);
+      film.preload = 'auto'; film.load();
+      film.addEventListener('seeked', heroLoop.wake);
+      film.addEventListener('loadedmetadata', heroLoop.wake);
+      layoutHero(); heroLoop.reset(); navStuck();
+      window.addEventListener('scroll', function () { heroLoop.wake(); navStuck(); }, { passive: true });
+      window.addEventListener('resize', function () { layoutHero(); heroLoop.wake(); navStuck(); }, { passive: true });
+    }
+  }
+
+  /* -------------------------------------------------------------- craft
+     Same engine, second film. The film only loads once the section is a
+     screen away. Stage copy lives in the HTML list; the panel mirrors it. */
+  var craft = document.getElementById('craft');
+  if (craft) {
+    var cv = document.getElementById('craftVideo');
+    var intro = document.getElementById('craftIntro');
+    var panel = document.getElementById('craftPanel');
+    var stepEl = document.getElementById('craftStep');
+    var titleEl = document.getElementById('craftTitle');
+    var copyEl = document.getElementById('craftCopy');
+    var bar = document.getElementById('craftProgress');
+    var stages = [].slice.call(document.querySelectorAll('#craftList li')).map(function (li) {
+      return { at: parseFloat(li.getAttribute('data-at')), title: li.querySelector('h3').textContent, copy: li.querySelector('p').textContent };
+    });
+    var cset = writer();
+    var cscrub = scrubber(cv, function (dur) { if (reduce) cscrub.seek(dur); });
+    var loaded = false;
+    function loadCraft() {
+      if (loaded) return; loaded = true;
+      cv.src = cv.getAttribute('data-src');
+      cv.preload = 'auto'; cv.load();
+    }
+    if ('IntersectionObserver' in window) {
+      var cio = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { loadCraft(); cio.disconnect(); }
+      }, { rootMargin: '100% 0px' });
+      cio.observe(craft);
+    } else loadCraft();
+
+    var active = -1;
+    function applyCraft(p) {
+      var d = cscrub.duration();
+      if (d) cscrub.seek(p * d);
+      cset(bar, 'width', (p * 100).toFixed(2) + '%');
+      var fade = 1 - range(p, .02, .12);
+      cset(intro, 'opacity', fade.toFixed(3));
+      cset(intro, 'transform', 'translate3d(0,' + (-24 * (1 - fade)).toFixed(2) + 'px,0)');
+      var next = -1;
+      for (var i = 0; i < stages.length; i++) if (p >= stages[i].at) next = i;
+      if (next === active) return;
+      active = next;
+      if (next < 0) { panel.classList.remove('is-on'); return; }
+      stepEl.textContent = String(next + 1).padStart(2, '0') + ' / ' + String(stages.length).padStart(2, '0');
+      titleEl.textContent = stages[next].title;
+      copyEl.textContent = stages[next].copy;
+      panel.classList.add('is-on');
+    }
+    if (!reduce) {
+      var craftLoop = loop(function () {
+        var span = craft.offsetHeight - window.innerHeight;
+        return span > 0 ? clamp(-craft.getBoundingClientRect().top / span, 0, 1) : 0;
+      }, applyCraft, .16);
+      cv.addEventListener('seeked', craftLoop.wake);
+      cv.addEventListener('loadedmetadata', craftLoop.wake);
+      craftLoop.reset();
+      window.addEventListener('scroll', craftLoop.wake, { passive: true });
+      window.addEventListener('resize', craftLoop.wake, { passive: true });
+    }
+  }
+
+  /* ------------------------------------------------------------ reviews
+     Plates on the counter. The active plate is centered; next serves the
+     next one in from the right. Arrows, dots, keys and swipe all call go(). */
+  var counter = document.getElementById('reviews');
+  if (counter) {
+    var track = document.getElementById('reviewTrack');
+    var plates = [].slice.call(track.children);
+    var count = document.getElementById('reviewCount');
+    var dots = document.getElementById('reviewDots');
+    var index = 1;
+    plates.forEach(function (_, i) {
+      var b = document.createElement('button'); b.type = 'button';
+      b.setAttribute('aria-label', 'Go to review ' + (i + 1));
+      b.addEventListener('click', function () { go(i, true); });
+      dots.appendChild(b);
+    });
+    function offset(i) {
+      var plate = plates[i];
+      return track.parentElement.clientWidth / 2 - (plate.offsetLeft + plate.offsetWidth / 2);
+    }
+    function paint(serve) {
+      track.style.transform = 'translate3d(' + offset(index).toFixed(1) + 'px,0,0)';
+      plates.forEach(function (c, i) {
+        var on = i === index;
+        c.classList.toggle('is-active', on);
+        c.classList.remove('is-served');
+        if (on && serve) { void c.offsetWidth; c.classList.add('is-served'); }
+      });
+      [].slice.call(dots.children).forEach(function (d, i) { d.classList.toggle('is-active', i === index); });
+      count.textContent = String(index + 1).padStart(2, '0');
+    }
+    function go(i, serve) { index = (i + plates.length) % plates.length; paint(serve); }
+    counter.querySelectorAll('[data-dir]').forEach(function (btn) {
+      btn.addEventListener('click', function () { go(index + parseInt(btn.getAttribute('data-dir'), 10), true); });
+    });
+    counter.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { go(index + 1, true); e.preventDefault(); }
+      if (e.key === 'ArrowLeft') { go(index - 1, true); e.preventDefault(); }
+    });
+    var touchX = null;
+    track.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', function (e) {
+      if (touchX === null) return;
+      var dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 45) go(index + (dx < 0 ? 1 : -1), true);
+      touchX = null;
+    }, { passive: true });
+    if ('IntersectionObserver' in window && !reduce) {
+      var rio = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { counter.classList.add('is-in'); rio.disconnect(); }
+      }, { threshold: .25 });
+      rio.observe(counter);
+    } else counter.classList.add('is-in');
+    var rraf = 0;
+    window.addEventListener('resize', function () { if (!rraf) rraf = requestAnimationFrame(function () { rraf = 0; paint(false); }); });
+    paint(false);
+  }
+})();
