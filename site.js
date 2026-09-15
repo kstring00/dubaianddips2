@@ -134,20 +134,21 @@
       var in_ = easeOut(range(p, .64, .78));
       set(land, 'opacity', in_.toFixed(3));
       set(land, 'transform', 'translate3d(0,' + (40 * (1 - in_)).toFixed(2) + 'px,0)');
-      set(land, 'pointerEvents', in_ > .7 ? '' : 'none');
+      set(land, 'pointerEvents', in_ > .7 ? 'auto' : 'none');
       set(scrim, 'opacity', in_.toFixed(3));
       set(exit, 'opacity', easeInOut(range(p, .90, 1)).toFixed(3));
       set(rule, 'width', (p * 100).toFixed(2) + '%');
 
       var navIn = easeInOut(range(p, .84, .94));
       set(nav, 'opacity', navIn.toFixed(3));
-      set(nav, 'pointerEvents', navIn > .6 ? '' : 'none');
+      set(nav, 'pointerEvents', navIn > .6 ? 'auto' : 'none');
     }
 
     if (reduce) {
       /* Static close state: the room, the copy, the nav. The CSS already
          collapses the stage; the film seeks to its last frame on load. */
       film.preload = 'auto'; film.load();
+      nav.style.opacity = '1'; nav.style.pointerEvents = 'auto';
       window.addEventListener('scroll', navStuck, { passive: true });
       navStuck();
     } else {
