@@ -117,7 +117,7 @@
       if (reduce) scrub.seek(dur);
     });
     /* If the film never arrives the poster stays and the copy still lands. */
-    film.addEventListener('error', function () { film.removeAttribute('poster'); film.style.backgroundImage = 'url(assets/hero-poster.webp)'; film.style.backgroundSize = 'cover'; }, true);
+    film.addEventListener('error', function () { film.removeAttribute('poster'); film.style.backgroundImage = 'url(/assets/hero-poster.webp)'; film.style.backgroundSize = 'cover'; }, true);
 
     var travel = 1;
     function layoutHero() { travel = Math.max(1, hero.offsetHeight - window.innerHeight); }
@@ -219,6 +219,104 @@
       craftLoop.reset();
       window.addEventListener('scroll', craftLoop.wake, { passive: true });
       window.addEventListener('resize', craftLoop.wake, { passive: true });
+    }
+  }
+
+  /* --------------------------------------------------------------- menu
+     Each category card is a real link to /menu/<slug>. The panel markup
+     is already in the page, so it works with no JavaScript and crawlers
+     read it; here we lift it out as a sheet, give it a history entry,
+     trap focus inside it, and put focus back where it was on close. */
+  var menu = document.getElementById('menu');
+  if (menu) {
+    var scrim = document.getElementById('menuScrim');
+    var sheets = {};
+    [].forEach.call(menu.querySelectorAll('.sheet'), function (el) { sheets[el.getAttribute('data-slug')] = el; });
+    var openSheet = null, lastFocus = null;
+    var baseTitle = document.title;
+    var canonical = document.querySelector('link[rel=canonical]');
+    var baseCanonical = canonical ? canonical.getAttribute('href') : null;
+    function setCanonical(href) { if (canonical && href) canonical.setAttribute('href', href); }
+
+    function slugFromPath() {
+      var m = /^\/menu\/([a-z0-9-]+)\/?$/.exec(location.pathname);
+      return m && sheets[m[1]] ? m[1] : null;
+    }
+    function focusables(el) {
+      return [].slice.call(el.querySelectorAll('a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])'))
+        .filter(function (n) { return n.offsetWidth || n.offsetHeight || n.getClientRects().length; });
+    }
+    function onKey(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); close(); return; }
+      if (e.key !== 'Tab' || !openSheet) return;
+      var f = focusables(openSheet);
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+    }
+    function show(slug, moveFocus) {
+      var el = sheets[slug];
+      if (!el || openSheet === el) return;
+      if (openSheet) hide(false);
+      openSheet = el;
+      el.classList.add('is-open');
+      el.setAttribute('role', 'dialog');
+      el.setAttribute('aria-modal', 'true');
+      scrim.classList.add('is-on');
+      document.documentElement.classList.add('is-sheet-open');
+      document.title = el.getAttribute('data-title') + ' | Dubai & Dips';
+      setCanonical(location.origin + '/menu/' + slug);
+      document.addEventListener('keydown', onKey);
+      if (moveFocus !== false) {
+        var btn = el.querySelector('[data-close]');
+        if (btn) btn.focus();
+      }
+    }
+    function hide(restore) {
+      if (!openSheet) return;
+      openSheet.classList.remove('is-open');
+      openSheet.removeAttribute('role');
+      openSheet.removeAttribute('aria-modal');
+      openSheet = null;
+      scrim.classList.remove('is-on');
+      document.documentElement.classList.remove('is-sheet-open');
+      document.title = baseTitle;
+      setCanonical(baseCanonical);
+      document.removeEventListener('keydown', onKey);
+      if (restore !== false && lastFocus && lastFocus.focus) { lastFocus.focus(); }
+      lastFocus = null;
+    }
+    /* Close walks the history back when we pushed the entry ourselves, so
+       the back button and the close button end up in the same place. */
+    function close() {
+      if (history.state && history.state.sheet) history.back();
+      else { try { history.replaceState(null, '', '/'); } catch (e) {} hide(); }
+    }
+
+    menu.addEventListener('click', function (e) {
+      var link = e.target.closest ? e.target.closest('[data-sheet]') : null;
+      if (link && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+        e.preventDefault();
+        var slug = link.getAttribute('data-sheet');
+        lastFocus = link;
+        try { history.pushState({ sheet: slug }, '', '/menu/' + slug); } catch (err) {}
+        show(slug);
+        return;
+      }
+      if (e.target.closest && e.target.closest('[data-close]')) { e.preventDefault(); close(); }
+    });
+    scrim.addEventListener('click', close);
+    window.addEventListener('popstate', function () {
+      var slug = slugFromPath();
+      if (slug) show(slug);
+      else hide();
+    });
+
+    var initial = slugFromPath();
+    if (initial) {
+      try { history.replaceState({ sheet: initial }, '', location.pathname); } catch (e) {}
+      show(initial);
     }
   }
 

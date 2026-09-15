@@ -6,18 +6,28 @@ of the deploy (see `.vercelignore`).
 
 | File | What it is | Where it ended up |
 | --- | --- | --- |
-| `herovideo.mp4` | 1920x1080, 5.04s, 24fps, no audio. The first Higgsfield push-in. | Retired. The hero is now the chocolate-bar film (`assets/hero.mp4`, `assets/hero.webm`, poster `assets/hero-poster.webp`, share card `assets/og.jpg` from its last frame). |
+| `herovideo.mp4` | 1920x1080, 5.04s, 24fps, no audio. The first Higgsfield push-in. | Retired. The hero is now the chocolate-bar film (`assets/hero.mp4`, poster `assets/hero-poster.webp`, share card `assets/og.jpg` from its last frame). |
 | `herodd.jpg` | The room photo, 1360x765. | Not shipped since the video hero. Keep it for print or socials. |
-| `biscoff.jpg` | Biscoff frappe studio shot. | `assets/known-biscoff.webp` |
-| `ddd.jpg` | Pistachio and chocolate frappe studio shot. | `assets/known-pistachio.webp` |
-| `foodd-lineup.jpg` | The six drink lineup. | `assets/known-lineup.webp` |
-| `safforn.jpg` | Kunafa on a gold board. | Not shipped at the moment. |
-| `unnamed.jpg` | Counter shot: pistachio gelato, branded cup and bag. | Not shipped at the moment. |
+| `ddd.jpg` | Frappe with whipped cream and both a pistachio and a dark chocolate drizzle. | `assets/known-dubai-frappe.webp` (4:5 crop) and `assets/menu-dubai-frappe.webp` (wide crop). Used as the Dubai Chocolate Frappe on the strength of the visual match with the hero panel on the in-store board. **Confirm this is that drink and not the Pistachio Frappe.** |
+| `biscoff.jpg` | Biscoff frappe studio shot. | `assets/known-biscoff.webp` (4:5 crop) |
+| `foodd-lineup.jpg` | The six drink lineup. | `assets/known-strawberry-matcha.webp` is the right-hand cup cropped out: pink strawberry over green matcha, matcha dusted on the foam. |
+| `safforn.jpg` | Kunafa on a gold board. | `assets/menu-kunafa.webp`, the image at the top of the D&D Desserts panel. |
+| `unnamed.jpg` | Counter shot: pistachio gelato, branded cup and bag. | Not shipped. It is a phone snapshot and sits below the studio shots in quality. |
 
 The two Higgsfield films (the chocolate bar opening into the room, and the
 matcha cup coming apart) were delivered as 1280-wide H.264 with a single
 keyframe and B-frames, which cannot be scrubbed smoothly. They are re-encoded
 into `assets/` and the originals are not kept in the repo.
+
+## Photography still needed
+
+The menu category cards are typographic on the green because there is no
+shop photography for them. A photo for any of these drops straight in:
+Classic Coffees, The Matchas, The Lattes, The Frappes, The Refreshers,
+The Smoothies, Breakfast Bites, The Crepes, The Waffles. Shoot them the way
+`biscoff.jpg` and `ddd.jpg` were shot: one item, marble surface, plain
+background, natural light. No AI food imagery in the menu section, because
+it renders the wordmark on the cups differently in every frame.
 
 ## How the films are encoded
 
@@ -30,10 +40,6 @@ before the whole file arrives.
 ffmpeg -i film.mp4 -an -vf "scale=1280:-2" -c:v libx264 -profile:v high \
   -pix_fmt yuv420p -g 8 -keyint_min 8 -sc_threshold 0 -bf 0 -crf 27 \
   -preset slow -tune film -movflags +faststart assets/hero.mp4
-
-ffmpeg -i film.mp4 -an -vf "scale=1280:-2" -c:v libvpx-vp9 -g 8 -keyint_min 8 \
-  -lag-in-frames 0 -auto-alt-ref 0 -crf 40 -b:v 0 -deadline good -cpu-used 2 \
-  -row-mt 1 assets/hero.webm
 
 ffmpeg -i film.mp4 -vf "select='eq(n\,0)',scale=1280:-2" -frames:v 1 \
   -c:v libwebp -quality 82 assets/hero-poster.webp
