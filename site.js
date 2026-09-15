@@ -67,6 +67,17 @@
     return { seek: seek, duration: function () { return dur; } };
   }
 
+  /* Adds is-live once a section is on screen, which is what the reviews
+     start-up sequence hangs its animation delays off. */
+  function startup(el) {
+    if (!el) return;
+    if (!('IntersectionObserver' in window)) { el.classList.add('is-live'); return; }
+    var io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { el.classList.add('is-live'); io.disconnect(); }
+    }, { threshold: .12 });
+    io.observe(el);
+  }
+
   /* ----------------------------------------------------------- reveals */
   var rises = document.querySelectorAll('.rise');
   if ('IntersectionObserver' in window && !reduce) {
@@ -456,11 +467,13 @@
     window.addEventListener('resize', function () { syncOffset(); wake(); }, { passive: true });
     paint();
     wake();
+    startup(revs);
   } else if (revs) {
     /* Reduced motion: the stack is CSS-only, but the counter still needs
        to not lie about a rail that is not there. */
     var c = document.getElementById('revCount');
     if (c) c.textContent = '01';
+    startup(revs);
   }
 
 })();

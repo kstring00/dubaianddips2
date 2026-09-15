@@ -247,20 +247,40 @@ p{margin:0}
    passes the viewport, and gives each ticket a rotation that lags the
    one before it, so the row moves like paper on a line. */
 .revs{background:var(--surface);overflow:hidden}
-.revs__head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap}
-.revs__head .sec__head{margin-bottom:0}
-.revs__nav{display:flex;align-items:center;gap:1.1rem;padding-bottom:.3rem}
-.revs__count{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;color:var(--accent-ink)}
-.revs__arrows{display:flex;gap:.55rem}
-.revs__arrows button{appearance:none;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgb(var(--accent-rgb)/.55);border-radius:999px;background:transparent;color:var(--accent-ink);font-size:1.3rem;line-height:1;cursor:pointer;transition:background .3s var(--ease),border-color .3s var(--ease)}
+
+/* The header is part of the apparatus rather than a title above it. One
+   gold hairline runs the full width of the section: the headline sits on
+   it, the note and the transport sit on it like mounted hardware, and the
+   tickets hang from it. The headline's gesture is the italic cut on
+   "after." - the straddle variant was tried and it fights the rail,
+   because nothing else can hang below a line the tickets hang from. */
+.revs__head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem 3rem;flex-wrap:wrap;padding-bottom:clamp(1.4rem,2.6vw,2rem)}
+.revs__title{display:flex;flex-direction:column;gap:.9rem}
+.revs__title h2{font-size:clamp(1.9rem,4vw,3.1rem);max-width:12ch}
+.revs__title h2 em{font-style:italic;font-weight:400;color:var(--accent-ink)}
+
+/* The rating as a typographic object, not a badge. */
+.revs__rating{display:flex;flex-direction:column;align-items:flex-end;gap:.35rem;padding-bottom:.2rem}
+.revs__row{display:flex;align-items:baseline;gap:.75rem}
+.revs__score{font-family:var(--display);font-weight:500;font-size:clamp(2.8rem,6vw,4.6rem);line-height:.8;letter-spacing:-.045em;color:var(--ink)}
+.revs__stars{color:var(--accent-ink);letter-spacing:.2em;font-size:clamp(.85rem,1.1vw,1rem);line-height:1}
+.revs__of{font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* The rail line, and the hardware mounted on it. */
+.revs__stage{position:relative}
+.revs__wire{position:absolute;z-index:1;left:0;right:0;top:10px;height:1px;pointer-events:none;overflow:hidden}
+.revs__wire i{display:block;height:100%;background:linear-gradient(90deg,transparent,rgb(var(--accent-rgb)/.85) 5%,rgb(var(--accent-rgb)/.85) 95%,transparent)}
+.revs__hw{position:absolute;z-index:3;left:50%;transform:translate(-50%,-50%);top:10px;display:flex;align-items:center;justify-content:flex-end;gap:1.1rem}
+.revs__note{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;line-height:1.5;text-align:right;max-width:44ch;color:var(--ink-soft);background:var(--surface);padding:0 .75rem}
+.revs__ctrl{display:flex;align-items:center;gap:.85rem;background:var(--surface);padding-left:.75rem}
+.revs__count{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;color:var(--accent-ink);white-space:nowrap}
+.revs__arrows{display:flex;gap:.5rem}
+.revs__arrows button{position:relative;appearance:none;width:38px;height:38px;display:grid;place-items:center;border:1px solid rgb(var(--accent-rgb)/.6);border-radius:999px;background:var(--surface);color:var(--accent-ink);font-size:1.1rem;line-height:1;cursor:pointer;transition:background .3s var(--ease),border-color .3s var(--ease)}
+.revs__arrows button::after{content:"";position:absolute;inset:-4px}
 .revs__arrows button:hover{background:rgb(var(--accent-rgb)/.14);border-color:var(--accent)}
 .revs__arrows button[disabled]{opacity:.35;cursor:default}
 
-/* The wire the tickets clip to, and the light pooling on them from above. */
-.revs__stage{position:relative;margin-top:clamp(2rem,4vw,3rem)}
-.revs__wire{position:absolute;z-index:1;left:0;right:0;top:26px;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgb(var(--accent-rgb)/.85) 6%,rgb(var(--accent-rgb)/.85) 94%,transparent)}
-
-.rail{position:relative;z-index:1;overflow-x:auto;overflow-y:hidden;scroll-behavior:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;padding:26px 0 54px;cursor:grab}
+.rail{position:relative;z-index:1;overflow-x:auto;overflow-y:hidden;scroll-behavior:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;padding:10px 0 54px;cursor:grab}
 .rail::-webkit-scrollbar{display:none}
 .rail.is-dragging{cursor:grabbing}
 .rail:focus-visible{outline:2px solid var(--accent-ink);outline-offset:4px;border-radius:2px}
@@ -292,7 +312,15 @@ p{margin:0}
 .rail__end a:hover{color:var(--ink);border-bottom-color:var(--ink)}
 
 @media(max-width:899px){
-  .revs__nav{width:100%;justify-content:space-between}
+  .revs__head{padding-bottom:1.3rem}
+  .revs__title h2{max-width:none}
+  .revs__rating{align-items:flex-start}
+  /* On a phone the hardware comes off the line and sits under it, so the
+     line itself stays unbroken across the full width. */
+  .revs__hw{position:static;transform:none;width:var(--shell);margin:0 auto;flex-wrap:wrap;justify-content:space-between;gap:.6rem 1rem;padding:1.4rem 0 1.5rem}
+  .revs__wire{position:static;margin-bottom:-10px}
+  .revs__note{text-align:left;max-width:26ch;padding:0;background:none}
+  .revs__ctrl{padding-left:0;background:none}
   .ticket{width:min(80vw,320px)}
   .ticket__paper{min-height:0}
   .ticket blockquote{font-size:1.05rem}
@@ -300,6 +328,23 @@ p{margin:0}
   .rail.is-touched{scroll-snap-type:x proximity}
   .rail.is-touched .ticket{scroll-snap-align:center}
 }
+
+/* Scroll-in: the line draws left to right, the header lifts off it with a
+   short stagger, then the tickets settle. One mechanism starting up. */
+.js .revs__wire i{transform:scaleX(0);transform-origin:left}
+.js .revs.is-live .revs__wire i{animation:wireDraw .85s var(--ease-out) forwards}
+@keyframes wireDraw{to{transform:scaleX(1)}}
+.js .revs__title,.js .revs__rating,.js .revs__note,.js .revs__ctrl{opacity:0;transform:translateY(14px)}
+.js .revs.is-live .revs__title{animation:hwUp .7s var(--ease-out) .26s forwards}
+.js .revs.is-live .revs__rating{animation:hwUp .7s var(--ease-out) .38s forwards}
+.js .revs.is-live .revs__note{animation:hwUp .7s var(--ease-out) .5s forwards}
+.js .revs.is-live .revs__ctrl{animation:hwUp .7s var(--ease-out) .58s forwards}
+@keyframes hwUp{to{opacity:1;transform:none}}
+/* Opacity only: site.js owns the tickets' transform every frame, and an
+   animation with fill-mode forwards would win the cascade and freeze it. */
+.js .ticket{opacity:0}
+.js .revs.is-live .ticket{animation:tkIn .75s var(--ease-out) forwards;animation-delay:calc(.66s + var(--i) * .09s)}
+@keyframes tkIn{to{opacity:1}}
 
 /* ============================= CONTACT ============================= */
 .contact{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(1.6rem,4vw,3.4rem)}
@@ -429,7 +474,12 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
   .rail{overflow:visible;padding:0 0 .5rem;cursor:auto}
   .rail__row{flex-direction:column;align-items:stretch;width:auto;padding:0 var(--gutter);gap:1.1rem}
   .ticket{width:auto;max-width:34rem;padding-top:0;transform:none!important}
-  .ticket::before,.revs__wire,.revs__nav{display:none}
+  .ticket::before{display:none}
+  .revs__hw{position:static;transform:none;width:auto;margin:0;flex-wrap:wrap;justify-content:flex-start;gap:.6rem 1rem;padding:1.2rem var(--gutter) .6rem}
+  .revs__note{text-align:left;background:none;padding:0}
+  .revs__ctrl{display:none}
+  .js .revs__wire i{transform:none}
+  .js .revs__title,.js .revs__rating,.js .revs__note,.js .revs__ctrl,.js .ticket{opacity:1;transform:none;animation:none}
   .ticket__paper,.ticket__order img{transition:none}
   .ticket__paper:hover,.ticket:focus-within .ticket__paper{transform:none}
   .rail__end{align-self:flex-start;padding:.6rem var(--gutter) 0}
@@ -796,24 +846,31 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
 <!-- ============================== REVIEWS ============================== -->
 <section class="sec revs" id="reviews" aria-labelledby="revs-title">
   <div class="shell revs__head">
-    <div class="sec__head rise">
+    <div class="revs__title">
       <span class="label">Reviews</span>
-      <h2 id="revs-title">What people say after.</h2>
-      <p>Sample reviews for now. Your real Google reviews go here, word for word.</p>
+      <h2 id="revs-title">What people say <em>after.</em></h2>
     </div>
-    <div class="revs__nav rise">
-      <span class="revs__count"><span id="revCount">01</span> / 05</span>
-      <div class="revs__arrows">
-        <button type="button" data-rev="-1" aria-label="Previous review">&lsaquo;</button>
-        <button type="button" data-rev="1" aria-label="Next review">&rsaquo;</button>
-      </div>
+    <div class="revs__rating">
+      <span class="revs__row"><span class="revs__score" aria-hidden="true">5.0</span><span class="revs__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span>
+      <span class="revs__of" aria-hidden="true">Five sample reviews</span>
+      <span class="vh">Rated 5.0 out of 5, averaged across the five sample reviews below.</span>
     </div>
   </div>
   <div class="revs__stage">
-    <div class="revs__wire" aria-hidden="true"></div>
+    <div class="shell revs__hw">
+      <p class="revs__note">Sample reviews for now. Your real Google reviews go here, word for word.</p>
+      <div class="revs__ctrl">
+        <span class="revs__count"><span id="revCount">01</span> / 05</span>
+        <div class="revs__arrows">
+          <button type="button" data-rev="-1" aria-label="Previous review">&lsaquo;</button>
+          <button type="button" data-rev="1" aria-label="Next review">&rsaquo;</button>
+        </div>
+      </div>
+    </div>
+    <div class="revs__wire" aria-hidden="true"><i></i></div>
     <div class="rail" id="revRail" tabindex="0" role="region" aria-label="Reviews, scroll sideways">
       <ul class="rail__row">
-      <li class="ticket" style="--hang:14px;--hov:2.1deg;--rot:-1.3deg">
+      <li class="ticket" style="--i:0;--hang:56px;--hov:2.1deg;--rot:-1.3deg">
         <article class="ticket__paper">
           <div class="ticket__top"><span>Sample review</span></div>
           <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
@@ -825,7 +882,7 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
           </a>
         </article>
       </li>
-      <li class="ticket" style="--hang:32px;--hov:-2.4deg;--rot:1.6deg">
+      <li class="ticket" style="--i:1;--hang:78px;--hov:-2.4deg;--rot:1.6deg">
         <article class="ticket__paper">
           <div class="ticket__top"><span>Sample review</span></div>
           <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
@@ -837,7 +894,7 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
           </a>
         </article>
       </li>
-      <li class="ticket" style="--hang:20px;--hov:1.8deg;--rot:-0.7deg">
+      <li class="ticket" style="--i:2;--hang:62px;--hov:1.8deg;--rot:-0.7deg">
         <article class="ticket__paper">
           <div class="ticket__top"><span>Sample review</span></div>
           <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
@@ -849,7 +906,7 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
           </a>
         </article>
       </li>
-      <li class="ticket" style="--hang:40px;--hov:-1.9deg;--rot:1.1deg">
+      <li class="ticket" style="--i:3;--hang:88px;--hov:-1.9deg;--rot:1.1deg">
         <article class="ticket__paper">
           <div class="ticket__top"><span>Sample review</span></div>
           <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
@@ -861,7 +918,7 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
           </a>
         </article>
       </li>
-      <li class="ticket" style="--hang:24px;--hov:2.3deg;--rot:-1.7deg">
+      <li class="ticket" style="--i:4;--hang:68px;--hov:2.3deg;--rot:-1.7deg">
         <article class="ticket__paper">
           <div class="ticket__top"><span>Sample review</span></div>
           <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
