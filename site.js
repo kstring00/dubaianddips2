@@ -247,101 +247,173 @@
     }
   }
 
-  /* --------------------------------------------------------------- menu
-     Each category card is a real link to /menu/<slug>. The panel markup
-     is already in the page, so it works with no JavaScript and crawlers
-     read it; here we lift it out as a sheet, give it a history entry,
-     trap focus inside it, and put focus back where it was on close. */
-  var menu = document.getElementById('menu');
-  if (menu) {
-    var menuScrim = document.getElementById('menuScrim');  /* not `scrim`: var is function scoped and the hero owns that name */
-    var sheets = {};
-    [].forEach.call(menu.querySelectorAll('.sheet'), function (el) { sheets[el.getAttribute('data-slug')] = el; });
-    var openSheet = null, lastFocus = null;
-    var baseTitle = document.title;
-    var canonical = document.querySelector('link[rel=canonical]');
-    var baseCanonical = canonical ? canonical.getAttribute('href') : null;
-    function setCanonical(href) { if (canonical && href) canonical.setAttribute('href', href); }
+  /* ------------------------------------------------------- departures
+     The menu as a departures board. A row expands in place; no route
+     change and no overlay. The status cell is the only value that changes
+     when a row activates, so it is the only cell that flaps - riffling a
+     cell that is landing on the character it already showed would be
+     motion for its own sake, which the board is meant to avoid. */
+  var board = document.getElementById('board');
+  if (board) {
+    var CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var STEP = 55;        /* ms per flap in a riffle */
+    var LEAD = 38;        /* per-character stagger, left to right */
+    var STEPS_WIDE = 8;   /* riffle length on a desktop-class screen */
+    var STEPS_SMALL = 4;  /* fewer cells animated on a phone, per the frame budget */
+    var MAX_CELLS = 40;   /* past this, set the rest instantly */
 
-    function slugFromPath() {
-      var m = /^\/menu\/([a-z0-9-]+)\/?$/.exec(location.pathname);
-      return m && sheets[m[1]] ? m[1] : null;
+    var jobs = [], flapRaf = 0, audio = null, soundOn = false;
+
+    function tick() {
+      if (!soundOn) return;
+      try {
+        if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+        var t = audio.currentTime;
+        var o = audio.createOscillator(), g = audio.createGain();
+        o.type = 'square'; o.frequency.setValueAtTime(2100, t);
+        g.gain.setValueAtTime(.05, t);
+        g.gain.exponentialRampToValueAtTime(.0008, t + .035);
+        o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + .04);
+      } catch (e) { soundOn = false; }
     }
-    function focusables(el) {
-      return [].slice.call(el.querySelectorAll('a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])'))
-        .filter(function (n) { return n.offsetWidth || n.offsetHeight || n.getClientRects().length; });
-    }
-    function onKey(e) {
-      if (e.key === 'Escape' || e.key === 'Esc') { e.preventDefault(); close(); return; }
-      if (e.key !== 'Tab' || !openSheet) return;
-      var f = focusables(openSheet);
-      if (!f.length) return;
-      var first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
-      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
-    }
-    function show(slug, moveFocus) {
-      var el = sheets[slug];
-      if (!el || openSheet === el) return;
-      if (openSheet) hide(false);
-      openSheet = el;
-      el.classList.add('is-open');
-      el.setAttribute('role', 'dialog');
-      el.setAttribute('aria-modal', 'true');
-      menuScrim.classList.add('is-on');
-      document.documentElement.classList.add('is-sheet-open');
-      document.title = el.getAttribute('data-title') + ' | Dubai & Dips';
-      setCanonical(location.origin + '/menu/' + slug);
-      document.addEventListener('keydown', onKey);
-      if (moveFocus !== false) {
-        var btn = el.querySelector('[data-close]');
-        if (btn) btn.focus();
+
+    function paint(cell, ch, last) {
+      var face = cell.firstElementChild, leaf = cell.lastElementChild;
+      leaf.firstElementChild.textContent = face.textContent;
+      face.textContent = ch;
+      if (leaf.animate) {
+        leaf.animate([{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(-90deg)' }],
+          { duration: last ? 150 : 80, easing: last ? 'cubic-bezier(.22,1,.36,1)' : 'ease-in', fill: 'forwards' });
       }
+      if (last) tick();
     }
-    function hide(restore) {
-      if (!openSheet) return;
-      openSheet.classList.remove('is-open');
-      openSheet.removeAttribute('role');
-      openSheet.removeAttribute('aria-modal');
-      openSheet = null;
-      menuScrim.classList.remove('is-on');
-      document.documentElement.classList.remove('is-sheet-open');
-      document.title = baseTitle;
-      setCanonical(baseCanonical);
-      document.removeEventListener('keydown', onKey);
-      if (restore !== false && lastFocus && lastFocus.focus) { lastFocus.focus(); }
-      lastFocus = null;
+    function runJobs(now) {
+      flapRaf = 0;
+      var alive = false;
+      for (var i = 0; i < jobs.length; i++) {
+        var j = jobs[i];
+        if (j.done) continue;
+        var idx = Math.floor((now - j.start) / STEP);
+        if (idx < 0) { alive = true; continue; }
+        if (idx >= j.seq.length) { j.done = true; continue; }
+        if (idx !== j.at) { j.at = idx; paint(j.cell, j.seq[idx], idx === j.seq.length - 1); }
+        alive = true;
+      }
+      if (alive) flapRaf = requestAnimationFrame(runJobs);
+      else jobs = [];
     }
-    /* Close walks the history back when we pushed the entry ourselves, so
-       the back button and the close button end up in the same place. */
-    function close() {
-      if (history.state && history.state.sheet) history.back();
-      else { try { history.replaceState(null, '', '/'); } catch (e) {} hide(); }
+    /* walk the character set from the old letter to the new one */
+    function sequence(from, to, cap) {
+      var a = CHARS.indexOf(from), b = CHARS.indexOf(to);
+      if (a < 0) a = 0;
+      if (b < 0) b = 0;
+      var steps = (b - a + CHARS.length) % CHARS.length;
+      var out = [];
+      if (steps === 0 || steps > cap) {
+        var n = Math.min(cap, steps || cap);
+        for (var k = n; k > 0; k--) out.push(CHARS[(b - k + CHARS.length) % CHARS.length]);
+      } else {
+        for (var i = 1; i <= steps; i++) out.push(CHARS[(a + i) % CHARS.length]);
+      }
+      out.push(to);
+      return out;
     }
-
-    document.addEventListener('click', function (e) {
-      var link = e.target.closest ? e.target.closest('[data-sheet]') : null;
-      if (link && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
-        e.preventDefault();
-        var slug = link.getAttribute('data-sheet');
-        lastFocus = link;
-        try { history.pushState({ sheet: slug }, '', '/menu/' + slug); } catch (err) {}
-        show(slug);
+    function flapTo(el, next) {
+      var cells = el.children, len = cells.length;
+      var cur = el.getAttribute('data-value') || '';
+      next = String(next).toUpperCase();
+      var pad = next.length >= len ? next.slice(0, len) : next + Array(len - next.length + 1).join(' ');
+      el.setAttribute('data-value', pad);
+      var changed = [];
+      for (var i = 0; i < len; i++) {
+        var f = cur.charAt(i) || ' ', t = pad.charAt(i) || ' ';
+        if (f !== t) changed.push([i, f, t]);
+      }
+      if (reduce || !board.isConnected) {
+        changed.forEach(function (c) { cells[c[0]].firstElementChild.textContent = c[2]; });
         return;
       }
-      if (e.target.closest && e.target.closest('[data-close]')) { e.preventDefault(); close(); }
+      var small = phone.matches;
+      var cap = small ? STEPS_SMALL : STEPS_WIDE;
+      var lead = small ? 26 : LEAD;
+      var now = performance.now(), budget = MAX_CELLS - jobs.filter(function (j) { return !j.done; }).length;
+      changed.forEach(function (c, n) {
+        if (n >= budget) { cells[c[0]].firstElementChild.textContent = c[2]; return; }
+        jobs.push({ cell: cells[c[0]], seq: sequence(c[1], c[2], cap), start: now + c[0] * lead, at: -1, done: false });
+      });
+      if (!flapRaf && jobs.length) flapRaf = requestAnimationFrame(runJobs);
+    }
+
+    var rows = [].slice.call(board.querySelectorAll('.brow'));
+    var btns = rows.map(function (r) { return r.querySelector('.brow__btn'); });
+    var openRow = null;
+
+    function setRow(row, on) {
+      var btn = row.querySelector('.brow__btn');
+      var panel = row.querySelector('.bpanel');
+      var flaps = row.querySelector('.flaps');
+      var note = row.querySelector('.brow__status .vh');
+      row.classList.toggle('is-open', on);
+      btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      panel.hidden = !on;
+      if (note) note.textContent = on ? 'Now boarding' : 'On time';
+      flapTo(flaps, on ? 'NOW BOARDING' : 'ON TIME');
+      if (on && !reduce && panel.animate) {
+        panel.firstElementChild.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 260, easing: 'cubic-bezier(.16,1,.3,1)' });
+      }
+    }
+    function openBoardRow(row, focusIt) {
+      if (openRow === row) { setRow(row, false); openRow = null; return; }
+      if (openRow) setRow(openRow, false);
+      setRow(row, true);
+      openRow = row;
+      if (focusIt) row.querySelector('.brow__btn').focus();
+    }
+    btns.forEach(function (b, i) {
+      b.addEventListener('click', function () { openBoardRow(rows[i], false); });
     });
-    menuScrim.addEventListener('click', close);
-    window.addEventListener('popstate', function () {
-      var slug = slugFromPath();
-      if (slug) show(slug);
-      else hide();
+    board.addEventListener('keydown', function (e) {
+      var i = btns.indexOf(document.activeElement);
+      if (e.key === 'Escape' && openRow) { setRow(openRow, false); openRow = null; e.preventDefault(); return; }
+      if (i < 0) return;
+      if (e.key === 'ArrowDown') { btns[Math.min(btns.length - 1, i + 1)].focus(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { btns[Math.max(0, i - 1)].focus(); e.preventDefault(); }
+      else if (e.key === 'Home') { btns[0].focus(); e.preventDefault(); }
+      else if (e.key === 'End') { btns[btns.length - 1].focus(); e.preventDefault(); }
     });
 
-    var initial = slugFromPath();
-    if (initial) {
-      try { history.replaceState({ sheet: initial }, '', location.pathname); } catch (e) {}
-      show(initial);
+    var soundBtn = document.getElementById('boardSound');
+    if (soundBtn) soundBtn.addEventListener('click', function () {
+      soundOn = !soundOn;
+      soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+      soundBtn.querySelector('i').textContent = soundOn ? 'on' : 'off';
+      if (soundOn) tick();
+    });
+
+    /* A link anywhere on the page that names a category opens its row in
+       place. Opened in a new tab it is a real URL, and the rewrite serves
+       the page, which is what the on-load branch below picks up. */
+    function rowFor(slug) {
+      for (var i = 0; i < rows.length; i++) if (rows[i].getAttribute('data-slug') === slug) return rows[i];
+      return null;
+    }
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest ? e.target.closest('[data-sheet]') : null;
+      if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      var row = rowFor(link.getAttribute('data-sheet'));
+      if (!row) return;
+      e.preventDefault();
+      board.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+      openBoardRow(row, true);
+    });
+    var deep = /^\/menu\/([a-z0-9-]+)\/?$/.exec(location.pathname);
+    if (deep) {
+      var dr = rowFor(deep[1]);
+      if (dr) {
+        openBoardRow(dr, false);
+        requestAnimationFrame(function () { board.scrollIntoView({ block: 'center' }); dr.querySelector('.brow__btn').focus(); });
+      }
     }
   }
 

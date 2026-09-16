@@ -406,11 +406,13 @@ p{margin:0}
 @media(max-width:899px){:root{--thumb:60px}.thumbbar{display:grid}}
 
 /* =============================== MENU ===============================
-   Ten categories, in the order they run across the boards above the
-   counter. Each card is a real link to /menu/<slug>; the panel markup
-   lives in the page, so it is crawlable and works with no JavaScript.
-   With JS on, the panel lifts out as a side sheet (desktop) or a
-   full-screen sheet (phone). */
+   The menu is a departures board. Their own packaging is a boarding pass
+   (D&D AIRLINES, FCO ITALY), so the structure is theirs, not a costume.
+   One row per category in board order. Destination carries a real IATA
+   code only where the category has a genuine origin; everything else
+   flies domestic out of Houston rather than being given a country it does
+   not have. There is no price column: no price on the board photo was
+   legible, and an invented one is worse than none. */
 .menu__note{margin-top:clamp(2.2rem,4vw,3rem);padding-top:1.4rem;border-top:1px solid rgb(var(--accent-rgb)/.35);font-size:.88rem;color:var(--ink-soft);max-width:62ch}
 .tag{display:inline-block;font-family:var(--mono);font-weight:400;font-size:.66rem;letter-spacing:.12em;color:var(--accent-ink);border:1px solid rgb(var(--accent-rgb)/.65);border-radius:2px;padding:.16rem .45rem;white-space:nowrap}
 
@@ -426,62 +428,74 @@ p{margin:0}
 .feature:hover .feature__go i{transform:translateX(5px)}
 @media(max-width:880px){.feature{grid-template-columns:1fr}.feature img{min-height:0;aspect-ratio:16/10}}
 
-.menu__grid{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(.7rem,1.4vw,1rem)}
-.mcard{position:relative;display:flex;flex-direction:column;gap:.5rem;min-height:190px;padding:1.3rem 1.2rem 3.2rem;background:var(--surface-raised);border:1px solid rgb(var(--accent-rgb)/.3);border-radius:4px;text-decoration:none;color:inherit;box-shadow:var(--lift-1);transition:border-color .35s var(--ease),box-shadow .35s var(--ease-out),transform .35s var(--ease-out)}
-.mcard:hover{border-color:rgb(var(--accent-rgb)/.8);box-shadow:var(--lift-2);transform:translateY(-2px)}
-.mcard__name{font-family:var(--display);font-weight:600;font-size:1.22rem;line-height:1.1;letter-spacing:-.01em;color:var(--ink)}
-.mcard__line{font-size:.9rem;line-height:1.45;color:var(--ink-soft)}
-.mcard__go{position:absolute;left:1.2rem;bottom:1.15rem;display:grid;place-items:center;width:32px;height:32px;border:1px solid rgb(var(--accent-rgb)/.6);border-radius:999px;color:var(--accent-ink);font-size:.95rem;transition:background .35s var(--ease),transform .35s var(--ease-out)}
-.mcard:hover .mcard__go{background:rgb(var(--accent-rgb)/.16);transform:translateX(4px)}
-@media(max-width:1100px){.menu__grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:700px){.menu__grid{grid-template-columns:repeat(2,1fr)}.mcard{min-height:0;padding:1.1rem 1rem 3rem}.mcard__name{font-size:1.1rem}}
+/* ---- the board itself: a dark object on the cream page ---- */
+.board{background:var(--deep);border:1px solid rgb(var(--accent-rgb)/.45);border-radius:4px;overflow:hidden;box-shadow:var(--lift-2);color:var(--on-dark)}
+.board__head,.brow__btn{display:grid;grid-template-columns:5.5rem 11rem 1fr 4.5rem 11.5rem;align-items:center;gap:clamp(.6rem,1.4vw,1.4rem);padding:.7rem clamp(.9rem,2vw,1.6rem)}
+.board__head{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:rgb(var(--surface-rgb)/.6);border-bottom:1px solid rgb(var(--accent-rgb)/.35);background:var(--deep-dim)}
+.board__rows{list-style:none;margin:0;padding:0}
+.board[data-view="six"] .board__rows{max-height:25.5rem;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.brow{border-bottom:1px solid rgb(var(--surface-rgb)/.1)}
+.brow:last-child{border-bottom:0}
+.brow__btn{width:100%;text-align:left;background:transparent;border:0;border-left:3px solid transparent;cursor:pointer;color:inherit;font:inherit;padding-block:.85rem;transition:background .3s var(--ease),border-color .3s var(--ease)}
+.brow__btn:hover{background:rgb(var(--surface-rgb)/.05)}
+.brow__btn:focus-visible{outline:2px solid var(--accent-bright);outline-offset:-3px}
+.brow.is-open .brow__btn{background:rgb(var(--accent-rgb)/.12);border-left-color:var(--accent-bright)}
+.brow__cell{min-width:0}
+.brow__flight{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;color:var(--accent-bright);white-space:nowrap}
+.brow__dest{display:flex;align-items:baseline;gap:.55rem;font-family:var(--display);font-size:1.02rem;letter-spacing:.04em;color:var(--on-dark);white-space:nowrap}
+.brow__dest i{font-style:normal;font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;color:rgb(var(--surface-rgb)/.62)}
+.brow__cat{display:block;font-family:var(--display);font-weight:600;font-size:1.02rem;color:var(--on-dark)}
+.brow__items{display:block;margin-top:.2rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:rgb(var(--surface-rgb)/.58);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brow__gate{display:flex;flex-direction:column;gap:.1rem;font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;color:var(--on-dark)}
+.brow__gate i{font-style:normal;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:rgb(var(--surface-rgb)/.7)}
+.brow__status{justify-self:end}
 
-/* Panels. Default (no JavaScript) they are a stacked list under the
-   grid. The .js class turns them into overlay sheets. */
-.sheets{margin-top:clamp(2rem,4vw,3rem)}
-.sheet{padding:2rem 0;border-top:1px solid rgb(var(--accent-rgb)/.35);scroll-margin-top:5.5rem}
-.sheet__scrim{display:none}
-.sheet__top{display:flex;flex-direction:column;align-items:flex-start;gap:.55rem;position:relative}
-.sheet__top h2{font-size:clamp(1.7rem,3.4vw,2.4rem);color:var(--ink)}
-.sheet__top p{color:var(--ink-soft);font-size:.95rem;max-width:40ch}
-.sheet__close{display:none}
-.sheet__body{margin-top:1.5rem}
-.sheet__need{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-bottom:1.4rem;padding:.85rem 1rem;border:1px solid rgb(var(--accent-rgb)/.45);border-radius:4px;background:rgb(var(--accent-rgb)/.1);font-size:.88rem;line-height:1.5;color:var(--ink-soft)}
-.sheet img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;margin-bottom:1.4rem;filter:var(--grade);border:1px solid rgb(var(--accent-rgb)/.3)}
-.items{list-style:none;margin:0;padding:0}
-.items li{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:.85rem 0;border-bottom:1px solid rgb(var(--ink-rgb)/.14)}
-.items li:last-child{border-bottom:0}
-.items__name{font-size:1.02rem;color:var(--ink)}
-.items__miss{color:var(--ink-soft);font-size:.95rem}
-.sheet__empty{display:flex;flex-direction:column;align-items:flex-start;gap:.9rem;padding:1.6rem 0 .4rem;color:var(--ink-soft)}
+/* ---- split-flap ---- */
+.flaps{display:inline-flex;gap:2px;perspective:340px}
+.flap{position:relative;width:.82em;height:1.6em;overflow:hidden;border-radius:1px;background:var(--deep-dim);box-shadow:inset 0 0 0 1px rgb(var(--black-rgb)/.25);font-family:var(--mono);font-size:.74rem;line-height:1.6em;text-align:center;color:var(--accent-bright)}
+.flap::after{content:"";position:absolute;z-index:3;left:0;right:0;top:50%;height:1px;background:rgb(var(--black-rgb)/.5)}
+.flap__ch{position:absolute;inset:0}
+.flap__leaf{position:absolute;z-index:2;left:0;right:0;top:0;height:50%;overflow:hidden;transform-origin:50% 100%;backface-visibility:hidden;background:var(--deep-dim);will-change:transform}
+.flap__leaf>span{position:absolute;left:0;right:0;top:0;height:200%}
+.brow.is-open .flap{color:var(--accent-bright);background:rgb(var(--accent-rgb)/.2)}
+.brow.is-open .flap__leaf{background:rgb(var(--accent-rgb)/.2)}
 
-.js .sheet__scrim{display:block;position:fixed;inset:0;z-index:100;background:rgb(var(--deep-rgb)/.62);opacity:0;visibility:hidden;transition:opacity .4s var(--ease),visibility .4s}
-.js .sheet__scrim.is-on{opacity:1;visibility:visible}
-.js .sheets{margin-top:0}
-.js .sheet{display:none;position:fixed;z-index:110;top:0;right:0;bottom:0;width:min(560px,94vw);flex-direction:column;padding:0;border-top:0;border-left:1px solid rgb(var(--accent-rgb)/.45);background:var(--surface);box-shadow:-30px 0 70px rgb(var(--shade-rgb)/.24)}
-.js .sheet.is-open{display:flex;animation:sheetSide .45s var(--ease-out)}
-@keyframes sheetSide{from{transform:translateX(100%)}to{transform:none}}
-.js .sheet__top{flex:0 0 auto;padding:calc(1.7rem + env(safe-area-inset-top,0px)) 1.6rem 1.35rem;padding-right:5.5rem;border-bottom:1px solid rgb(var(--accent-rgb)/.35)}
-.js .sheet__body{flex:1 1 auto;margin-top:0;padding:1.5rem 1.6rem calc(2.5rem + env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.js .sheet__close{position:absolute;top:calc(1.2rem + env(safe-area-inset-top,0px));right:1.2rem;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-width:44px;min-height:44px;padding:.5rem .9rem;border:1px solid rgb(var(--accent-rgb)/.55);border-radius:999px;background:var(--surface-raised);color:var(--ink);font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .3s var(--ease),border-color .3s var(--ease)}
-.js .sheet__close:hover{background:rgb(var(--accent-rgb)/.16);border-color:var(--accent)}
-html.is-sheet-open,html.is-sheet-open body{overflow:hidden}
-/* main carries z-index:1 so it clears the sticky hero, which makes it a
-   stacking context: the fixed nav at z-index 60 would otherwise paint over
-   the sheet no matter how high the sheet's own z-index is. Lift main while
-   a sheet is open so the scrim dims the nav and the panel sits on top. */
-html.is-sheet-open main{z-index:120}
-html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
+/* ---- the expanded panel ---- */
+.bpanel{background:var(--deep-dim);border-top:1px solid rgb(var(--accent-rgb)/.3)}
+.bpanel__in{padding:clamp(1.1rem,2.4vw,1.8rem) clamp(.9rem,2vw,1.6rem) clamp(1.4rem,2.8vw,2rem)}
+.bpanel__need{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-bottom:1.2rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;line-height:1.6;color:rgb(var(--surface-rgb)/.72)}
+.bpanel__need .tag,.bpanel__miss .tag{color:var(--accent-bright);border-color:rgb(var(--accent-rgb)/.75)}
+.bpanel__miss{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;font-size:.92rem;color:rgb(var(--surface-rgb)/.78)}
+.bpanel__shot{width:100%;max-width:26rem;aspect-ratio:16/9;object-fit:cover;border-radius:3px;margin-bottom:1.1rem}
+.bitems{list-style:none;margin:0 0 1rem;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.9rem}
+.bitem{display:flex;flex-direction:column;gap:.55rem}
+.bitem img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:3px}
+.bitem__plate{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:3px;background:var(--deep);border:1px solid rgb(var(--accent-rgb)/.3);font-family:var(--display);font-size:1.6rem;color:rgb(var(--accent-bright-rgb)/.75)}
+.bitem__name{font-size:.92rem;line-height:1.35;color:var(--on-dark)}
+.board__foot{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.2rem;padding:.9rem clamp(.9rem,2vw,1.6rem);border-top:1px solid rgb(var(--surface-rgb)/.12);background:var(--deep-dim);font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;color:rgb(var(--surface-rgb)/.6)}
+.board__sound{appearance:none;background:transparent;border:1px solid rgb(var(--accent-rgb)/.5);border-radius:999px;color:var(--accent-bright);font:inherit;padding:.35rem .8rem;min-height:32px;cursor:pointer}
+.board__sound i{font-style:normal;color:rgb(var(--surface-rgb)/.65)}
+.board__sound[aria-pressed="true"] i{color:var(--accent-bright)}
+
 @media(max-width:899px){
-  .js .sheet{inset:0;width:auto;border-left:0}
-  .js .sheet.is-open{animation-name:sheetUp}
-  @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
-  .js .sheet__body{padding-bottom:calc(2.5rem + var(--thumb) + env(safe-area-inset-bottom,0px))}
+  /* rows stack: flight and gate ride together, destination and status keep
+     their own line so the flaps stay readable */
+  .board__head{display:none}
+  .brow__btn{grid-template-columns:1fr auto;grid-template-areas:"flight gate" "cat cat" "dest status";gap:.45rem .8rem;padding-block:1rem}
+  .brow__flight{grid-area:flight}
+  .brow__gate{grid-area:gate;flex-direction:row;align-items:baseline;gap:.35rem;justify-self:end}
+  .brow__on{grid-area:cat}
+  .brow__dest{grid-area:dest}
+  .brow__status{grid-area:status;justify-self:end}
+  .flap{font-size:.66rem;width:.8em}
+  .board[data-view="six"] .board__rows{max-height:31rem}
+  .bitems{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+}
+@media(max-width:400px){
+  .flaps{gap:1px}
+  .flap{font-size:.6rem}
 }
 
-/* Reduced motion: one static screen per section, nothing sticky, nothing
-   scrubbed. The hero shows the room, the craft shows the cup taken apart
-   with the layers listed underneath. */
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .js .rise{opacity:1;transform:none;transition:none}
@@ -516,8 +530,9 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
   .rail__end{align-self:flex-start;padding:.6rem var(--gutter) 0}
   .js .sheet.is-open{animation:sheetFade .2s linear}
   @keyframes sheetFade{from{opacity:0}to{opacity:1}}
-  .js .sheet__scrim{transition:none}
-  .feature,.mcard,.mcard__go,.feature__go i,.sheet__close{transition:none}
+  .feature,.feature__go i{transition:none}
+  .flap__leaf{display:none}
+  .flap__ch{transition:opacity .18s linear}
 }
 </style>
 </head>
@@ -595,234 +610,205 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
       </div>
     </a>
 
-    <div class="menu__grid">
-      <a class="mcard rise" href="/menu/classic-coffees" data-sheet="classic-coffees">
-        <span class="mcard__name">Classic Coffees</span>
-        <span class="mcard__line">The ones you order by name, pulled on the machine behind the counter.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/matchas" data-sheet="matchas">
-        <span class="mcard__name">The Matchas</span>
-        <span class="mcard__line">Whisked to order, on ice. Eight ways to have it.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/lattes" data-sheet="lattes">
-        <span class="mcard__name">The Lattes</span>
-        <span class="mcard__line">Espresso and milk with a flavour stirred through.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/frappes" data-sheet="frappes">
-        <span class="mcard__name">The Frappes</span>
-        <span class="mcard__line">Blended cold. The one most people come in for.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/refreshers" data-sheet="refreshers">
-        <span class="mcard__name">The Refreshers</span>
-        <span class="mcard__line">Cold and fruit-forward, with no coffee in them.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/smoothies" data-sheet="smoothies">
-        <span class="mcard__name">The Smoothies</span>
-        <span class="mcard__line">Fruit and ice, blended thick.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/breakfast-bites" data-sheet="breakfast-bites">
-        <span class="mcard__name">Breakfast Bites</span>
-        <span class="mcard__line">Savoury pies and spirals, warm out of the case.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/crepes" data-sheet="crepes">
-        <span class="mcard__name">The Crepes</span>
-        <span class="mcard__line">Thin, folded and finished to order.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/waffles" data-sheet="waffles">
-        <span class="mcard__name">The Waffles</span>
-        <span class="mcard__line">Pressed fresh, then loaded.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="mcard rise" href="/menu/desserts" data-sheet="desserts">
-        <span class="mcard__name">D&amp;D Desserts</span>
-        <span class="mcard__line">Kunafa, and the rest of what is in the case.</span>
-        <span class="mcard__go" aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
-
-    <p class="menu__note">These are the categories and item names we could read off a photo of your boards. Send the menu file and the prices, descriptions and options drop straight in.</p>
-
-    <div class="sheets" id="menuSheets">
-      <div class="sheet__scrim" id="menuScrim"></div>
-    <section class="sheet" id="sheet-classic-coffees" data-slug="classic-coffees" data-title="Classic Coffees" aria-labelledby="sheet-classic-coffees-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-classic-coffees-title">Classic Coffees</h2>
-        <p>The ones you order by name, pulled on the machine behind the counter.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
+    <div class="board" id="board" data-view="all">
+      <div class="board__head" aria-hidden="true">
+        <span class="brow__cell brow__flight">Flight</span>
+        <span class="brow__cell brow__dest">Destination</span>
+        <span class="brow__cell brow__on">On board</span>
+        <span class="brow__cell brow__gate">Gate</span>
+        <span class="brow__cell brow__status">Status</span>
       </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <ul class="items">
-          <li><span class="items__name">Espresso</span></li>
-          <li><span class="items__name">Cappuccino</span></li>
-          <li><span class="items__name">Americano</span></li>
-          <li><span class="items__name">Affogato</span></li>
-          <li><span class="items__name">Cortado</span></li>
-          <li><span class="items__name">Leche y Leche (Spanish Cortado)</span></li>
-        </ul>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-matchas" data-slug="matchas" data-title="The Matchas" aria-labelledby="sheet-matchas-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-matchas-title">The Matchas</h2>
-        <p>Whisked to order, on ice. Eight ways to have it.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <ul class="items">
-          <li><span class="items__name">Matcha Cortado (12 oz)</span></li>
-          <li><span class="items__name">Strawberry Matcha</span></li>
-          <li><span class="items__name">Biscoff Matcha</span></li>
-          <li><span class="items__name">Mango Matcha</span></li>
-          <li><span class="items__name">Banana Matcha</span></li>
-          <li><span class="items__name">Blueberry Cream Matcha</span></li>
-          <li><span class="items__name">Banana Date Matcha</span></li>
-          <li><span class="items__name">Pistachio Matcha</span></li>
-        </ul>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-lattes" data-slug="lattes" data-title="The Lattes" aria-labelledby="sheet-lattes-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-lattes-title">The Lattes</h2>
-        <p>Espresso and milk with a flavour stirred through.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <ul class="items">
-          <li><span class="items__name">Spanish Latte</span></li>
-          <li><span class="items__name">Pistachio Latte</span></li>
-          <li><span class="items__name">Tiramisu Latte</span></li>
-          <li><span class="items__name">Biscoff Latte</span></li>
-          <li><span class="items__name">Taro Latte</span></li>
-          <li><span class="items__miss">Three more lines on this part of the board could not be read from the photo</span> <span class="tag">⟨NEEDS MENU FILE⟩</span></li>
-        </ul>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-frappes" data-slug="frappes" data-title="The Frappes" aria-labelledby="sheet-frappes-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-frappes-title">The Frappes</h2>
-        <p>Blended cold. The one most people come in for.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <img src="/assets/menu-dubai-frappe.webp" width="1400" height="700" loading="lazy" decoding="async" alt="The Dubai Chocolate Frappe in a clear cup on marble: a tan blended base with pistachio and dark chocolate pulled down the inside, whipped cream and both drizzles on top.">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <ul class="items">
-          <li><span class="items__name">Salted Caramel Frappe</span></li>
-          <li><span class="items__name">Pistachio Frappe</span></li>
-          <li><span class="items__name">Biscoff Frappe</span></li>
-          <li><span class="items__name">Dubai Chocolate Frappe</span></li>
-        </ul>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-refreshers" data-slug="refreshers" data-title="The Refreshers" aria-labelledby="sheet-refreshers-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-refreshers-title">The Refreshers</h2>
-        <p>Cold and fruit-forward, with no coffee in them.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <div class="sheet__empty">
-          <p>This category is on the board, but the item names were too small to read in the photo.</p>
-          <span class="tag">⟨NEEDS MENU FILE⟩</span>
+      <ul class="board__rows" id="boardRows">
+      <li class="brow" data-slug="classic-coffees">
+        <button class="brow__btn" type="button" id="brow-classic-coffees" aria-expanded="false" aria-controls="bpanel-classic-coffees">
+          <span class="brow__cell brow__flight">DD 101</span>
+          <span class="brow__cell brow__dest"><i>FCO</i>ITALY</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">Classic Coffees</span><span class="brow__items">Espresso / Cappuccino / Americano</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>A1</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-classic-coffees" role="region" aria-labelledby="brow-classic-coffees" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <ul class="bitems">
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">E</span><span class="bitem__name">Espresso</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">C</span><span class="bitem__name">Cappuccino</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">A</span><span class="bitem__name">Americano</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">A</span><span class="bitem__name">Affogato</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">C</span><span class="bitem__name">Cortado</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">L</span><span class="bitem__name">Leche y Leche (Spanish Cortado)</span></li>
+          </ul>
         </div>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-smoothies" data-slug="smoothies" data-title="The Smoothies" aria-labelledby="sheet-smoothies-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-smoothies-title">The Smoothies</h2>
-        <p>Fruit and ice, blended thick.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <ul class="items">
-          <li><span class="items__name">Strawberry Smoothie</span></li>
-          <li><span class="items__name">Strawberry Banana Smoothie</span></li>
-          <li><span class="items__name">Mango Smoothie</span></li>
-          <li><span class="items__name">Banana Date Smoothie</span></li>
-          <li><span class="items__miss">One more line on this part of the board could not be read from the photo</span> <span class="tag">⟨NEEDS MENU FILE⟩</span></li>
-        </ul>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-breakfast-bites" data-slug="breakfast-bites" data-title="Breakfast Bites" aria-labelledby="sheet-breakfast-bites-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-breakfast-bites-title">Breakfast Bites</h2>
-        <p>Savoury pies and spirals, warm out of the case.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <div class="sheet__empty">
-          <p>This category is on the board, but the item names were too small to read in the photo.</p>
-          <span class="tag">⟨NEEDS MENU FILE⟩</span>
         </div>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-crepes" data-slug="crepes" data-title="The Crepes" aria-labelledby="sheet-crepes-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-crepes-title">The Crepes</h2>
-        <p>Thin, folded and finished to order.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <div class="sheet__empty">
-          <p>This category is on the board, but the item names were too small to read in the photo.</p>
-          <span class="tag">⟨NEEDS MENU FILE⟩</span>
+      </li>
+      <li class="brow" data-slug="matchas">
+        <button class="brow__btn" type="button" id="brow-matchas" aria-expanded="false" aria-controls="bpanel-matchas">
+          <span class="brow__cell brow__flight">DD 202</span>
+          <span class="brow__cell brow__dest"><i>NRT</i>JAPAN</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">The Matchas</span><span class="brow__items">Matcha Cortado (12 oz) / Strawberry Matcha / Biscoff Matcha</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>A2</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-matchas" role="region" aria-labelledby="brow-matchas" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <ul class="bitems">
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Matcha Cortado (12 oz)</span></li>
+            <li class="bitem"><img src="/assets/rev-strawberry-matcha.webp" width="260" height="260" loading="lazy" decoding="async" alt="A strawberry matcha in a clear cup, a pink strawberry layer over green matcha with matcha dusted on the foam."><span class="bitem__name">Strawberry Matcha</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Biscoff Matcha</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Mango Matcha</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Matcha</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Blueberry Cream Matcha</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Date Matcha</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">P</span><span class="bitem__name">Pistachio Matcha</span></li>
+          </ul>
         </div>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-waffles" data-slug="waffles" data-title="The Waffles" aria-labelledby="sheet-waffles-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-waffles-title">The Waffles</h2>
-        <p>Pressed fresh, then loaded.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <div class="sheet__empty">
-          <p>This category is on the board, but the item names were too small to read in the photo.</p>
-          <span class="tag">⟨NEEDS MENU FILE⟩</span>
         </div>
-      </div>
-    </section>
-    <section class="sheet" id="sheet-desserts" data-slug="desserts" data-title="D&amp;D Desserts" aria-labelledby="sheet-desserts-title">
-      <div class="sheet__top">
-        <span class="label">The menu</span>
-        <h2 id="sheet-desserts-title">D&amp;D Desserts</h2>
-        <p>Kunafa, and the rest of what is in the case.</p>
-        <button class="sheet__close" type="button" data-close>Close &#10005;</button>
-      </div>
-      <div class="sheet__body">
-        <img src="/assets/menu-kunafa.webp" width="1000" height="563" loading="lazy" decoding="async" alt="A round kunafa on a gold board on marble: crisp golden kataifi pastry with a mound of crushed green pistachio in the centre.">
-        <p class="sheet__need">Item names transcribed from a photo of the boards in the shop. Prices, descriptions and options are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
-        <div class="sheet__empty">
-          <p>This category is on the board, but the item names were too small to read in the photo.</p>
-          <span class="tag">⟨NEEDS MENU FILE⟩</span>
+      </li>
+      <li class="brow" data-slug="lattes">
+        <button class="brow__btn" type="button" id="brow-lattes" aria-expanded="false" aria-controls="bpanel-lattes">
+          <span class="brow__cell brow__flight">DD 303</span>
+          <span class="brow__cell brow__dest"><i>HOU</i>HOUSTON</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">The Lattes</span><span class="brow__items">Spanish Latte / Pistachio Latte / Tiramisu Latte</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>B1</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-lattes" role="region" aria-labelledby="brow-lattes" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <ul class="bitems">
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Spanish Latte</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">P</span><span class="bitem__name">Pistachio Latte</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">T</span><span class="bitem__name">Tiramisu Latte</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Biscoff Latte</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">T</span><span class="bitem__name">Taro Latte</span></li>
+          </ul>
+          <p class="bpanel__miss">Three more lines on this part of the board could not be read from the photo <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
         </div>
-      </div>
-    </section>
+        </div>
+      </li>
+      <li class="brow" data-slug="frappes">
+        <button class="brow__btn" type="button" id="brow-frappes" aria-expanded="false" aria-controls="bpanel-frappes">
+          <span class="brow__cell brow__flight">DD 404</span>
+          <span class="brow__cell brow__dest"><i>DXB</i>UAE</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">The Frappes</span><span class="brow__items">Salted Caramel Frappe / Pistachio Frappe / Biscoff Frappe</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>B3</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-frappes" role="region" aria-labelledby="brow-frappes" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <ul class="bitems">
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Salted Caramel Frappe</span></li>
+            <li class="bitem"><img src="/assets/rev-pistachio-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A pistachio frappe in a clear cup, whipped cream on top with green pistachio sauce drizzled over it."><span class="bitem__name">Pistachio Frappe</span></li>
+            <li class="bitem"><img src="/assets/rev-biscoff-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A Biscoff frappe in a clear cup, cookie butter swirled through it with whipped cream and a whole Biscoff cookie on top."><span class="bitem__name">Biscoff Frappe</span></li>
+            <li class="bitem"><img src="/assets/rev-dubai-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="The Dubai Chocolate Frappe in a clear cup, whipped cream with pistachio and dark chocolate drizzled over the top."><span class="bitem__name">Dubai Chocolate Frappe</span></li>
+          </ul>
+        </div>
+        </div>
+      </li>
+      <li class="brow" data-slug="refreshers">
+        <button class="brow__btn" type="button" id="brow-refreshers" aria-expanded="false" aria-controls="bpanel-refreshers">
+          <span class="brow__cell brow__flight">DD 505</span>
+          <span class="brow__cell brow__dest"><i>HOU</i>HOUSTON</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">The Refreshers</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>C1</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-refreshers" role="region" aria-labelledby="brow-refreshers" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+        </div>
+        </div>
+      </li>
+      <li class="brow" data-slug="smoothies">
+        <button class="brow__btn" type="button" id="brow-smoothies" aria-expanded="false" aria-controls="bpanel-smoothies">
+          <span class="brow__cell brow__flight">DD 606</span>
+          <span class="brow__cell brow__dest"><i>HOU</i>HOUSTON</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">The Smoothies</span><span class="brow__items">Strawberry Smoothie / Strawberry Banana Smoothie / Mango Smoothie</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>C2</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-smoothies" role="region" aria-labelledby="brow-smoothies" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <ul class="bitems">
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Strawberry Smoothie</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Strawberry Banana Smoothie</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Mango Smoothie</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Date Smoothie</span></li>
+          </ul>
+          <p class="bpanel__miss">One more line on this part of the board could not be read from the photo <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+        </div>
+        </div>
+      </li>
+      <li class="brow" data-slug="breakfast-bites">
+        <button class="brow__btn" type="button" id="brow-breakfast-bites" aria-expanded="false" aria-controls="bpanel-breakfast-bites">
+          <span class="brow__cell brow__flight">DD 707</span>
+          <span class="brow__cell brow__dest"><i>HOU</i>HOUSTON</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">Breakfast Bites</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>D1</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-breakfast-bites" role="region" aria-labelledby="brow-breakfast-bites" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+        </div>
+        </div>
+      </li>
+      <li class="brow" data-slug="crepes">
+        <button class="brow__btn" type="button" id="brow-crepes" aria-expanded="false" aria-controls="bpanel-crepes">
+          <span class="brow__cell brow__flight">DD 808</span>
+          <span class="brow__cell brow__dest"><i>HOU</i>HOUSTON</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">The Crepes</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>D2</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-crepes" role="region" aria-labelledby="brow-crepes" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+        </div>
+        </div>
+      </li>
+      <li class="brow" data-slug="waffles">
+        <button class="brow__btn" type="button" id="brow-waffles" aria-expanded="false" aria-controls="bpanel-waffles">
+          <span class="brow__cell brow__flight">DD 909</span>
+          <span class="brow__cell brow__dest"><i>HOU</i>HOUSTON</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">The Waffles</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>D3</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-waffles" role="region" aria-labelledby="brow-waffles" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+        </div>
+        </div>
+      </li>
+      <li class="brow" data-slug="desserts">
+        <button class="brow__btn" type="button" id="brow-desserts" aria-expanded="false" aria-controls="bpanel-desserts">
+          <span class="brow__cell brow__flight">DD 110</span>
+          <span class="brow__cell brow__dest"><i>CAI</i>EGYPT</span>
+          <span class="brow__cell brow__on"><span class="brow__cat">D&amp;D Desserts</span></span>
+          <span class="brow__cell brow__gate"><i>Gate</i>E1</span>
+          <span class="brow__cell brow__status"><span class="flaps" data-value="ON TIME     " aria-hidden="true"><span class="flap"><span class="flap__ch">O</span><span class="flap__leaf"><span>O</span></span></span><span class="flap"><span class="flap__ch">N</span><span class="flap__leaf"><span>N</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch">T</span><span class="flap__leaf"><span>T</span></span></span><span class="flap"><span class="flap__ch">I</span><span class="flap__leaf"><span>I</span></span></span><span class="flap"><span class="flap__ch">M</span><span class="flap__leaf"><span>M</span></span></span><span class="flap"><span class="flap__ch">E</span><span class="flap__leaf"><span>E</span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span><span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span></span><span class="vh">On time</span></span>
+        </button>
+        <div class="bpanel" id="bpanel-desserts" role="region" aria-labelledby="brow-desserts" hidden>
+        <div class="bpanel__in">
+          <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <img class="bpanel__shot" src="/assets/menu-kunafa.webp" width="1000" height="563" loading="lazy" decoding="async" alt="A round kunafa on a gold board, crisp golden pastry with a mound of crushed green pistachio in the middle.">
+          <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+        </div>
+        </div>
+      </li>
+      </ul>
+      <p class="board__foot">
+        <button class="board__sound" type="button" id="boardSound" aria-pressed="false">Sound <i>off</i></button>
+        <span>Ten categories, straight off the boards above the counter.</span>
+      </p>
     </div>
   </div>
 </section>
