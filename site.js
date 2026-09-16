@@ -358,15 +358,17 @@
     var setB = null, setW = 0, x = 0, boost = 0, boostTarget = 0;
     var bandRaf = 0, lastT = 0, hovered = false, onScreen = false, lastY = scrollY();
 
+    /* Repeat the whole phrase pair, never a single phrase, so the two
+       phrases keep alternating however many times the set has to repeat. */
+    var proto = setA.innerHTML;
     function fill() {
       if (setB) { track.removeChild(setB); setB = null; }
-      var item = setA.firstElementChild;
-      var itemW = item ? item.getBoundingClientRect().width : 0;
-      if (!itemW) return;
-      /* one set must always be at least as wide as the viewport, or the
-         wrap would expose a gap on a very wide screen */
-      while (setA.getBoundingClientRect().width < window.innerWidth + itemW) {
-        setA.appendChild(item.cloneNode(true));
+      setA.innerHTML = proto;
+      /* one set must always be at least a viewport wide, or the wrap
+         would expose a gap on a very wide screen */
+      for (var guard = 0; guard < 24; guard++) {
+        if (setA.getBoundingClientRect().width >= window.innerWidth + 240) break;
+        setA.insertAdjacentHTML('beforeend', proto);
       }
       setB = setA.cloneNode(true);
       track.appendChild(setB);
@@ -393,6 +395,8 @@
 
     band.addEventListener('mouseenter', function () { hovered = true; });
     band.addEventListener('mouseleave', function () { hovered = false; bandWake(); });
+    band.addEventListener('focus', function () { hovered = true; });
+    band.addEventListener('blur', function () { hovered = false; bandWake(); });
     window.addEventListener('scroll', function () {
       var y = scrollY();
       boostTarget = Math.min(150, Math.abs(y - lastY) * 4);

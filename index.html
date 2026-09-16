@@ -64,6 +64,8 @@
   --accent-mid:#c9a75f;
   --accent-bright:#d9bb7c;
   --accent-ink:#6d5415;
+  --pistachio:#a8c686;        /* type on the wall green */
+  --pistachio-deep:#34471e;   /* type on a gold fill */
 
   /* Channels, so every tint below is still a variable */
   --surface-rgb:242 237 228;
@@ -243,7 +245,7 @@ p{margin:0}
    for free. site.js eases the scroll position laterally as the section
    passes the viewport, and gives each ticket a rotation that lags the
    one before it, so the row moves like paper on a line. */
-.revs{background:var(--surface);overflow:hidden}
+.revs{background:var(--surface);overflow:hidden;padding-bottom:clamp(1.2rem,2.5vw,2rem)}
 
 /* The header is part of the apparatus rather than a title above it. One
    gold hairline runs the full width of the section: the headline sits on
@@ -344,21 +346,34 @@ p{margin:0}
 @keyframes tkIn{to{opacity:1}}
 
 /* ========================= HANDMADE BAND =========================
-   The packaging band, as a divider. Full bleed, gold on the wall green,
-   a hairline top and bottom. Two identical sets ride in a flex row and
-   the track is translated by one set width and wrapped, so there is no
-   reset seam. Transform only - the band never triggers layout. */
-.band{position:relative;overflow:hidden;background:var(--deep);border-top:1px solid rgb(var(--accent-rgb)/.55);border-bottom:1px solid rgb(var(--accent-rgb)/.55)}
+   The packaging band, as the seam where the hero hands off to the menu.
+   Two phrases alternate with the Burj spire between them, so the catering
+   line passes the eye without displacing the brand line. The whole band is
+   one link; the arrow at the right edge is pinned so there is always a
+   target that is not moving. Two identical sets ride one track and the
+   track wraps by exactly one set width, so the loop has no reset seam. */
+.band{position:relative;display:block;overflow:hidden;text-decoration:none;background:var(--deep);border-top:1px solid rgb(var(--accent-rgb)/.55);border-bottom:1px solid rgb(var(--accent-rgb)/.55);cursor:pointer}
+.band:focus-visible{outline:2px solid var(--accent-bright);outline-offset:-4px}
 .band__track{display:flex;width:max-content;will-change:transform;backface-visibility:hidden}
 .band__set{display:flex;align-items:center;flex:0 0 auto}
-.band__item{display:inline-flex;align-items:center;gap:clamp(1.4rem,3vw,2.6rem);padding-right:clamp(1.4rem,3vw,2.6rem);white-space:nowrap;font-family:var(--display);font-style:italic;font-weight:400;font-size:clamp(1rem,1.5vw,1.35rem);letter-spacing:.055em;line-height:1;color:var(--accent-bright);padding-block:clamp(.95rem,1.9vw,1.35rem)}
+.band__item{display:inline-flex;align-items:center;gap:clamp(1.3rem,2.8vw,2.4rem);padding-right:clamp(1.3rem,2.8vw,2.4rem);white-space:nowrap;font-family:var(--display);font-style:italic;font-weight:400;font-size:clamp(1rem,1.5vw,1.35rem);letter-spacing:.055em;line-height:1;color:var(--accent-bright);padding-block:clamp(.95rem,1.9vw,1.35rem)}
 .band__mark{display:inline-flex;color:var(--accent);opacity:.9}
 .band__mark svg{display:block;width:clamp(7px,.75vw,10px);height:auto}
+
+/* Option A: the catering line in pistachio, straight on the green. */
+.band[data-band="a"] .band__cta{color:var(--pistachio)}
+/* Option B: a gold-filled segment carrying pistachio, so the catering line
+   reads as a different object riding the same rail. */
+.band[data-band="b"] .band__cta{background:var(--accent-bright);color:var(--pistachio-deep);padding:.36em .85em .42em;border-radius:2px;font-style:normal;font-family:var(--mono);font-weight:400;font-size:.76em;letter-spacing:.14em;text-transform:uppercase}
+
+/* Pinned target at the right edge; the text drifts behind it. */
+.band__go{position:absolute;z-index:2;right:0;top:0;bottom:0;display:grid;place-items:center;padding-inline:clamp(.9rem,2vw,1.5rem);background:var(--deep);color:var(--accent-bright);font-size:1.1rem;line-height:1}
+.band__go::before{content:"";position:absolute;right:100%;top:0;bottom:0;width:clamp(2rem,5vw,4rem);background:linear-gradient(to right,rgb(var(--deep-rgb)/0),var(--deep));pointer-events:none}
+.band:hover .band__go{color:var(--surface)}
+
 @media(prefers-reduced-motion:reduce){
-  .band{display:flex;justify-content:center}
-  .band__track{width:auto;transform:none!important}
+  .band__track{width:auto;transform:none!important;justify-content:center;flex:1}
   .band__set:nth-child(2){display:none}
-  .band__set{justify-content:center}
   .band__item:nth-child(n+3){display:none}
 }
 
@@ -549,6 +564,18 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
 </section>
 
 <main>
+<!-- ===================== HANDMADE BAND =====================
+     The shop's packaging band as the seam between the hero and the
+     menu, doubling as the catering link. The marquee text is
+     aria-hidden and the link carries one clear name, so a screen
+     reader gets "Catering and large orders" once, not eight times. -->
+<a class="band" id="band" data-band="b" href="#contact" aria-label="Catering and large orders">
+  <span class="band__track" id="bandTrack" aria-hidden="true">
+    <span class="band__set"><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item"><span class="band__cta">Catering &amp; large orders</span> <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item"><span class="band__cta">Catering &amp; large orders</span> <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item"><span class="band__cta">Catering &amp; large orders</span> <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item"><span class="band__cta">Catering &amp; large orders</span> <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span></span>
+  </span>
+  <span class="band__go" aria-hidden="true">&rarr;</span>
+</a>
+
 <!-- =============================== MENU =============================== -->
 <section class="sec menu" id="menu">
   <div class="shell">
@@ -969,15 +996,6 @@ html.is-sheet-open .nav{backdrop-filter:none;-webkit-backdrop-filter:none}
   }
   </script>
 </section>
-
-<!-- ===================== HANDMADE BAND =====================
-     Decorative: the shop's packaging band used as the seam between
-     Reviews and Contact. aria-hidden so it is not read out ten times. -->
-<div class="band" id="band" aria-hidden="true">
-  <div class="band__track" id="bandTrack">
-    <div class="band__set"><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span><span class="band__item">Handmade with Love <i class="band__mark"><svg viewBox="0 0 12 28" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 0l.62 5.9.52 1.1.66 4.3.5 1 .72 4.6.55 1.1.78 6.2.15 3.8H1.5l.15-3.8.78-6.2.55-1.1.72-4.6.5-1 .66-4.3.52-1.1z"/></svg></i></span></div>
-  </div>
-</div>
 
 <!-- ============================== CONTACT ============================== -->
 <section class="sec" id="contact">
