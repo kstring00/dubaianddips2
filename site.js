@@ -417,6 +417,138 @@
     }
   }
 
+  /* ---------------------------------------------------------- hours
+     One source for the open/closed state, read in the shop's own
+     timezone rather than the visitor's. These are still the placeholder
+     hours from the markup; change them here and the nav and the footer
+     both follow. Index is day of week, 0 = Sunday, [open, close] in
+     24-hour local time. */
+  var HOURS = [[12, 21], [11, 22], [11, 22], [11, 22], [11, 22], [11, 23], [12, 23]];
+  function shopClock() {
+    try {
+      var parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago', hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit'
+      }).formatToParts(new Date());
+      var o = {};
+      parts.forEach(function (x) { o[x.type] = x.value; });
+      var days = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      var h = parseInt(o.hour, 10) % 24;
+      return { d: days[o.weekday], m: h * 60 + parseInt(o.minute, 10) };
+    } catch (e) {
+      var n = new Date();
+      return { d: n.getDay(), m: n.getHours() * 60 + n.getMinutes() };
+    }
+  }
+  function clockLabel(h) {
+    var ap = h >= 12 ? 'pm' : 'am', hh = h % 12;
+    return (hh || 12) + ' ' + ap;
+  }
+  function hoursState() {
+    var t = shopClock(), today = HOURS[t.d];
+    if (today && t.m >= today[0] * 60 && t.m < today[1] * 60) {
+      return { open: true, text: 'Open until ' + clockLabel(today[1]) };
+    }
+    if (today && t.m < today[0] * 60) {
+      return { open: false, text: 'Closed · opens ' + clockLabel(today[0]) };
+    }
+    for (var i = 1; i <= 7; i++) {
+      var next = HOURS[(t.d + i) % 7];
+      if (next) return { open: false, text: 'Closed · opens ' + (i === 1 ? 'tomorrow ' : '') + clockLabel(next[0]) };
+    }
+    return { open: false, text: 'Closed' };
+  }
+  (function () {
+    var st = hoursState();
+    var navHours = document.querySelector('.nav__hours');
+    if (navHours) navHours.textContent = st.text;
+    var footState = document.getElementById('footState');
+    if (footState) { footState.textContent = st.text; footState.setAttribute('data-open', st.open ? 'yes' : 'no'); }
+  })();
+
+  /* ----------------------------------------------------------- footer
+     The mailing box. The open state is the CSS default, so no JS, reduced
+     motion, or landing at the bottom all render it open and static. The
+     closed state is only armed when the footer is still below the fold on
+     load, and any focus landing inside snaps it open at once - the content
+     is never gated behind the animation. */
+  var foot = document.getElementById('foot');
+  if (foot) {
+    var lid = foot.querySelector('.boxfoot__lid');
+    var risers = [].slice.call(foot.querySelectorAll('[data-rise-foot]'));
+    var opened = false, ticking = false;
+
+    /* How much of the footer is showing, against the most it could ever
+       show. The footer is the last element on the page, so on a tall
+       screen the scroll runs out with it only part way up - measuring
+       against the viewport alone would never reach the trigger. */
+    function shown() {
+      var r = foot.getBoundingClientRect();
+      var vis = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+      return vis / Math.max(1, Math.min(r.height, window.innerHeight));
+    }
+
+    /* Everything back to the CSS default, which is open. Used for the
+       focus escape hatch and as the catch arm if the animation throws. */
+    function snapOpen() {
+      opened = true;
+      foot.classList.remove('is-armed');
+      lid.style.transform = ''; lid.style.opacity = '';
+      risers.forEach(function (el) { el.style.opacity = ''; el.style.transform = ''; });
+    }
+
+    /* Time based, not scroll keyed. 344px of footer is all the travel
+       there is on a desktop screen, and a scrub across that finishes the
+       lid before the box has finished arriving - you never see it shut.
+       Triggered once, on its own clock, the closed box gets its beat.
+       Transform and opacity only, so it composites off the main thread. */
+    function openBox() {
+      if (opened) return;
+      opened = true;
+      try {
+        lid.animate([
+          { transform: 'rotateX(0deg)', opacity: 1, offset: 0 },
+          { transform: 'rotateX(-11deg)', opacity: 1, offset: .24 },
+          { transform: 'rotateX(-70deg)', opacity: .6, offset: .68 },
+          { transform: 'rotateX(-108deg)', opacity: 0, offset: 1 }
+        ], { duration: 820, easing: 'cubic-bezier(.33,0,.15,1)', fill: 'forwards' })
+          .addEventListener('finish', function () { foot.classList.remove('is-armed'); });
+        for (var i = 0; i < risers.length; i++) {
+          risers[i].animate([
+            { opacity: 0, transform: 'translate3d(0,26px,0)' },
+            { opacity: 1, transform: 'none' }
+          ], { duration: 560, delay: 300 + i * 90, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' });
+        }
+      } catch (e) { snapOpen(); }
+    }
+
+    function check() {
+      if (opened || ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        if (!opened && shown() >= .72) openBox();
+      });
+    }
+
+    /* The decision waits for load: a reload or a back button restores the
+       scroll position after a deferred script runs, so checking too early
+       would arm the box while the visitor is already looking at it and
+       slam the lid shut in front of them. Until then the CSS default
+       leaves it open, which is invisible while the footer is off screen.
+       No WAAPI, or reduced motion, and it is never armed at all. */
+    function armFooter() {
+      if (reduce || !lid || !lid.animate) return;
+      if (shown() > .12) return;                  /* already in frame: leave it open */
+      foot.classList.add('is-armed');
+      window.addEventListener('scroll', check, { passive: true });
+      window.addEventListener('resize', check, { passive: true });
+      foot.addEventListener('focusin', snapOpen);
+      check();
+    }
+    if (document.readyState === 'complete') requestAnimationFrame(armFooter);
+    else window.addEventListener('load', function () { requestAnimationFrame(armFooter); });
+  }
+
   /* -------------------------------------------------------------- band
      The packaging ticker. Two identical sets ride in one flex track; the
      track is translated and wrapped by exactly one set width, so the loop

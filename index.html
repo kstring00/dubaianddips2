@@ -387,17 +387,70 @@ p{margin:0}
 .thanks{display:none}.thanks.is-on{display:flex}.form.is-sent{display:none}
 @media(max-width:880px){.contact{grid-template-columns:1fr}}
 
-/* ============================== FOOT ============================== */
-.foot{background:var(--wood);border-top:1px solid rgb(var(--accent-rgb)/.3);padding:clamp(3rem,6vw,4.5rem) 0 2rem}
-.foot__grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:2.4rem;margin-bottom:2.6rem}
-.foot h3{font-family:var(--body);font-size:.8rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-bright);margin-bottom:.9rem}
-.foot p,.foot address,.foot li{color:rgb(var(--surface-rgb)/.86);font-size:.94rem;font-style:normal}
-.foot ul{list-style:none;margin:0;padding:0}
-.foot a{text-decoration:none;color:rgb(var(--surface-rgb)/.86)}
-.foot__mark{font-family:var(--display);font-weight:700;font-size:1.4rem;color:var(--surface);margin-bottom:.8rem}
-.foot__mark i{font-style:normal;color:var(--accent-bright)}
-.foot__base{display:flex;flex-wrap:wrap;gap:.8rem 1.6rem;justify-content:space-between;align-items:center;border-top:1px solid rgb(var(--surface-rgb)/.22);padding-top:1.6rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;color:rgb(var(--surface-rgb)/.8)}
-@media(max-width:880px){.foot__grid{grid-template-columns:1fr}}
+/* ============================== FOOT ==============================
+   The footer is the shop's own mailing box. It sits closed as the footer
+   comes into frame, the lid hinges back and the content rises out of the
+   green interior in gold.
+
+   The content is real DOM and is never gated behind the animation: the
+   open state is the default, and JavaScript only arms the closed state
+   when the footer is still below the fold on load. No JS, reduced motion,
+   or a visitor landing at the bottom all get the box already open. If a
+   keyboard user tabs in mid-animation it snaps open immediately.
+
+   2D layers with one rotateX, no WebGL: the page already carries a film
+   scene and this does not need a second. */
+.boxfoot{position:relative;background:var(--deep);border-top:1px solid rgb(var(--accent-rgb)/.5);color:var(--accent-bright)}
+.boxfoot__stage{position:relative;perspective:1200px;perspective-origin:50% 0}
+/* the interior: a little darker than the lid, lit from the opening */
+.boxfoot__inner{position:relative;z-index:1;background:linear-gradient(180deg,var(--deep-dim) 0%,var(--deep) 42%);padding:clamp(2.6rem,5vw,4rem) 0 1.9rem;box-shadow:inset 0 14px 28px rgb(var(--black-rgb)/.38)}
+.boxfoot__grid{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:clamp(1.8rem,4vw,3rem)}
+.boxfoot__col{display:flex;flex-direction:column;align-items:flex-start;gap:.55rem}
+.boxfoot__mark{font-family:var(--display);font-weight:700;font-size:1.4rem;letter-spacing:.02em;color:var(--surface);margin-bottom:.35rem}
+.boxfoot__mark i{font-style:normal;color:var(--accent-bright)}
+.boxfoot h3{font-family:var(--body);font-size:.78rem;font-weight:600;letter-spacing:.17em;text-transform:uppercase;color:rgb(var(--surface-rgb)/.75);margin-bottom:.5rem}
+.boxfoot address,.boxfoot li,.boxfoot p{font-style:normal;font-size:.94rem;line-height:1.6;color:var(--accent-bright)}
+.boxfoot ul{list-style:none;margin:0;padding:0}
+.boxfoot a{color:var(--accent-bright);text-decoration:none}
+.boxfoot a:hover{color:var(--surface)}
+.boxfoot .btn--gold{color:var(--ink)}
+.boxfoot .btn--gold:hover{color:var(--ink)}
+.boxfoot__tel{font-weight:600;border-bottom:1px solid rgb(var(--accent-rgb)/.5)}
+.boxfoot__state{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase}
+.boxfoot__state::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent-bright);flex:0 0 auto}
+.boxfoot__state[data-open="no"]{color:rgb(var(--surface-rgb)/.72)}
+.boxfoot__state[data-open="no"]::before{background:rgb(var(--surface-rgb)/.5)}
+.boxfoot__hours{font-family:var(--mono);font-size:.76rem;letter-spacing:.04em;color:rgb(var(--surface-rgb)/.82)}
+.boxfoot__hours li{font-size:.76rem;color:inherit;display:flex;justify-content:space-between;gap:1.2rem;padding:.12rem 0}
+.boxfoot .btn{margin-top:.5rem}
+.boxfoot__base{display:flex;flex-wrap:wrap;gap:.8rem 1.6rem;justify-content:space-between;align-items:center;margin-top:clamp(2rem,4vw,3rem);padding-top:1.5rem;border-top:1px solid rgb(var(--surface-rgb)/.22);font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;color:rgb(var(--surface-rgb)/.8)}
+
+/* ---- the lid. Decoration only; it is not in the DOM until JS arms it. ---- */
+.boxfoot__lid{display:none;position:absolute;z-index:2;inset:0;transform-origin:50% 0;backface-visibility:hidden;will-change:transform;background:var(--deep);box-shadow:0 18px 40px rgb(var(--black-rgb)/.4)}
+.boxfoot.is-armed .boxfoot__lid{display:block}
+.boxfoot.is-armed [data-rise-foot]{opacity:0}
+.boxfoot__lidface{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;gap:clamp(1rem,4vw,3rem);width:var(--shell);margin-inline:auto;
+  background-image:repeating-linear-gradient(94deg,rgb(var(--black-rgb)/.05) 0 1px,transparent 1px 6px)}
+.boxfoot__wordmark{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,3.6vw,2.8rem);letter-spacing:.06em;color:rgb(var(--surface-rgb)/.92);white-space:nowrap}
+.boxfoot__wordmark i{font-style:normal;color:rgb(var(--surface-rgb)/.7)}
+
+/* ---- the boarding-pass label, with the shop's real values ---- */
+.pass{flex:0 0 auto;width:min(19rem,42%);background:var(--surface-raised);color:var(--ink);border-radius:2px;overflow:hidden;display:grid;grid-template-columns:6px 1fr;box-shadow:0 6px 18px rgb(var(--black-rgb)/.35)}
+.pass__edge{background:var(--accent)}
+.pass__in{padding:.6rem .75rem .5rem;display:flex;flex-direction:column;gap:.4rem}
+.pass__top{display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.pass__code{background:var(--ink);color:var(--surface);font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;padding:.16rem .4rem;border-radius:1px}
+.pass__air{font-family:var(--mono);font-size:.54rem;letter-spacing:.14em;color:var(--ink-soft)}
+.pass__fields{display:flex;gap:1.2rem}
+.pass__k{display:block;font-family:var(--mono);font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.pass__v{display:block;font-family:var(--display);font-weight:600;font-size:.95rem;line-height:1.1;color:var(--ink)}
+.pass__bars{height:16px;background-image:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 5px,transparent 5px 9px,var(--ink) 9px 11px,transparent 11px 13px)}
+@media(max-width:899px){
+  .boxfoot__grid{grid-template-columns:1fr}
+  .boxfoot__lidface{flex-direction:column;justify-content:center;gap:1.2rem;padding-block:1rem}
+  .pass{width:min(18rem,86%)}
+  .boxfoot__wordmark{font-size:clamp(1.3rem,6.4vw,1.9rem)}
+}
 
 /* Phone thumb bar: directions, call, order from anywhere on the page. */
 .thumbbar{position:fixed;z-index:70;left:0;right:0;bottom:0;display:none;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--deep)}
@@ -515,6 +568,8 @@ p{margin:0}
   .craft__list p{color:rgb(var(--surface-rgb)/.8);font-size:.95rem}
   .btn,.nav__links a{transition:none}
   .hero__hint span{animation:none}
+  .boxfoot__lid{display:none!important}
+  .boxfoot [data-rise-foot]{opacity:1!important;transform:none!important}
   /* Reviews: no rail, no sway. A plain stack of the same tickets. */
   .rail{overflow:visible;padding:0 0 .5rem;cursor:auto}
   .rail__row{flex-direction:column;align-items:stretch;width:auto;padding:0 var(--gutter);gap:1.1rem}
@@ -1006,14 +1061,50 @@ p{margin:0}
 </section>
 </main>
 
-<footer class="foot">
-  <div class="shell">
-    <div class="foot__grid">
-      <div><div class="foot__mark">DUBAI <i>&amp;</i> DIPS</div><address>1234 Bay Area Blvd, Suite 100<br>Houston, TX 77058<br><a href="tel:+12815550147">(281) 555-0147</a></address></div>
-      <div><h3>Hours</h3><ul><li>Mon to Thu, 11am to 10pm</li><li>Fri, 11am to 11pm</li><li>Sat, 12pm to 11pm</li><li>Sun, 12pm to 9pm</li></ul></div>
-      <div><h3>Follow</h3><ul><li><a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></li><li><a href="#contact">Contact</a></li></ul></div>
+<footer class="boxfoot" id="foot">
+  <div class="boxfoot__stage">
+    <div class="boxfoot__inner">
+      <div class="shell boxfoot__grid">
+        <div class="boxfoot__col" data-rise-foot>
+          <div class="boxfoot__mark">DUBAI <i>&amp;</i> DIPS</div>
+          <address>1234 Bay Area Blvd, Suite 100<br>Houston, TX 77058</address>
+          <a class="boxfoot__tel" href="tel:+12815550147">(281) 555-0147</a>
+        </div>
+        <div class="boxfoot__col" data-rise-foot>
+          <h3>Hours</h3>
+          <p class="boxfoot__state" id="footState" data-open="yes">Open until 10 pm</p>
+          <ul class="boxfoot__hours"><li><span>Mon to Thu</span><span>11am to 10pm</span></li><li><span>Fri</span><span>11am to 11pm</span></li><li><span>Sat</span><span>12pm to 11pm</span></li><li><span>Sun</span><span>12pm to 9pm</span></li></ul>
+        </div>
+        <div class="boxfoot__col" data-rise-foot>
+          <h3>Follow</h3>
+          <ul>
+            <li><a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="https://tiktok.com/" target="_blank" rel="noopener">TikTok</a></li>
+          </ul>
+          <a class="btn btn--gold" href="#contact">Catering &amp; large orders</a>
+        </div>
+      </div>
+      <div class="shell boxfoot__base" data-rise-foot>
+        <span>&copy; <span id="year">2026</span> Dubai &amp; Dips.</span>
+        <span>Clear Lake, Houston</span>
+      </div>
     </div>
-    <div class="foot__base"><span>&copy; <span id="year">2026</span> Dubai &amp; Dips.</span><span>Clear Lake, Houston</span></div>
+    <div class="boxfoot__lid" aria-hidden="true">
+      <div class="boxfoot__lidface">
+        <span class="boxfoot__wordmark">DUBAI <i>&amp;</i> DIPS</span>
+        <span class="pass">
+          <span class="pass__edge"></span>
+          <span class="pass__in">
+            <span class="pass__top"><span class="pass__code">HOU</span><span class="pass__air">D&amp;D Airlines</span></span>
+            <span class="pass__fields">
+              <span><span class="pass__k">Destination</span><span class="pass__v">Clear Lake</span></span>
+              <span><span class="pass__k">Gate</span><span class="pass__v">100</span></span>
+            </span>
+            <span class="pass__bars"></span>
+          </span>
+        </span>
+      </div>
+    </div>
   </div>
 </footer>
 
