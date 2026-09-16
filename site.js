@@ -111,9 +111,11 @@
      Beats, as a fraction of the hero's scroll travel:
        .00 to .03   the bar, the wordmark, nothing moves
        .03 to .64   the film: bar splits, room opens, sign lands
-       .14 to .30   wordmark lifts out as the bar splits
-       .64 to .78   copy lands, scrim comes up
+       .10 to .22   wordmark lifts out, before the frame brightens
+       .56 to .70   the dark plate comes up, ahead of the copy
+       .64 to .78   copy lands on it
        .84 to .94   nav fades in
+       .85 to .93   copy leaves, before the cream exit touches it
        .90 to 1.0   exit gradient, the next section takes over */
   if (hero) {
     var film = document.getElementById('heroVideo');
@@ -137,16 +139,27 @@
       var d = scrub.duration();
       if (d) scrub.seek(easeInOut(range(p, .03, .64)) * d);
 
-      var lift = easeInOut(range(p, .14, .30));
+      var lift = easeInOut(range(p, .10, .22));
       set(open, 'opacity', (1 - lift).toFixed(3));
       set(open, 'transform', 'translate3d(0,' + (-28 * lift).toFixed(2) + 'px,0)');
       set(hint, 'opacity', (1 - easeInOut(range(p, .04, .14))).toFixed(3));
 
+      /* The copy is cream and the film ends on a bright marble floor, so it
+         only ever shows while the dark plate is under it. The plate leads
+         the copy in, and the copy is gone before the cream exit washes the
+         bottom of the frame - otherwise the exit, which is there to hand
+         off to the menu, is what destroys the contrast. */
+      var plateIn = easeOut(range(p, .56, .70));
+      var plateOut = easeInOut(range(p, .90, .985));
+      var plate = plateIn * (1 - plateOut);
+      set(scrim, 'opacity', plate.toFixed(3));
+
       var in_ = easeOut(range(p, .64, .78));
-      set(land, 'opacity', in_.toFixed(3));
-      set(land, 'transform', 'translate3d(0,' + (40 * (1 - in_)).toFixed(2) + 'px,0)');
-      set(land, 'pointerEvents', in_ > .7 ? 'auto' : 'none');
-      set(scrim, 'opacity', in_.toFixed(3));
+      var out_ = easeInOut(range(p, .85, .93));
+      var copy = in_ * (1 - out_);
+      set(land, 'opacity', copy.toFixed(3));
+      set(land, 'transform', 'translate3d(0,' + (40 * (1 - in_) + 20 * out_).toFixed(2) + 'px,0)');
+      set(land, 'pointerEvents', copy > .7 ? 'auto' : 'none');
       set(exit, 'opacity', easeInOut(range(p, .90, 1)).toFixed(3));
       set(rule, 'width', (p * 100).toFixed(2) + '%');
 
@@ -241,7 +254,7 @@
      trap focus inside it, and put focus back where it was on close. */
   var menu = document.getElementById('menu');
   if (menu) {
-    var scrim = document.getElementById('menuScrim');
+    var menuScrim = document.getElementById('menuScrim');  /* not `scrim`: var is function scoped and the hero owns that name */
     var sheets = {};
     [].forEach.call(menu.querySelectorAll('.sheet'), function (el) { sheets[el.getAttribute('data-slug')] = el; });
     var openSheet = null, lastFocus = null;
@@ -275,7 +288,7 @@
       el.classList.add('is-open');
       el.setAttribute('role', 'dialog');
       el.setAttribute('aria-modal', 'true');
-      scrim.classList.add('is-on');
+      menuScrim.classList.add('is-on');
       document.documentElement.classList.add('is-sheet-open');
       document.title = el.getAttribute('data-title') + ' | Dubai & Dips';
       setCanonical(location.origin + '/menu/' + slug);
@@ -291,7 +304,7 @@
       openSheet.removeAttribute('role');
       openSheet.removeAttribute('aria-modal');
       openSheet = null;
-      scrim.classList.remove('is-on');
+      menuScrim.classList.remove('is-on');
       document.documentElement.classList.remove('is-sheet-open');
       document.title = baseTitle;
       setCanonical(baseCanonical);
@@ -318,7 +331,7 @@
       }
       if (e.target.closest && e.target.closest('[data-close]')) { e.preventDefault(); close(); }
     });
-    scrim.addEventListener('click', close);
+    menuScrim.addEventListener('click', close);
     window.addEventListener('popstate', function () {
       var slug = slugFromPath();
       if (slug) show(slug);
@@ -330,6 +343,76 @@
       try { history.replaceState({ sheet: initial }, '', location.pathname); } catch (e) {}
       show(initial);
     }
+  }
+
+  /* -------------------------------------------------------------- band
+     The packaging ticker. Two identical sets ride in one flex track; the
+     track is translated and wrapped by exactly one set width, so the loop
+     has no reset seam. Drifts right, against the ticket rail above it.
+     Scroll velocity adds a little speed and decays back to base. Transform
+     only, and the rAF stops whenever the band is off screen or hovered. */
+  var band = document.getElementById('band');
+  if (band && !reduce) {
+    var track = document.getElementById('bandTrack');
+    var setA = track.firstElementChild;
+    var setB = null, setW = 0, x = 0, boost = 0, boostTarget = 0;
+    var bandRaf = 0, lastT = 0, hovered = false, onScreen = false, lastY = scrollY();
+
+    function fill() {
+      if (setB) { track.removeChild(setB); setB = null; }
+      var item = setA.firstElementChild;
+      var itemW = item ? item.getBoundingClientRect().width : 0;
+      if (!itemW) return;
+      /* one set must always be at least as wide as the viewport, or the
+         wrap would expose a gap on a very wide screen */
+      while (setA.getBoundingClientRect().width < window.innerWidth + itemW) {
+        setA.appendChild(item.cloneNode(true));
+      }
+      setB = setA.cloneNode(true);
+      track.appendChild(setB);
+      setW = setA.getBoundingClientRect().width;
+      if (x > 0 || x < -setW) x = -setW;
+    }
+
+    function bandFrame(now) {
+      bandRaf = 0;
+      var dt = Math.min(.05, (now - lastT) / 1000 || .016);
+      lastT = now;
+      boost += (boostTarget - boost) * .06;
+      boostTarget *= .90;
+      x += (18 + boost) * dt;              /* rightward */
+      if (x >= 0) x -= setW;
+      track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+      if (onScreen && !hovered) bandRaf = requestAnimationFrame(bandFrame);
+    }
+    function bandWake() {
+      if (bandRaf || !onScreen || hovered || !setW) return;
+      lastT = performance.now();
+      bandRaf = requestAnimationFrame(bandFrame);
+    }
+
+    band.addEventListener('mouseenter', function () { hovered = true; });
+    band.addEventListener('mouseleave', function () { hovered = false; bandWake(); });
+    window.addEventListener('scroll', function () {
+      var y = scrollY();
+      boostTarget = Math.min(150, Math.abs(y - lastY) * 4);
+      lastY = y;
+      bandWake();
+    }, { passive: true });
+    window.addEventListener('resize', function () { fill(); bandWake(); }, { passive: true });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        onScreen = es.some(function (e) { return e.isIntersecting; });
+        bandWake();
+      }, { rootMargin: '120px' }).observe(band);
+    } else { onScreen = true; }
+
+    fill();
+    x = -setW;
+    track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fill(); bandWake(); });
+    bandWake();
   }
 
   /* ------------------------------------------------------------ reviews
