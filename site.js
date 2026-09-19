@@ -7,6 +7,12 @@
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var phone = window.matchMedia('(max-width: 899px)');
+  /* Everything about ordering comes from config/ordering.js; events go
+     through track.js. Both are optional at runtime so the page still
+     works if either script fails to arrive. */
+  var CFG = window.DD_CONFIG || {};
+  var COPY = CFG.COPY || {};
+  var emit = (window.DD && window.DD.track) || function () {};
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function range(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }
@@ -126,9 +132,32 @@
     var scrim = document.getElementById('heroScrim');
     var exit = document.getElementById('heroExit');
     var rule = document.getElementById('heroRule');
+    var cta = document.getElementById('heroCta');
+    var fades = [].slice.call(nav.querySelectorAll('.nav__fade'));
     var scrub = scrubber(film, function (dur) {
       if (reduce) scrub.seek(dur);
     });
+    /* The film waits for the page: it is 2.5 MB and nothing above the fold
+       depends on it (the poster is the first frame). It starts on load, or
+       on the first scroll if that comes sooner, so the hero and the order
+       button are painted long before a byte of video is requested. */
+    var filmStarted = false;
+    function startFilm() {
+      if (filmStarted) return; filmStarted = true;
+      film.src = film.getAttribute('data-src');
+      film.preload = 'auto'; film.load();
+    }
+    function deferFilm() {
+      if (document.readyState === 'complete') setTimeout(startFilm, 0);
+      else window.addEventListener('load', function () { setTimeout(startFilm, 0); });
+      window.addEventListener('scroll', startFilm, { once: true, passive: true });
+    }
+    function setNav(op) {
+      for (var i = 0; i < fades.length; i++) {
+        set(fades[i], 'opacity', op.toFixed(3));
+        set(fades[i], 'pointerEvents', op > .6 ? 'auto' : 'none');
+      }
+    }
     /* If the film never arrives the poster stays and the copy still lands. */
     film.addEventListener('error', function () { film.removeAttribute('poster'); film.style.backgroundImage = 'url(/assets/hero-poster.webp)'; film.style.backgroundSize = 'cover'; }, true);
 
@@ -142,6 +171,7 @@
       var lift = easeInOut(range(p, .10, .22));
       set(open, 'opacity', (1 - lift).toFixed(3));
       set(open, 'transform', 'translate3d(0,' + (-28 * lift).toFixed(2) + 'px,0)');
+      set(cta, 'pointerEvents', lift > .6 ? 'none' : 'auto');
       set(hint, 'opacity', (1 - easeInOut(range(p, .04, .14))).toFixed(3));
 
       /* The copy is cream and the film ends on a bright marble floor, so it
@@ -163,21 +193,19 @@
       set(exit, 'opacity', easeInOut(range(p, .90, 1)).toFixed(3));
       set(rule, 'width', (p * 100).toFixed(2) + '%');
 
-      var navIn = easeInOut(range(p, .84, .94));
-      set(nav, 'opacity', navIn.toFixed(3));
-      set(nav, 'pointerEvents', navIn > .6 ? 'auto' : 'none');
+      setNav(easeInOut(range(p, .84, .94)));
     }
 
     if (reduce) {
       /* Static close state: the room, the copy, the nav. The CSS already
          collapses the stage; the film seeks to its last frame on load. */
-      film.preload = 'auto'; film.load();
-      nav.style.opacity = '1'; nav.style.pointerEvents = 'auto';
+      deferFilm();
+      setNav(1);
       window.addEventListener('scroll', navStuck, { passive: true });
       navStuck();
     } else {
       var heroLoop = loop(function () { return clamp(scrollY() / travel, 0, 1); }, applyHero, phone.matches ? .2 : .14);
-      film.preload = 'auto'; film.load();
+      deferFilm();
       film.addEventListener('seeked', heroLoop.wake);
       film.addEventListener('loadedmetadata', heroLoop.wake);
       layoutHero(); heroLoop.reset(); navStuck();
@@ -423,11 +451,11 @@
      hours from the markup; change them here and the nav and the footer
      both follow. Index is day of week, 0 = Sunday, [open, close] in
      24-hour local time. */
-  var HOURS = [[12, 21], [11, 22], [11, 22], [11, 22], [11, 22], [11, 23], [12, 23]];
+  var HOURS = CFG.HOURS || [[12, 21], [11, 22], [11, 22], [11, 22], [11, 22], [11, 23], [12, 23]];
   function shopClock() {
     try {
       var parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/Chicago', hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit'
+        timeZone: (CFG.SHOP && CFG.SHOP.timezone) || 'America/Chicago', hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit'
       }).formatToParts(new Date());
       var o = {};
       parts.forEach(function (x) { o[x.type] = x.value; });
@@ -464,6 +492,135 @@
     var footState = document.getElementById('footState');
     if (footState) { footState.textContent = st.text; footState.setAttribute('data-open', st.open ? 'yes' : 'no'); }
   })();
+
+  /* ---------------------------------------------------------- ordering
+     Toast is the ordering engine. Every element with data-order reads its
+     destination from config: pickup, delivery and group each fall back to
+     TOAST_ORDER_URL. With a URL, the click goes to Toast - same tab on a
+     phone, a new tab on a desktop. Without one, the click opens the
+     "goes live soon" sheet instead, so no button is ever dead. Every click
+     is tracked with its mode and where on the page it came from. */
+  function money(n) { return '$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, ''); }
+  function orderUrl(mode) {
+    var u = mode === 'delivery' ? (CFG.TOAST_DELIVERY_URL || CFG.TOAST_ORDER_URL)
+      : mode === 'group' ? (CFG.TOAST_GROUP_URL || CFG.TOAST_ORDER_URL)
+      : (CFG.TOAST_PICKUP_URL || CFG.TOAST_ORDER_URL);
+    return (u || '').replace(/^\s+|\s+$/g, '');
+  }
+  function withMode(url, mode) {
+    /* Our own pages get told which mode was chosen; Toast's URL is left alone. */
+    if (url.charAt(0) !== '/' || mode === 'pickup') return url;
+    return url + (url.indexOf('?') > -1 ? '&' : '?') + 'mode=' + mode;
+  }
+  function feeSentence() {
+    var tiers = (CFG.DELIVERY_FEE_TIERS || []).slice().sort(function (a, b) { return a.min - b.min; });
+    if (!tiers.length) return '';
+    var parts = tiers.map(function (t, i) {
+      var fee = t.fee > 0 ? money(t.fee) : 'free';
+      return i === 0 ? fee + ' on orders over ' + money(t.min) : fee + ' over ' + money(t.min);
+    });
+    return 'Delivery fee ' + parts.join(', ') + '.';
+  }
+  function hoursRows() {
+    return (CFG.HOURS_LABELS || []).map(function (h) {
+      return '<tr><th>' + h.days + '</th><td>' + clockLabel(h.open).replace(' ', '') + ' to ' + clockLabel(h.close).replace(' ', '') + '</td></tr>';
+    }).join('');
+  }
+  (function ordering() {
+    var phoneCfg = CFG.PHONE || {};
+    var copyEls = document.querySelectorAll('[data-copy]');
+    for (var i = 0; i < copyEls.length; i++) {
+      var key = copyEls[i].getAttribute('data-copy');
+      if (COPY[key]) copyEls[i].textContent = COPY[key];
+    }
+    var tels = document.querySelectorAll('[data-tel]');
+    for (var t = 0; t < tels.length; t++) {
+      if (phoneCfg.tel) tels[t].setAttribute('href', 'tel:' + phoneCfg.tel);
+      if (phoneCfg.display && !tels[t].hasAttribute('data-tel-label') && !tels[t].hasAttribute('data-copy')) tels[t].textContent = phoneCfg.display;
+      if (tels[t].hasAttribute('data-tel-label') && phoneCfg.display) tels[t].textContent = (COPY.callCta || 'Call') + ' ' + phoneCfg.display;
+    }
+    var tables = document.querySelectorAll('[data-hours] tbody');
+    for (var h = 0; h < tables.length; h++) if (CFG.HOURS_LABELS) tables[h].innerHTML = hoursRows();
+    var list = document.querySelector('[data-hours-list]');
+    if (list && CFG.HOURS_LABELS) list.innerHTML = CFG.HOURS_LABELS.map(function (x) {
+      return '<li><span>' + x.days + '</span><span>' + clockLabel(x.open).replace(' ', '') + ' to ' + clockLabel(x.close).replace(' ', '') + '</span></li>';
+    }).join('');
+
+    var dc = document.getElementById('deliveryCopy');
+    if (dc) dc.textContent = 'Delivery within ' + CFG.DELIVERY_RADIUS_MILES + ' miles. ' + money(CFG.DELIVERY_MINIMUM) + ' minimum. ' + feeSentence() + ' ' + (COPY.deliveryCover || '');
+    var gc = document.getElementById('groupCopy');
+    if (gc) gc.textContent = 'Orders ' + money(CFG.GROUP_ORDER_MINIMUM) + '+ get free delivery. ' + (COPY.groupText || '');
+    var why = document.getElementById('whyList');
+    if (why && COPY.why) why.innerHTML = COPY.why.slice(0, 3).map(function (w) {
+      var soon = w.soon && !CFG.REWARDS_LIVE ? '<span class="tag">' + w.soon + '</span>' : '';
+      return '<li><strong>' + w.title + '</strong><span>' + w.text + '</span>' + soon + '</li>';
+    }).join('');
+
+    /* the sheet */
+    var sheet = document.getElementById('orderSheet');
+    var lastFocus = null;
+    function openSheet(from) {
+      if (!sheet) return;
+      lastFocus = document.activeElement;
+      sheet.hidden = false;
+      sheet.classList.add('is-open');
+      document.body.classList.add('sheet-open');
+      var card = sheet.querySelector('.sheet__card');
+      if (card) card.focus();
+      emit('order_sheet_open', { place: from });
+    }
+    function closeSheet() {
+      if (!sheet || sheet.hidden) return;
+      sheet.hidden = true;
+      sheet.classList.remove('is-open');
+      document.body.classList.remove('sheet-open');
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    if (sheet) {
+      sheet.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-sheet-close]')) closeSheet();
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+    }
+
+    /* the buttons */
+    var btns = document.querySelectorAll('[data-order]');
+    for (var b = 0; b < btns.length; b++) {
+      var mode = btns[b].getAttribute('data-order') || 'pickup';
+      var url = orderUrl(mode);
+      if (url) {
+        btns[b].setAttribute('href', withMode(url, mode));
+        if (phone.matches) { btns[b].removeAttribute('target'); btns[b].removeAttribute('rel'); }
+        else { btns[b].setAttribute('target', '_blank'); btns[b].setAttribute('rel', 'noopener'); }
+      } else {
+        btns[b].setAttribute('href', '#order');
+        btns[b].setAttribute('data-order-soon', '');
+      }
+    }
+    document.addEventListener('click', function (e) {
+      var el = e.target.closest ? e.target.closest('[data-order],[data-call]') : null;
+      if (!el) return;
+      if (el.hasAttribute('data-call')) { emit('call_click', { place: el.getAttribute('data-call') }); return; }
+      var mode = el.getAttribute('data-order') || 'pickup';
+      var live = !!orderUrl(mode);
+      emit('order_click', {
+        mode: mode, place: el.getAttribute('data-place') || '',
+        item: el.getAttribute('data-item') || '', category: el.getAttribute('data-category') || '',
+        live: live, viewport: phone.matches ? 'phone' : 'desktop'
+      });
+      if (!live) { e.preventDefault(); openSheet(el.getAttribute('data-place') || ''); }
+    });
+    window.DD = window.DD || {};
+    window.DD.openSheet = openSheet; window.DD.closeSheet = closeSheet; window.DD.orderUrl = orderUrl;
+  })();
+
+  /* Installable: the service worker caches the shell and the posters, never
+     a video and never anything off this origin (so never a Toast page). */
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    window.addEventListener('load', function () {
+      if (navigator.serviceWorker) navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
 
   /* ----------------------------------------------------------- footer
      The mailing box. The open state is the CSS default, so no JS, reduced

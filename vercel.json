@@ -13,11 +13,33 @@
       ]
     },
     {
-      "source": "/(index.html|site.js|404.html)",
+      "source": "/(index.html|order-demo.html|site.js|demo.js|track.js|404.html|manifest.webmanifest)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/config/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
         }
       ]
     }
@@ -26,6 +48,10 @@
     {
       "source": "/menu/:slug",
       "destination": "/index.html"
+    },
+    {
+      "source": "/order-demo",
+      "destination": "/order-demo.html"
     }
   ]
 }

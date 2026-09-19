@@ -1,3 +1,7 @@
 # The originals are kept for reference only. They are 11 MB and nothing
 # serves them, so they stay out of the deploy.
 source/
+# Local checks (Playwright + Lighthouse), not part of the site.
+scripts/
+# Docs, not part of the site.
+ORDERING.md
