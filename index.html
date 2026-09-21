@@ -5,15 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>document.documentElement.className='js'</script>
 <title>Dubai &amp; Dips | Dessert Shop in Clear Lake, Houston</title>
-<meta name="description" content="Dessert shop in Clear Lake, Houston. Gelato, pastries, coffee and matcha, made in-house every morning. Come see the case, or call ahead and pick yours up.">
+<meta name="description" content="Dubai &amp; Dips is a dessert shop in Clear Lake, Houston. Gelato, pastries, coffee and matcha, made in-house every morning. Order ahead for pickup or delivery, or come see the case.">
 <meta name="theme-color" content="#f2ede4">
 <link rel="canonical" href="https://dubaianddips.com/">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dubai &amp; Dips">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dubai &amp; Dips">
 <meta property="og:title" content="Dubai &amp; Dips | Dessert Shop in Clear Lake, Houston">
-<meta property="og:description" content="Gelato, pastries, coffee and matcha, made in-house in Clear Lake, Houston. Come see the case, or call ahead and pick yours up.">
+<meta property="og:description" content="Gelato, pastries, coffee and matcha, made in-house in Clear Lake, Houston. Order ahead for pickup or delivery, or come see the case.">
 <meta property="og:image" content="https://dubaianddips.com/assets/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -120,9 +125,12 @@ p{margin:0}
 /* Nav: hidden through the film, fades in as the copy lands, gets its
    background once the hero has scrolled away. */
 .nav{position:fixed;inset:0 0 auto 0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem var(--gutter);transition:background .4s var(--ease),padding .4s var(--ease)}
-.js .nav{opacity:0;pointer-events:none}
+.js .nav__fade{opacity:0;pointer-events:none}
+.nav__meta{display:flex;align-items:center;gap:1.4rem}
+.nav__order{min-height:44px;padding:.55rem 1.2rem;font-size:.92rem}
+.nav__order:hover{transform:none}
 .nav.is-stuck{background:rgb(var(--surface-rgb)/.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgb(var(--accent-rgb)/.4);padding-block:.75rem}
-.nav__mark{font-family:var(--display);font-weight:600;font-size:.98rem;letter-spacing:.01em;text-decoration:none;color:var(--on-dark)}
+.nav__mark{font-family:var(--display);font-weight:600;font-size:.98rem;letter-spacing:.01em;text-decoration:none;color:var(--on-dark);white-space:nowrap}
 .nav.is-stuck .nav__mark{color:var(--ink)}
 .nav__mark i{font-style:normal;color:var(--accent-bright)}
 .nav.is-stuck .nav__mark i{color:var(--accent-ink)}
@@ -136,7 +144,8 @@ p{margin:0}
 .nav.is-stuck .nav__call{color:var(--ink)}
 .nav__hours{font-family:var(--mono);font-weight:300;font-size:.7rem;letter-spacing:.12em;color:var(--accent-bright)}
 .nav.is-stuck .nav__hours{color:var(--accent-ink)}
-@media(max-width:899px){.nav__links,.nav__call{display:none}}
+@media(max-width:599px){.nav__hours{display:none}}
+@media(max-width:899px){.nav__links,.nav__call{display:none}.nav{padding-top:calc(.8rem + env(safe-area-inset-top,0px));padding-bottom:.8rem}.nav.is-stuck{padding-block:calc(.6rem + env(safe-area-inset-top,0px)) .6rem}}
 
 /* ============================== HERO ==============================
    The film is the hero. Scroll scrubs it from the closed bar to the room.
@@ -152,6 +161,13 @@ p{margin:0}
 .hero__place{order:2;font-family:var(--mono);font-weight:300;font-size:.74rem;letter-spacing:.26em;text-transform:uppercase;color:var(--accent-bright);margin-top:1rem}
 .hero__mark{order:1;font-family:var(--display);font-weight:500;font-size:clamp(2.4rem,6vw,6rem);line-height:1;letter-spacing:.09em;color:var(--accent-bright);text-shadow:0 2px 40px rgb(var(--black-rgb)/.45),0 0 2px rgb(var(--black-rgb)/.4)}
 .hero__mark i{font-style:normal;font-weight:400;color:var(--accent);letter-spacing:0}
+/* The order CTA in the opening state. Visible at first paint, before any
+   film has loaded, and it is the largest single element on the page. */
+.hero__cta{position:absolute;left:50%;bottom:max(9vh,64px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.75rem;pointer-events:auto}
+.btn--hero{font-size:1.12rem;min-height:60px;padding:1.05rem 2.6rem;box-shadow:var(--lift-2),0 0 0 6px rgb(var(--accent-bright-rgb)/.16)}
+.btn--hero:hover{box-shadow:var(--lift-3),0 0 0 8px rgb(var(--accent-bright-rgb)/.22)}
+.hero__alt{display:inline-flex;align-items:center;min-height:44px;padding:.2rem .2rem;font-size:.98rem;font-weight:600;letter-spacing:.02em;color:rgb(var(--surface-rgb)/.88);text-decoration:none;border-bottom:1px solid rgb(var(--accent-rgb)/.65)}
+.hero__alt:hover{color:var(--accent-bright)}
 .hero__hint{position:absolute;z-index:3;left:var(--gutter);bottom:max(3.4vh,26px);font-family:var(--mono);font-weight:300;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:rgb(var(--surface-rgb)/.68)}
 .hero__hint span{display:inline-block;margin-left:.5rem;color:var(--accent-bright);animation:heroArrow 1.6s var(--ease) infinite}
 @keyframes heroArrow{0%,100%{transform:translateY(0);opacity:.65}50%{transform:translateY(5px);opacity:1}}
@@ -171,7 +187,7 @@ p{margin:0}
    the space above it, the copy the space below, all on the film's green. */
 @media(max-width:899px){
   .hero{height:360vh}
-  .hero__film video{top:26svh;height:56.25vw;object-fit:contain;-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgb(var(--black-rgb)) 6%,rgb(var(--black-rgb)) 94%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,rgb(var(--black-rgb)) 6%,rgb(var(--black-rgb)) 94%,transparent 100%)}
+  .hero__film video{top:22svh;height:56.25vw;object-fit:contain;-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgb(var(--black-rgb)) 6%,rgb(var(--black-rgb)) 94%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,rgb(var(--black-rgb)) 6%,rgb(var(--black-rgb)) 94%,transparent 100%)}
   .hero__open{padding-top:12vh}
   .hero__mark{font-size:clamp(2rem,9.6vw,3.4rem);letter-spacing:.08em}
   .hero__place{font-size:.62rem;letter-spacing:.2em;margin-top:.9rem}
@@ -179,7 +195,11 @@ p{margin:0}
   .hero__land{left:max(5vw,1rem);right:max(5vw,1rem);width:auto;bottom:calc(var(--thumb) + 4vh);gap:.75rem}
   .hero__land h1{font-size:clamp(2.3rem,11vw,3.6rem)}
   .hero__land p{font-size:1rem}
-  .hero__row .btn{display:none}
+  /* On a phone the CTA sits in the lower third, under the film window,
+     clear of the wordmark above and the thumb bar below. */
+  .hero__cta{left:max(5vw,1rem);right:max(5vw,1rem);bottom:calc(var(--thumb) + 12vh);transform:none;gap:.6rem}
+  .btn--hero{width:100%}
+  .hero__open{padding-top:calc(9vh + env(safe-area-inset-top,0px))}
   .hero__scrim{background:linear-gradient(to top,rgb(var(--film-rgb)/.96) 0%,rgb(var(--film-rgb)/.88) 26%,rgb(var(--film-rgb)/.5) 42%,rgb(var(--film-rgb)/0) 58%)}
 }
 
@@ -192,6 +212,46 @@ p{margin:0}
 .js .rise{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
 .js .rise.is-in{opacity:1;transform:none}
 
+
+/* =========================== ORDER DIRECT =========================== */
+.direct{padding-top:0}
+.direct .sec__head h2 em{font-style:italic;font-weight:400;color:var(--accent-ink)}
+.direct__grid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:clamp(1rem,2vw,1.6rem);align-items:stretch}
+.dcard{display:flex;flex-direction:column;align-items:flex-start;gap:.8rem;padding:clamp(1.4rem,2.6vw,2rem);background:var(--surface-raised);border:1px solid rgb(var(--accent-rgb)/.42);border-radius:5px;box-shadow:var(--lift-1)}
+.dcard h3{font-size:clamp(1.4rem,2.2vw,1.9rem);color:var(--ink)}
+.dcard p{color:var(--ink-soft);max-width:44ch}
+.dcard__pickup{font-weight:600;color:var(--ink)!important}
+.dcard__row{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem 1.4rem;margin-top:auto;padding-top:.6rem}
+.dcard--group{background:var(--deep);border-color:rgb(var(--accent-rgb)/.55);color:var(--on-dark)}
+.dcard--group h3{color:var(--on-dark)}
+.dcard--group p{color:rgb(var(--surface-rgb)/.82)}
+.dcard--group .label{color:var(--accent-bright)}
+.dcard--group .btn{margin-top:auto}
+.why{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1rem}
+.why li{display:flex;flex-direction:column;gap:.2rem;padding-left:1.1rem;border-left:2px solid rgb(var(--accent-rgb)/.6)}
+.why strong{font-family:var(--display);font-weight:600;font-size:1.1rem;color:var(--ink)}
+.why span{font-size:.95rem;color:var(--ink-soft)}
+.why .tag{align-self:flex-start;margin-top:.3rem}
+@media(max-width:899px){.direct__grid{grid-template-columns:1fr}}
+
+/* ============================== SHEET ==============================
+   "Ordering goes live soon". A bottom sheet on a phone, a centred card on
+   a desktop. Opened by site.js when config has no Toast URL. */
+.sheet{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center}
+.sheet[hidden]{display:none}
+.sheet__scrim{position:absolute;inset:0;background:rgb(var(--craft-rgb)/.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.sheet__card{position:relative;z-index:1;width:100%;max-width:30rem;max-height:calc(100svh - 2rem);overflow:auto;display:flex;flex-direction:column;align-items:flex-start;gap:.8rem;padding:1.6rem 1.4rem calc(1.4rem + env(safe-area-inset-bottom,0px));background:var(--surface);color:var(--ink);border:1px solid rgb(var(--accent-rgb)/.5);border-bottom:0;border-radius:14px 14px 0 0;box-shadow:var(--lift-3)}
+.sheet__card:focus{outline:none}
+.sheet__x{position:absolute;top:.6rem;right:.6rem;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:var(--ink-soft);font-size:1.6rem;line-height:1;cursor:pointer}
+.sheet__x:hover{background:rgb(var(--accent-rgb)/.15)}
+.sheet__title{font-size:clamp(1.6rem,4vw,2rem)}
+.sheet__text{color:var(--ink-soft);max-width:40ch}
+.sheet__call{width:100%;margin-top:.3rem}
+.sheet__hours{margin-top:.4rem}
+.js .sheet.is-open .sheet__card{animation:sheetUp .32s var(--ease-out)}
+@keyframes sheetUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media(min-width:700px){.sheet{align-items:center;padding:1rem}.sheet__card{border-bottom:1px solid rgb(var(--accent-rgb)/.5);border-radius:8px;padding-bottom:1.6rem}}
+body.sheet-open{overflow:hidden}
 
 /* ============================== CRAFT ==============================
    The second film. The cup comes apart layer by layer as you scroll; the
@@ -416,6 +476,7 @@ p{margin:0}
 .boxfoot .btn--gold{color:var(--ink)}
 .boxfoot .btn--gold:hover{color:var(--ink)}
 .boxfoot__tel{font-weight:600;border-bottom:1px solid rgb(var(--accent-rgb)/.5)}
+.boxfoot__dir,.boxfoot__cater{display:inline-flex;align-items:center;min-height:44px;font-size:.94rem;border-bottom:1px solid rgb(var(--accent-rgb)/.5)}
 .boxfoot__state{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase}
 .boxfoot__state::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent-bright);flex:0 0 auto}
 .boxfoot__state[data-open="no"]{color:rgb(var(--surface-rgb)/.72)}
@@ -452,11 +513,13 @@ p{margin:0}
   .boxfoot__wordmark{font-size:clamp(1.3rem,6.4vw,1.9rem)}
 }
 
-/* Phone thumb bar: directions, call, order from anywhere on the page. */
-.thumbbar{position:fixed;z-index:70;left:0;right:0;bottom:0;display:none;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--deep)}
-.thumbbar a{display:flex;align-items:center;justify-content:center;min-height:60px;font-weight:600;text-decoration:none;color:var(--on-dark)}
-.thumbbar a:first-child{background:var(--accent-bright);color:var(--ink)}
-@media(max-width:899px){:root{--thumb:60px}.thumbbar{display:grid}}
+/* Phone thumb bar: order pickup, then call, from anywhere on the page.
+   --thumb carries the bar's height plus the iOS home-indicator inset, and
+   body padding-bottom uses it, so the bar never sits on top of content. */
+.thumbbar{position:fixed;z-index:70;left:0;right:0;bottom:0;display:none;grid-template-columns:1.6fr 1fr;padding-bottom:env(safe-area-inset-bottom,0px);background:var(--deep);border-top:1px solid rgb(var(--accent-rgb)/.4)}
+.thumbbar a{display:flex;align-items:center;justify-content:center;gap:.5rem;min-height:60px;font-size:1.02rem;font-weight:600;text-decoration:none;color:var(--on-dark)}
+.thumbbar__order{background:var(--accent-bright);color:var(--ink)!important}
+@media(max-width:899px){:root{--thumb:calc(61px + env(safe-area-inset-bottom,0px))}.thumbbar{display:grid}}
 
 /* =============================== MENU ===============================
    The menu is a departures board. Their own packaging is a boarding pass
@@ -476,7 +539,8 @@ p{margin:0}
 .feature__body{display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;padding:clamp(1.6rem,3vw,2.6rem)}
 .feature__body h3{font-size:clamp(1.7rem,3.2vw,2.6rem);color:var(--ink)}
 .feature__body p{color:var(--ink-soft);max-width:38ch}
-.feature__go{display:inline-flex;align-items:center;gap:.5rem;margin-top:auto;padding-top:1rem;font-weight:600;font-size:.95rem;color:var(--accent-ink)}
+.feature__row{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.4rem;margin-top:auto;padding-top:1rem}
+.feature__go{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;font-weight:600;font-size:.95rem;color:var(--accent-ink);text-decoration:none}
 .feature__go i{font-style:normal;transition:transform .35s var(--ease-out)}
 .feature:hover .feature__go i{transform:translateX(5px)}
 @media(max-width:880px){.feature{grid-template-columns:1fr}.feature img{min-height:0;aspect-ratio:16/10}}
@@ -525,6 +589,10 @@ p{margin:0}
 .bitem img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:3px}
 .bitem__plate{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:3px;background:var(--deep);border:1px solid rgb(var(--accent-rgb)/.3);font-family:var(--display);font-size:1.6rem;color:rgb(var(--accent-bright-rgb)/.75)}
 .bitem__name{font-size:.92rem;line-height:1.35;color:var(--on-dark)}
+.bitem__order{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;min-height:44px;min-width:44px;padding:.45rem 1rem;margin-top:auto;border-radius:999px;border:1px solid rgb(var(--accent-rgb)/.7);color:var(--accent-bright);font-size:.85rem;font-weight:600;letter-spacing:.03em;text-decoration:none;transition:background .3s var(--ease),color .3s var(--ease)}
+.bitem__order:hover,.bitem__order:focus-visible{background:var(--accent-bright);color:var(--ink);border-color:var(--accent-bright)}
+.bpanel__order{margin:1.2rem 0 0}
+.btn--sm{min-height:46px;padding:.7rem 1.4rem;font-size:.92rem}
 .board__foot{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.2rem;padding:.9rem clamp(.9rem,2vw,1.6rem);border-top:1px solid rgb(var(--surface-rgb)/.12);background:var(--deep-dim);font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;color:rgb(var(--surface-rgb)/.6)}
 .board__sound{appearance:none;background:transparent;border:1px solid rgb(var(--accent-rgb)/.5);border-radius:999px;color:var(--accent-bright);font:inherit;padding:.35rem .8rem;min-height:32px;cursor:pointer}
 .board__sound i{font-style:normal;color:rgb(var(--surface-rgb)/.65)}
@@ -557,7 +625,7 @@ p{margin:0}
   .hero__open,.hero__hint,.hero__rule{display:none}
   .js .hero__land{opacity:1}
   .hero__scrim{opacity:1}
-  .js .nav{opacity:1;pointer-events:auto}
+  .js .nav__fade{opacity:1;pointer-events:auto}
   .craft{height:auto}
   .craft__stage{position:relative;height:auto;min-height:0;display:flex;flex-direction:column;gap:1.5rem;padding:clamp(4.5rem,9vw,8rem) var(--gutter)}
   .craft__stage video{position:relative;height:auto;aspect-ratio:16/9;order:2}
@@ -583,8 +651,8 @@ p{margin:0}
   .ticket__paper,.ticket__order img{transition:none}
   .ticket__paper:hover,.ticket:focus-within .ticket__paper{transform:none}
   .rail__end{align-self:flex-start;padding:.6rem var(--gutter) 0}
-  .js .sheet.is-open{animation:sheetFade .2s linear}
-  @keyframes sheetFade{from{opacity:0}to{opacity:1}}
+  .js .sheet.is-open .sheet__card{animation:none}
+  .bitem__order,.hero__alt{transition:none}
   .feature,.feature__go i{transition:none}
   .flap__leaf{display:none}
   .flap__ch{transition:opacity .18s linear}
@@ -595,13 +663,18 @@ p{margin:0}
 <a class="skip" href="#menu">Skip to the menu</a>
 
 <header class="nav" id="nav">
-  <a class="nav__mark" href="#top">Dubai <i>&amp;</i> Dips</a>
-  <nav class="nav__links" aria-label="Primary">
-    <a href="#menu">The menu</a><a href="#craft">The craft</a><a href="#visit">Visit</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>
+  <a class="nav__mark nav__fade" href="#top">Dubai <i>&amp;</i> Dips</a>
+  <nav class="nav__links nav__fade" aria-label="Primary">
+    <a href="#menu">The menu</a><a href="#order">Delivery</a><a href="#craft">The craft</a><a href="#visit">Visit</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a>
   </nav>
   <div class="nav__right">
-    <a class="nav__call" href="tel:+12815550147">(281) 555-0147</a>
-    <span class="nav__hours">Open until 10 pm</span>
+    <span class="nav__meta nav__fade">
+      <a class="nav__call" href="tel:+12815550147" data-tel>(281) 555-0147</a>
+      <span class="nav__hours">Open until 10 pm</span>
+    </span>
+    <!-- The one piece of the header that never fades: the Order button.
+         Its destination and behaviour come from config/ordering.js. -->
+    <a class="btn btn--gold nav__order" href="#visit" data-order="pickup" data-place="header" data-copy="orderShort">Order</a>
   </div>
 </header>
 
@@ -609,15 +682,22 @@ p{margin:0}
 <section class="hero" id="top" aria-label="Dubai and Dips, dessert shop in Clear Lake, Houston">
   <div class="hero__stage">
     <div class="hero__film">
-      <video id="heroVideo" muted playsinline preload="metadata" poster="/assets/hero-poster.webp" aria-hidden="true" tabindex="-1">
-        <source src="/assets/hero.mp4" type="video/mp4">
-      </video>
+      <!-- The film is deferred: no source until after first paint, so the
+           poster, the wordmark and the order button never wait on 2.5 MB
+           of video. site.js attaches the source on load. -->
+      <video id="heroVideo" muted playsinline preload="none" poster="/assets/hero-poster.webp" aria-hidden="true" tabindex="-1" data-src="/assets/hero.mp4"></video>
     </div>
     <div class="hero__scrim" id="heroScrim" aria-hidden="true"></div>
     <div class="hero__exit" id="heroExit" aria-hidden="true"></div>
     <div class="hero__open" id="heroOpen">
       <div class="hero__mark">DUBAI <i>&amp;</i> DIPS</div>
       <p class="hero__place">Dessert shop &middot; Clear Lake, Houston</p>
+      <!-- Pickup first. The primary is the most visible thing on the page
+           at load; the delivery link is the quiet alternative. -->
+      <div class="hero__cta" id="heroCta">
+        <a class="btn btn--gold btn--hero" href="#visit" data-order="pickup" data-place="hero" data-copy="pickupCta">Order ahead for pickup</a>
+        <a class="hero__alt" href="#visit" data-order="delivery" data-place="hero" data-copy="deliveryCta">Or get it delivered</a>
+      </div>
     </div>
     <p class="hero__hint" id="heroHint" aria-hidden="true">Scroll to open <span>&darr;</span></p>
     <div class="hero__land" id="heroLand">
@@ -625,8 +705,8 @@ p{margin:0}
       <h1>Made here, <em>every morning.</em></h1>
       <p>Gelato, pastries, coffee and matcha.</p>
       <div class="hero__row">
-        <a class="btn btn--gold" href="https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX" target="_blank" rel="noopener">Get directions</a>
-        <a class="tlink" href="tel:+12815550147">Call (281) 555-0147</a>
+        <a class="btn btn--gold" href="#visit" data-order="pickup" data-place="hero-landing" data-copy="pickupCta">Order ahead for pickup</a>
+        <a class="tlink" href="#visit" data-order="delivery" data-place="hero-landing" data-copy="deliveryCta">Or get it delivered</a>
       </div>
     </div>
     <div class="hero__rule" aria-hidden="true"><i id="heroRule"></i></div>
@@ -655,15 +735,18 @@ p{margin:0}
       <p>The same ten categories that run across the boards above the counter. Open one to see what is in it.</p>
     </div>
 
-    <a class="feature rise" href="/menu/frappes" data-sheet="frappes">
+    <div class="feature rise">
       <img src="/assets/menu-dubai-frappe.webp" width="1400" height="700" loading="lazy" decoding="async" alt="The Dubai Chocolate Frappe in a clear cup on marble: a tan blended base with pistachio and dark chocolate pulled down the inside, whipped cream and both drizzles on top.">
       <div class="feature__body">
         <span class="label">The one people come in for</span>
         <h3>Dubai Chocolate Frappe</h3>
         <p>Blended cold, with pistachio and dark chocolate pulled down the inside of the cup so it lands in every sip. Cream and both drizzles on top.</p>
-        <span class="feature__go">See the frappes <i>&rarr;</i></span>
+        <div class="feature__row">
+          <a class="btn btn--gold" href="#visit" data-order="pickup" data-place="feature" data-item="Dubai Chocolate Frappe" data-category="The Frappes" data-copy="orderShort">Order</a>
+          <a class="feature__go" href="/menu/frappes" data-sheet="frappes">See the frappes <i>&rarr;</i></a>
+        </div>
       </div>
-    </a>
+    </div>
 
     <div class="board" id="board" data-view="all">
       <div class="board__head" aria-hidden="true">
@@ -686,13 +769,14 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <ul class="bitems">
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">E</span><span class="bitem__name">Espresso</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">C</span><span class="bitem__name">Cappuccino</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">A</span><span class="bitem__name">Americano</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">A</span><span class="bitem__name">Affogato</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">C</span><span class="bitem__name">Cortado</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">L</span><span class="bitem__name">Leche y Leche (Spanish Cortado)</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">E</span><span class="bitem__name">Espresso</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Espresso" data-category="Classic Coffees" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">C</span><span class="bitem__name">Cappuccino</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Cappuccino" data-category="Classic Coffees" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">A</span><span class="bitem__name">Americano</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Americano" data-category="Classic Coffees" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">A</span><span class="bitem__name">Affogato</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Affogato" data-category="Classic Coffees" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">C</span><span class="bitem__name">Cortado</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Cortado" data-category="Classic Coffees" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">L</span><span class="bitem__name">Leche y Leche (Spanish Cortado)</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Leche y Leche (Spanish Cortado)" data-category="Classic Coffees" data-copy="orderShort">Order</a></li>
           </ul>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="Classic Coffees" aria-label="Order for pickup: Classic Coffees">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -708,15 +792,16 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <ul class="bitems">
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Matcha Cortado (12 oz)</span></li>
-            <li class="bitem"><img src="/assets/rev-strawberry-matcha.webp" width="260" height="260" loading="lazy" decoding="async" alt="A strawberry matcha in a clear cup, a pink strawberry layer over green matcha with matcha dusted on the foam."><span class="bitem__name">Strawberry Matcha</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Biscoff Matcha</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Mango Matcha</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Matcha</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Blueberry Cream Matcha</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Date Matcha</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">P</span><span class="bitem__name">Pistachio Matcha</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Matcha Cortado (12 oz)</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Matcha Cortado (12 oz)" data-category="The Matchas" data-copy="orderShort">Order</a></li>
+            <li class="bitem"><img src="/assets/rev-strawberry-matcha.webp" width="260" height="260" loading="lazy" decoding="async" alt="A strawberry matcha in a clear cup, a pink strawberry layer over green matcha with matcha dusted on the foam."><span class="bitem__name">Strawberry Matcha</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Strawberry Matcha" data-category="The Matchas" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Biscoff Matcha</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Biscoff Matcha" data-category="The Matchas" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Mango Matcha</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Mango Matcha" data-category="The Matchas" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Matcha</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Banana Matcha" data-category="The Matchas" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Blueberry Cream Matcha</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Blueberry Cream Matcha" data-category="The Matchas" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Date Matcha</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Banana Date Matcha" data-category="The Matchas" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">P</span><span class="bitem__name">Pistachio Matcha</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Pistachio Matcha" data-category="The Matchas" data-copy="orderShort">Order</a></li>
           </ul>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="The Matchas" aria-label="Order for pickup: The Matchas">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -732,13 +817,14 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <ul class="bitems">
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Spanish Latte</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">P</span><span class="bitem__name">Pistachio Latte</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">T</span><span class="bitem__name">Tiramisu Latte</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Biscoff Latte</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">T</span><span class="bitem__name">Taro Latte</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Spanish Latte</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Spanish Latte" data-category="The Lattes" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">P</span><span class="bitem__name">Pistachio Latte</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Pistachio Latte" data-category="The Lattes" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">T</span><span class="bitem__name">Tiramisu Latte</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Tiramisu Latte" data-category="The Lattes" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Biscoff Latte</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Biscoff Latte" data-category="The Lattes" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">T</span><span class="bitem__name">Taro Latte</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Taro Latte" data-category="The Lattes" data-copy="orderShort">Order</a></li>
           </ul>
           <p class="bpanel__miss">Three more lines on this part of the board could not be read from the photo <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="The Lattes" aria-label="Order for pickup: The Lattes">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -754,11 +840,12 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <ul class="bitems">
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Salted Caramel Frappe</span></li>
-            <li class="bitem"><img src="/assets/rev-pistachio-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A pistachio frappe in a clear cup, whipped cream on top with green pistachio sauce drizzled over it."><span class="bitem__name">Pistachio Frappe</span></li>
-            <li class="bitem"><img src="/assets/rev-biscoff-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A Biscoff frappe in a clear cup, cookie butter swirled through it with whipped cream and a whole Biscoff cookie on top."><span class="bitem__name">Biscoff Frappe</span></li>
-            <li class="bitem"><img src="/assets/rev-dubai-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="The Dubai Chocolate Frappe in a clear cup, whipped cream with pistachio and dark chocolate drizzled over the top."><span class="bitem__name">Dubai Chocolate Frappe</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Salted Caramel Frappe</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Salted Caramel Frappe" data-category="The Frappes" data-copy="orderShort">Order</a></li>
+            <li class="bitem"><img src="/assets/rev-pistachio-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A pistachio frappe in a clear cup, whipped cream on top with green pistachio sauce drizzled over it."><span class="bitem__name">Pistachio Frappe</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Pistachio Frappe" data-category="The Frappes" data-copy="orderShort">Order</a></li>
+            <li class="bitem"><img src="/assets/rev-biscoff-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A Biscoff frappe in a clear cup, cookie butter swirled through it with whipped cream and a whole Biscoff cookie on top."><span class="bitem__name">Biscoff Frappe</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Biscoff Frappe" data-category="The Frappes" data-copy="orderShort">Order</a></li>
+            <li class="bitem"><img src="/assets/rev-dubai-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="The Dubai Chocolate Frappe in a clear cup, whipped cream with pistachio and dark chocolate drizzled over the top."><span class="bitem__name">Dubai Chocolate Frappe</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Dubai Chocolate Frappe" data-category="The Frappes" data-copy="orderShort">Order</a></li>
           </ul>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="The Frappes" aria-label="Order for pickup: The Frappes">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -774,6 +861,7 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="The Refreshers" aria-label="Order for pickup: The Refreshers">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -789,12 +877,13 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <ul class="bitems">
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Strawberry Smoothie</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Strawberry Banana Smoothie</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Mango Smoothie</span></li>
-            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Date Smoothie</span></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Strawberry Smoothie</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Strawberry Smoothie" data-category="The Smoothies" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">S</span><span class="bitem__name">Strawberry Banana Smoothie</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Strawberry Banana Smoothie" data-category="The Smoothies" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">M</span><span class="bitem__name">Mango Smoothie</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Mango Smoothie" data-category="The Smoothies" data-copy="orderShort">Order</a></li>
+            <li class="bitem bitem--type"><span class="bitem__plate" aria-hidden="true">B</span><span class="bitem__name">Banana Date Smoothie</span><a class="bitem__order" href="#visit" data-order="pickup" data-place="item" data-item="Banana Date Smoothie" data-category="The Smoothies" data-copy="orderShort">Order</a></li>
           </ul>
           <p class="bpanel__miss">One more line on this part of the board could not be read from the photo <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="The Smoothies" aria-label="Order for pickup: The Smoothies">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -810,6 +899,7 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="Breakfast Bites" aria-label="Order for pickup: Breakfast Bites">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -825,6 +915,7 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="The Crepes" aria-label="Order for pickup: The Crepes">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -840,6 +931,7 @@ p{margin:0}
         <div class="bpanel__in">
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="The Waffles" aria-label="Order for pickup: The Waffles">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -856,6 +948,7 @@ p{margin:0}
           <p class="bpanel__need">Item names transcribed from a photo of the boards in the shop. Prices are not on the site yet. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
           <img class="bpanel__shot" src="/assets/menu-kunafa.webp" width="1000" height="563" loading="lazy" decoding="async" alt="A round kunafa on a gold board, crisp golden pastry with a mound of crushed green pistachio in the middle.">
           <p class="bpanel__miss">This category is on the board, but the item names were too small to read in the photo. <span class="tag">⟨NEEDS MENU FILE⟩</span></p>
+          <p class="bpanel__order"><a class="btn btn--gold btn--sm" href="#visit" data-order="pickup" data-place="category" data-category="D&D Desserts" aria-label="Order for pickup: D&D Desserts">Order for pickup</a></p>
         </div>
         </div>
       </li>
@@ -864,6 +957,41 @@ p{margin:0}
         <button class="board__sound" type="button" id="boardSound" aria-pressed="false">Sound <i>off</i></button>
         <span>Ten categories, straight off the boards above the counter.</span>
       </p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= ORDER DIRECT =========================
+     Three cards next to the menu: delivery, why direct, group orders.
+     Every number and every line of copy is filled from config/ordering.js
+     by site.js, so nothing here carries a fee or a minimum. -->
+<section class="sec direct" id="order" aria-labelledby="direct-title">
+  <div class="shell">
+    <div class="sec__head rise">
+      <span class="label">Order direct</span>
+      <h2 id="direct-title">Straight from us, <em>to you.</em></h2>
+    </div>
+    <div class="direct__grid">
+      <article class="dcard dcard--delivery rise">
+        <span class="label">Delivery</span>
+        <h3 data-copy="deliveryTitle">Delivery, done right.</h3>
+        <p id="deliveryCopy"></p>
+        <p class="dcard__pickup" data-copy="pickupLine"></p>
+        <div class="dcard__row">
+          <a class="btn btn--gold" href="#visit" data-order="pickup" data-place="delivery-card" data-copy="pickupCta">Order ahead for pickup</a>
+          <a class="tlink" href="#visit" data-order="delivery" data-place="delivery-card">Get it delivered</a>
+        </div>
+      </article>
+      <article class="dcard rise">
+        <span class="label" data-copy="whyTitle">Why order direct</span>
+        <ul class="why" id="whyList"></ul>
+      </article>
+      <article class="dcard dcard--group rise">
+        <span class="label">Group orders</span>
+        <h3 data-copy="groupTitle">Treat your office</h3>
+        <p id="groupCopy"></p>
+        <a class="btn btn--gold" href="#visit" data-order="group" data-place="group-card" data-copy="groupCta">Start a group order</a>
+      </article>
     </div>
   </div>
 </section>
@@ -909,7 +1037,7 @@ p{margin:0}
       <div class="visit__facts rise">
         <div class="fact"><h3>Address</h3><address>1234 Bay Area Blvd, Suite 100<br>Houston, TX 77058</address></div>
         <div class="fact"><h3>Hours</h3>
-          <table class="hours-table"><tbody>
+          <table class="hours-table" data-hours><tbody>
             <tr><th>Mon to Thu</th><td>11am to 10pm</td></tr>
             <tr><th>Fri</th><td>11am to 11pm</td></tr>
             <tr><th>Sat</th><td>12pm to 11pm</td></tr>
@@ -917,10 +1045,10 @@ p{margin:0}
           </tbody></table>
         </div>
         <div class="fact"><h3>Parking</h3><p>Free lot right out front, and more spaces around the side of the building.</p></div>
-        <div class="fact"><h3>Phone</h3><p><a href="tel:+12815550147">(281) 555-0147</a></p></div>
+        <div class="fact"><h3>Phone</h3><p><a href="tel:+12815550147" data-tel>(281) 555-0147</a></p></div>
         <div class="visit__cta">
           <a class="btn btn--gold" href="https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX" target="_blank" rel="noopener">Get directions</a>
-          <a class="tlink" href="https://order.example.com" target="_blank" rel="noopener">Order ahead</a>
+          <a class="tlink" href="#order" data-order="pickup" data-place="visit" data-copy="pickupCta">Order ahead for pickup</a>
         </div>
       </div>
     </div>
@@ -1068,12 +1196,13 @@ p{margin:0}
         <div class="boxfoot__col" data-rise-foot>
           <div class="boxfoot__mark">DUBAI <i>&amp;</i> DIPS</div>
           <address>1234 Bay Area Blvd, Suite 100<br>Houston, TX 77058</address>
-          <a class="boxfoot__tel" href="tel:+12815550147">(281) 555-0147</a>
+          <a class="boxfoot__tel" href="tel:+12815550147" data-tel>(281) 555-0147</a>
+          <a class="boxfoot__dir" href="https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX" target="_blank" rel="noopener">Get directions</a>
         </div>
         <div class="boxfoot__col" data-rise-foot>
           <h3>Hours</h3>
           <p class="boxfoot__state" id="footState" data-open="yes">Open until 10 pm</p>
-          <ul class="boxfoot__hours"><li><span>Mon to Thu</span><span>11am to 10pm</span></li><li><span>Fri</span><span>11am to 11pm</span></li><li><span>Sat</span><span>12pm to 11pm</span></li><li><span>Sun</span><span>12pm to 9pm</span></li></ul>
+          <ul class="boxfoot__hours" data-hours-list><li><span>Mon to Thu</span><span>11am to 10pm</span></li><li><span>Fri</span><span>11am to 11pm</span></li><li><span>Sat</span><span>12pm to 11pm</span></li><li><span>Sun</span><span>12pm to 9pm</span></li></ul>
         </div>
         <div class="boxfoot__col" data-rise-foot>
           <h3>Follow</h3>
@@ -1081,7 +1210,8 @@ p{margin:0}
             <li><a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
             <li><a href="https://tiktok.com/" target="_blank" rel="noopener">TikTok</a></li>
           </ul>
-          <a class="btn btn--gold" href="#contact">Catering &amp; large orders</a>
+          <a class="btn btn--gold" href="#visit" data-order="pickup" data-place="footer" data-copy="pickupCta">Order ahead for pickup</a>
+          <a class="boxfoot__cater" href="#contact">Catering &amp; large orders</a>
         </div>
       </div>
       <div class="shell boxfoot__base" data-rise-foot>
@@ -1108,12 +1238,30 @@ p{margin:0}
   </div>
 </footer>
 
+<!-- Phone thumb bar: two buttons, pickup first. Fixed above the iOS home
+     indicator; the page carries matching bottom padding so it never covers
+     content. -->
 <nav class="thumbbar" aria-label="Quick actions">
-  <a href="https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX">Directions</a>
-  <a href="tel:+12815550147">Call</a>
-  <a href="https://order.example.com">Order</a>
+  <a class="thumbbar__order" href="#visit" data-order="pickup" data-place="thumbbar" data-copy="pickupShort">Order pickup</a>
+  <a class="thumbbar__call" href="tel:+12815550147" data-tel data-call="thumbbar" data-copy="callCta">Call</a>
 </nav>
 
+<!-- "Ordering goes live soon". Opened by any Order button while
+     TOAST_ORDER_URL is empty in config/ordering.js. Never a dead link. -->
+<div class="sheet" id="orderSheet" hidden>
+  <div class="sheet__scrim" data-sheet-close></div>
+  <div class="sheet__card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" tabindex="-1">
+    <button class="sheet__x" type="button" aria-label="Close" data-sheet-close>&times;</button>
+    <span class="label">Online ordering</span>
+    <h2 class="sheet__title" id="sheetTitle" data-copy="soonTitle">Ordering goes live soon.</h2>
+    <p class="sheet__text" data-copy="soonText"></p>
+    <a class="btn btn--gold sheet__call" href="tel:+12815550147" data-tel data-tel-label data-call="sheet">Call (281) 555-0147</a>
+    <table class="hours-table sheet__hours" data-hours><tbody></tbody></table>
+  </div>
+</div>
+
+<script src="/config/ordering.js" defer></script>
+<script src="/track.js" defer></script>
 <script src="/site.js" defer></script>
 </body>
 </html>

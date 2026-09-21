@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>document.documentElement.className='js'</script>
+<title>Order Pickup &amp; Delivery Demo | Dubai &amp; Dips, Houston</title>
+<meta name="description" content="A demo of online ordering for Dubai &amp; Dips in Clear Lake, Houston: pickup or delivery, the menu, a cart, and the hand-off to Toast. No payments are taken on this site.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#22392c">
+<link rel="canonical" href="https://dubaianddips.com/order-demo">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dubai &amp; Dips">
+<meta property="og:title" content="Order Pickup &amp; Delivery Demo | Dubai &amp; Dips, Houston">
+<meta property="og:description" content="A demo of online ordering for Dubai &amp; Dips in Clear Lake, Houston. Payment and kitchen tickets live in Toast; nothing here touches a card.">
+<meta property="og:image" content="https://dubaianddips.com/assets/og.jpg">
+<meta property="og:image:alt" content="The Dubai and Dips room: a gold DUBAI & DIPS sign on a deep green wall above lit pastry cases, marble tables and white chairs.">
+<meta property="og:url" content="https://dubaianddips.com/order-demo">
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/fraunces-2.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/sourcesans-2.woff2" crossorigin>
+<style>
+@font-face{font-family:'Fraunces';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/fraunces-2.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3';font-style:normal;font-weight:300 600;font-display:swap;src:url(/assets/fonts/sourcesans-2.woff2) format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:300 400;font-display:swap;src:url(/assets/fonts/plexmono-2.woff2) format('woff2')}
+/* Same palette as the site. This page stands alone (no page reloads
+   between steps; state lives in memory), so the tokens are repeated. */
+:root{
+  --surface:#f2ede4;--surface-raised:#fbf9f5;--surface-sunk:#e8e1d5;
+  --ink:#1c3628;--ink-soft:#3d5a48;--ink-faint:#516b5a;
+  --deep:#22392c;--deep-dim:#1a2c22;--on-dark:#f2ede4;
+  --accent:#b08d4a;--accent-mid:#c9a75f;--accent-bright:#d9bb7c;--accent-ink:#6d5415;
+  --surface-rgb:242 237 228;--ink-rgb:28 54 40;--accent-rgb:176 141 74;--accent-bright-rgb:217 187 124;--shade-rgb:74 54 32;--black-rgb:0 0 0;
+  --lift-1:0 1px 2px rgb(var(--shade-rgb)/.05),0 3px 10px rgb(var(--shade-rgb)/.07);
+  --lift-2:0 2px 6px rgb(var(--shade-rgb)/.07),0 14px 30px rgb(var(--shade-rgb)/.10);
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Source Sans 3",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.22,.61,.36,1);--ease-out:cubic-bezier(.16,1,.3,1);
+  --head:56px;--bar:0px;--gutter:1rem;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--surface)}
+body{margin:0;min-height:100svh;background:var(--surface);color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-top:calc(var(--head) + env(safe-area-inset-top,0px));padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom,0px))}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.05;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(1.75rem,7vw,2.4rem)}
+h2{font-size:clamp(1.6rem,6vw,2.1rem)}
+h1 em,h2 em{font-style:italic;font-weight:400;color:var(--accent-ink)}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px;border-radius:3px}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+.label{font-family:var(--mono);font-weight:300;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink)}
+.shell{width:min(640px,100% - 2*var(--gutter));margin-inline:auto}
+.mono{font-family:var(--mono);font-size:.8rem;letter-spacing:.06em}
+
+/* The demo pill. Rendered by demo.js from DD_CONFIG.DEMO, never by hand. */
+.pill{position:fixed;z-index:200;bottom:calc(var(--bar) + .6rem + env(safe-area-inset-bottom,0px));left:.75rem;display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .65rem;border-radius:999px;background:var(--accent-bright);color:var(--ink);font-family:var(--mono);font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;box-shadow:var(--lift-1);pointer-events:none}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink)}
+.pill[hidden]{display:none}
+
+/* Header */
+.dhead{position:fixed;z-index:100;top:0;left:0;right:0;height:calc(var(--head) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:56px 1fr 56px;align-items:center;background:var(--deep);color:var(--on-dark);border-bottom:1px solid rgb(var(--accent-rgb)/.5)}
+.dhead__btn{display:grid;place-items:center;width:56px;height:56px;border:0;background:transparent;color:var(--accent-bright);text-decoration:none;font-size:1.3rem;cursor:pointer}
+.dhead__btn svg{width:22px;height:22px}
+.dhead__mark{justify-self:center;display:inline-flex;align-items:center;min-height:44px;font-family:var(--display);font-weight:600;font-size:1rem;letter-spacing:.06em;text-decoration:none;color:var(--on-dark);padding-right:2.6rem}
+.dhead__mark i{font-style:normal;color:var(--accent-bright)}
+
+/* Step rail */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin:1rem auto .4rem;list-style:none;padding:0}
+.steps li{display:flex;flex-direction:column;gap:.35rem;font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;line-height:1.3;text-transform:uppercase;color:var(--ink-faint)}
+.steps li::before{content:"";height:3px;border-radius:2px;background:rgb(var(--ink-rgb)/.14)}
+.steps li.is-done::before,.steps li.is-on::before{background:var(--accent)}
+.steps li.is-on{color:var(--accent-ink)}
+
+/* Screens */
+.screen{display:none;padding:1rem 0 1.5rem}
+.screen.is-on{display:block}
+.js .screen.is-on{animation:screenIn .28s var(--ease-out)}
+@keyframes screenIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+.screen__head{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.2rem}
+.screen__head p{color:var(--ink-soft)}
+.chip{display:inline-flex;align-items:center;gap:.4rem;min-height:32px;padding:.2rem .7rem;border-radius:999px;background:var(--surface-sunk);color:var(--ink);font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:52px;padding:.85rem 1.5rem;border:0;border-radius:999px;font-weight:600;font-size:1rem;letter-spacing:.02em;text-decoration:none;cursor:pointer;transition:transform .25s var(--ease-out),box-shadow .25s var(--ease-out),background .25s var(--ease)}
+.btn--gold{background:var(--accent-bright);color:var(--ink);box-shadow:var(--lift-1)}
+.btn--gold:hover{background:var(--accent-mid)}
+.btn--gold[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn--ghost{background:transparent;color:var(--ink);border:1px solid rgb(var(--ink-rgb)/.35)}
+.btn--wide{width:100%}
+
+/* Step 1: mode */
+.modes{display:grid;gap:.9rem}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:.5rem;width:100%;min-height:96px;padding:1.1rem 1.2rem;text-align:left;background:var(--surface-raised);border:1px solid rgb(var(--accent-rgb)/.45);border-radius:8px;box-shadow:var(--lift-1);cursor:pointer;transition:border-color .2s var(--ease),transform .2s var(--ease-out)}
+.mode:hover{border-color:var(--accent)}
+.mode[aria-pressed="true"]{border-color:var(--accent-ink);box-shadow:0 0 0 2px rgb(var(--accent-rgb)/.45),var(--lift-1)}
+.mode__title{display:flex;align-items:center;gap:.6rem;font-family:var(--display);font-weight:600;font-size:1.35rem}
+.mode__title svg{width:22px;height:22px;color:var(--accent-ink)}
+.mode__sub{color:var(--ink-soft);font-size:.95rem}
+.mode__fine{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;line-height:1.6;color:var(--ink-faint)}
+
+/* Step 2: menu */
+.items{list-style:none;margin:0;padding:0;display:grid;gap:.8rem}
+.item{display:grid;grid-template-columns:84px 1fr;gap:.8rem;padding:.8rem;background:var(--surface-raised);border:1px solid rgb(var(--accent-rgb)/.35);border-radius:8px;box-shadow:var(--lift-1)}
+.item img,.item__plate{width:84px;height:84px;border-radius:6px;object-fit:cover;filter:contrast(1.07) saturate(1.06) brightness(.985)}
+.item__plate{display:grid;place-items:center;background:var(--deep);border:1px solid rgb(var(--accent-rgb)/.3);font-family:var(--display);font-size:1.8rem;color:rgb(var(--accent-bright-rgb)/.8)}
+.item__body{display:flex;flex-direction:column;gap:.45rem;min-width:0}
+.item__top{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}
+.item__name{font-family:var(--display);font-weight:600;font-size:1.1rem;line-height:1.15}
+.item__price{font-family:var(--mono);font-size:.9rem;white-space:nowrap}
+.item__cat{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+.mods{display:flex;flex-wrap:wrap;gap:.4rem;margin:0;padding:0;border:0}
+.mods legend{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);padding:0;margin-bottom:.3rem}
+.mod{position:relative}
+.mod input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.mod span{display:inline-flex;align-items:center;min-height:36px;padding:.2rem .7rem;border-radius:999px;border:1px solid rgb(var(--ink-rgb)/.3);font-size:.85rem;background:var(--surface)}
+.mod input:checked+span{background:var(--deep);color:var(--on-dark);border-color:var(--deep)}
+.mod input:focus-visible+span{outline:2px solid var(--accent-ink);outline-offset:2px}
+.item__act{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-top:.2rem}
+.item__act .btn{min-height:44px;padding:.5rem 1.2rem;font-size:.92rem}
+.qty{display:inline-flex;align-items:center;border:1px solid rgb(var(--ink-rgb)/.3);border-radius:999px;background:var(--surface)}
+.qty button{width:44px;height:44px;border:0;background:transparent;font-size:1.2rem;cursor:pointer;border-radius:999px}
+.qty span{min-width:1.6rem;text-align:center;font-family:var(--mono);font-size:.95rem}
+.item__sub{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;color:var(--ink-faint)}
+
+/* Step 3: cart */
+.lines{list-style:none;margin:0 0 1rem;padding:0;display:grid;gap:.6rem}
+.line{display:grid;grid-template-columns:1fr auto;gap:.4rem .8rem;align-items:center;padding:.8rem .9rem;background:var(--surface-raised);border:1px solid rgb(var(--accent-rgb)/.35);border-radius:8px}
+.line__name{font-weight:600}
+.line__mod{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;color:var(--ink-faint)}
+.line__price{font-family:var(--mono);font-size:.9rem;text-align:right}
+.line .qty{grid-column:1;justify-self:start}
+.line__rm{grid-column:2;justify-self:end;min-height:44px;padding:.3rem .6rem;border:0;background:transparent;color:var(--ink-faint);font-size:.85rem;text-decoration:underline;cursor:pointer}
+.empty{padding:1.5rem 1rem;text-align:center;color:var(--ink-soft);border:1px dashed rgb(var(--accent-rgb)/.6);border-radius:8px}
+.block{display:flex;flex-direction:column;gap:.6rem;padding:1rem 0;border-top:1px solid rgb(var(--ink-rgb)/.14)}
+.block h3{font-family:var(--body);font-size:.8rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chips button{min-height:44px;padding:.4rem .95rem;border-radius:999px;border:1px solid rgb(var(--ink-rgb)/.3);background:var(--surface);font-weight:600;font-size:.92rem;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--deep);color:var(--on-dark);border-color:var(--deep)}
+.sel{font:inherit;min-height:48px;padding:.5rem .9rem;border:1px solid rgb(var(--ink-rgb)/.3);border-radius:8px;background:var(--surface-raised);color:var(--ink);width:100%}
+.notice{padding:.8rem 1rem;border-radius:8px;background:rgb(var(--accent-rgb)/.16);border:1px solid rgb(var(--accent-rgb)/.5);font-size:.95rem}
+.totals{list-style:none;margin:0;padding:1rem 0;display:grid;gap:.4rem;border-top:1px solid rgb(var(--ink-rgb)/.14)}
+.totals li{display:flex;justify-content:space-between;gap:1rem;font-family:var(--mono);font-size:.9rem;color:var(--ink-soft)}
+.totals li.is-total{font-family:var(--display);font-size:1.35rem;color:var(--ink);padding-top:.5rem;border-top:1px solid rgb(var(--ink-rgb)/.14);margin-top:.3rem}
+.totals small{display:block;font-size:.78rem;letter-spacing:.06em;color:var(--ink-faint)}
+
+/* Step 4: hand-off */
+.hand{display:flex;flex-direction:column;gap:1.1rem}
+.hand p{color:var(--ink-soft);font-size:1.05rem}
+.hand strong{color:var(--ink)}
+.diagram{width:100%;height:auto;padding:1rem;background:var(--deep);border-radius:10px;border:1px solid rgb(var(--accent-rgb)/.5)}
+.hand__row{display:flex;flex-wrap:wrap;gap:.8rem}
+.hand__sum{font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;color:var(--ink-faint)}
+
+/* Bottom action bar */
+.actbar{position:fixed;z-index:100;left:0;right:0;bottom:0;padding:.7rem var(--gutter) calc(.7rem + env(safe-area-inset-bottom,0px));background:rgb(var(--surface-rgb)/.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgb(var(--accent-rgb)/.45);display:none}
+.actbar.is-on{display:block}
+body.has-bar{--bar:80px}
+.actbar__in{width:min(640px,100%);margin-inline:auto;display:flex;align-items:center;gap:.8rem}
+.actbar .btn{flex:1;min-height:56px;font-size:1.05rem;justify-content:space-between;padding-inline:1.4rem}
+.actbar .btn b{font-family:var(--mono);font-weight:400;font-size:.95rem}
+.actbar__sub{font-family:var(--mono);font-size:.76rem;letter-spacing:.06em;color:var(--ink-faint);margin-top:.35rem;text-align:center}
+
+@media(min-width:700px){:root{--gutter:2rem}.modes{grid-template-columns:1fr 1fr}.item{grid-template-columns:110px 1fr}.item img,.item__plate{width:110px;height:110px}}
+@media(prefers-reduced-motion:reduce){.js .screen.is-on{animation:none}.btn,.mode{transition:none}}
+</style>
+</head>
+<body>
+<a class="vh" href="#app" style="position:absolute">Skip to the order</a>
+<div class="pill" id="demoPill" hidden aria-label="Demo">Demo</div>
+
+<header class="dhead">
+  <button class="dhead__btn" type="button" id="backBtn" aria-label="Back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <a class="dhead__mark" href="/">Dubai <i>&amp;</i> Dips</a>
+  <a class="dhead__btn" id="callBtn" href="tel:+12815550147" aria-label="Call the shop">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+  </a>
+</header>
+
+<main id="app" class="shell">
+  <ol class="steps" id="steps" aria-label="Order steps">
+    <li data-step="1">Pickup or delivery</li><li data-step="2">Menu</li><li data-step="3">Cart</li><li data-step="4">Checkout</li>
+  </ol>
+
+  <section class="screen" data-step="1" aria-labelledby="s1-title">
+    <div class="screen__head">
+      <span class="label">Order online</span>
+      <h1 id="s1-title">How do you want <em>it?</em></h1>
+      <p>Pickup is ready when you walk in. Delivery comes straight from our door.</p>
+    </div>
+    <div class="modes">
+      <button class="mode" type="button" data-mode="pickup" aria-pressed="false">
+        <span class="mode__title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Pickup</span>
+        <span class="mode__sub">Ready when you walk in.</span>
+        <span class="mode__fine" id="pickupFine"></span>
+      </button>
+      <button class="mode" type="button" data-mode="delivery" aria-pressed="false">
+        <span class="mode__title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h-2v-6l2-5h9v11"/><path d="M14 9h4l3 4v4h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Delivery</span>
+        <span class="mode__sub" id="deliverySub"></span>
+        <span class="mode__fine" id="deliveryFine"></span>
+      </button>
+    </div>
+  </section>
+
+  <section class="screen" data-step="2" aria-labelledby="s2-title">
+    <div class="screen__head">
+      <span class="chip" id="modeChip"></span>
+      <h2 id="s2-title">The menu.</h2>
+      <p>Six of the things people come in for. Pick a size or a milk, then add it.</p>
+    </div>
+    <ul class="items" id="items"></ul>
+  </section>
+
+  <section class="screen" data-step="3" aria-labelledby="s3-title">
+    <div class="screen__head">
+      <span class="chip" id="modeChip2"></span>
+      <h2 id="s3-title">Your order.</h2>
+    </div>
+    <ul class="lines" id="lines"></ul>
+    <div id="minNotice" class="notice" hidden></div>
+    <div class="block" id="timeBlock">
+      <h3 id="timeTitle">Pickup time</h3>
+      <div class="chips" id="timeChips"></div>
+      <label class="vh" for="timeSel">Choose a time</label>
+      <select class="sel" id="timeSel" hidden></select>
+    </div>
+    <div class="block">
+      <h3>Tip</h3>
+      <div class="chips" id="tipChips"></div>
+    </div>
+    <ul class="totals" id="totals"></ul>
+  </section>
+
+  <section class="screen" data-step="4" aria-labelledby="s4-title">
+    <div class="hand">
+      <span class="label">Checkout</span>
+      <h2 id="s4-title">This is where Toast <em>takes over.</em></h2>
+      <p>Payment, kitchen ticket, and driver dispatch all happen in Aladdin's existing Toast system. <strong>Nothing on this site touches cards.</strong></p>
+      <svg class="diagram" viewBox="0 0 640 200" role="img" aria-labelledby="diag-title">
+        <title id="diag-title">Diagram: the website hands the order to Toast, and Toast sends it to the kitchen and to the driver.</title>
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="#d9bb7c"/></marker></defs>
+        <g font-family="Fraunces,Georgia,serif" font-size="22" fill="#f2ede4" text-anchor="middle">
+          <rect x="20" y="70" width="160" height="60" rx="8" fill="none" stroke="#d9bb7c" stroke-width="1.5"/><text x="100" y="107">Website</text>
+          <rect x="240" y="70" width="160" height="60" rx="8" fill="#d9bb7c"/><text x="320" y="107" fill="#1c3628" font-weight="700">Toast</text>
+          <rect x="460" y="18" width="160" height="60" rx="8" fill="none" stroke="#d9bb7c" stroke-width="1.5"/><text x="540" y="55">Kitchen</text>
+          <rect x="460" y="122" width="160" height="60" rx="8" fill="none" stroke="#d9bb7c" stroke-width="1.5"/><text x="540" y="159">Driver</text>
+        </g>
+        <g stroke="#d9bb7c" stroke-width="2" fill="none" marker-end="url(#arr)">
+          <path d="M180 100H238"/><path d="M400 100C430 100 430 48 458 48"/><path d="M400 100C430 100 430 152 458 152"/>
+        </g>
+        <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="#a8c686" text-anchor="middle" letter-spacing="1">
+          <text x="209" y="90">ORDER</text><text x="430" y="36">TICKET</text><text x="430" y="180">DISPATCH</text>
+        </g>
+      </svg>
+      <p class="hand__sum" id="handSum"></p>
+      <div class="hand__row">
+        <a class="btn btn--gold" href="/">Back to the site</a>
+        <button class="btn btn--ghost" type="button" id="restart">Start over</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="actbar" id="actbar">
+  <div class="actbar__in"><button class="btn btn--gold" type="button" id="actBtn"></button></div>
+  <p class="actbar__sub" id="actSub"></p>
+</div>
+
+<script src="/config/ordering.js" defer></script>
+<script src="/track.js" defer></script>
+<script src="/demo.js" defer></script>
+</body>
+</html>
