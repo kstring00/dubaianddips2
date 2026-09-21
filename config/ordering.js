@@ -19,7 +19,6 @@
      TOAST_GROUP_URL   optional: a Toast group-ordering link
      PHONE             the shop's real number (the current one is the
                        placeholder that was already on the site)
-     HOURS             confirm against the door
      REWARDS_LIVE      true once Toast loyalty is switched on
      DEMO_ITEMS prices these are demo prices; no price on the boards was
                        legible, so confirm against the real menu
@@ -51,12 +50,12 @@ window.DD_CONFIG = {
   },
   /* Index is day of week, 0 = Sunday. [open, close] in 24-hour shop time.
      The label groups the rows the way the door sign does. */
-  HOURS: [[12, 21], [11, 22], [11, 22], [11, 22], [11, 22], [11, 23], [12, 23]],
+  /* A close of 24 is midnight. */
+  HOURS: [[10, 22], [9, 22], [9, 22], [9, 22], [9, 22], [9, 24], [9, 24]],
   HOURS_LABELS: [
-    { days: "Mon to Thu", open: 11, close: 22 },
-    { days: "Fri", open: 11, close: 23 },
-    { days: "Sat", open: 12, close: 23 },
-    { days: "Sun", open: 12, close: 21 }
+    { days: "Mon to Thu", open: 9, close: 22 },
+    { days: "Fri to Sat", open: 9, close: 24 },
+    { days: "Sun", open: 10, close: 22 }
   ],
 
   /* ---- Delivery ------------------------------------------------------ */
