@@ -451,7 +451,7 @@
      hours from the markup; change them here and the nav and the footer
      both follow. Index is day of week, 0 = Sunday, [open, close] in
      24-hour local time. */
-  var HOURS = CFG.HOURS || [[12, 21], [11, 22], [11, 22], [11, 22], [11, 22], [11, 23], [12, 23]];
+  var HOURS = CFG.HOURS || [[10, 22], [9, 22], [9, 22], [9, 22], [9, 22], [9, 24], [9, 24]];
   function shopClock() {
     try {
       var parts = new Intl.DateTimeFormat('en-US', {
@@ -468,7 +468,7 @@
     }
   }
   function clockLabel(h) {
-    var ap = h >= 12 ? 'pm' : 'am', hh = h % 12;
+    var ap = (h % 24) >= 12 ? 'pm' : 'am', hh = h % 12;   /* 24 is midnight: 12 am */
     return (hh || 12) + ' ' + ap;
   }
   function hoursState() {

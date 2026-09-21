@@ -18,7 +18,6 @@ minimum, radius, phone number or Toast link lives anywhere else.
 | `TOAST_DELIVERY_URL` | `""` | Toast deep link straight to delivery, same rule |
 | `TOAST_GROUP_URL` | `""` | Toast group-ordering link once one exists; until then the "Treat your office" card uses `TOAST_ORDER_URL` |
 | `PHONE` | `(281) 555-0147` / `+12815550147` | the shop's real number (this is the placeholder that was already on the site) |
-| `HOURS` / `HOURS_LABELS` | placeholder hours from the old markup | the real hours; the nav, footer, sheet and demo time picker all follow |
 | `SHOP.address`, `SHOP.directions` | placeholder address | the real address and Google Maps link |
 | `REWARDS_LIVE` | `false` (rewards labelled "Coming soon") | `true` once Toast loyalty is on |
 | `ANALYTICS_ENDPOINT` | `""` | optional: a URL that accepts a JSON POST per event (see below) |
