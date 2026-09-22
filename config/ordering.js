@@ -118,7 +118,7 @@ window.DD_CONFIG = {
       image: "/assets/rev-biscoff-frappe.webp",
       alt: "A Biscoff frappe in a clear cup, cookie butter swirled through it with whipped cream and a whole Biscoff cookie on top.",
       modifier: { label: "Size", options: [{ name: "16 oz", delta: 0 }, { name: "20 oz", delta: 1.00 }] } },
-    { id: "strawberry-matcha", name: "Strawberry Matcha", category: "The Matchas", price: 7.25,
+    { id: "strawberry-matcha", name: "Strawberry Matcha", category: "The Matchas", price: 5.00,
       image: "/assets/rev-strawberry-matcha.webp",
       alt: "A strawberry matcha in a clear cup, a pink strawberry layer over green matcha with matcha dusted on the foam.",
       modifier: { label: "Milk", options: [{ name: "Whole", delta: 0 }, { name: "Oat", delta: 0.75 }, { name: "Almond", delta: 0.75 }] } },
