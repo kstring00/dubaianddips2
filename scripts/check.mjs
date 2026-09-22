@@ -19,7 +19,9 @@ console.log('static checks');
 for (const f of SERVED) ok(!/lorem/i.test(read(f)), f + ' contains "lorem"');
 const cfg = read('config/ordering.js');
 const nums = [/4\.99/, /2\.99/, /\$\s?15\b/, /\$\s?25\b/, /\$\s?40\b/, /\$\s?50\b/, /\b5 miles\b/, /\b15 minimum\b/, /8\.25/];
-for (const f of SERVED) for (const re of nums) ok(!re.test(read(f)), f + ' has hardcoded ' + re);
+/* inline SVG path data (the logo sprite) is coordinates, not prices */
+const noSvg = f => read(f).replace(/<svg[\s\S]*?<\/svg>/g, '');
+for (const f of SERVED) for (const re of nums) ok(!re.test(noSvg(f)), f + ' has hardcoded ' + re);
 ok(/DELIVERY_MINIMUM: 15/.test(cfg) && /DELIVERY_RADIUS_MILES: 5/.test(cfg) && /GROUP_ORDER_MINIMUM: 50/.test(cfg), 'config carries the minimums');
 ok(!/order\.example\.com/.test(read('index.html')), 'old placeholder order URL gone');
 /* one h1, title + description mention the shop, Houston and the subject */

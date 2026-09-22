@@ -13,7 +13,16 @@
       ]
     },
     {
-      "source": "/(index.html|order-demo.html|site.js|demo.js|track.js|404.html|manifest.webmanifest)",
+      "source": "/public/brand/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/(index.html|order-demo.html|site.js|demo.js|track.js|404.html|manifest.webmanifest|brand.css)",
       "headers": [
         {
           "key": "Cache-Control",

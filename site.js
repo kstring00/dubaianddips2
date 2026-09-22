@@ -232,6 +232,10 @@
     var cset = writer();
     var cscrub = scrubber(cv, function (dur) { if (reduce) cscrub.seek(dur); });
     var loaded = false;
+    /* the star loader in the stage goes once the film has a frame */
+    function craftReady() { craft.classList.add('is-ready'); }
+    cv.addEventListener('loadeddata', craftReady);
+    cv.addEventListener('error', craftReady, true);
     function loadCraft() {
       if (loaded) return; loaded = true;
       cv.src = cv.getAttribute('data-src');
@@ -553,7 +557,7 @@
     var why = document.getElementById('whyList');
     if (why && COPY.why) why.innerHTML = COPY.why.slice(0, 3).map(function (w) {
       var soon = w.soon && !CFG.REWARDS_LIVE ? '<span class="tag">' + w.soon + '</span>' : '';
-      return '<li><strong>' + w.title + '</strong><span>' + w.text + '</span>' + soon + '</li>';
+      return '<li><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg><strong>' + w.title + '</strong><span>' + w.text + '</span>' + soon + '</li>';
     }).join('');
 
     /* the sheet */
