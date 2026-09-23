@@ -798,7 +798,7 @@
       lastT = now;
       boost += (boostTarget - boost) * .06;
       boostTarget *= .90;
-      x += (18 + boost) * dt;              /* rightward */
+      x += (38 + boost) * dt;              /* rightward */
       if (x >= 0) x -= setW;
       track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
       if (onScreen && !hovered) bandRaf = requestAnimationFrame(bandFrame);

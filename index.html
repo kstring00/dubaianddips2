@@ -254,15 +254,18 @@ p{margin:0}
 /* =========================== ORDER DIRECT ===========================
    Two reasons and three ways in. No fees, minimums or radius on this
    page: those belong to the ordering flow. */
-.direct .sec__head{max-width:none}
+.direct .sec__head{max-width:none;margin-inline:auto;text-align:center;align-items:center}
 .direct .sec__head h2 em{color:var(--accent-ink)}
-.why{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,24rem));gap:1.4rem 3rem}
+.why{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,24rem));justify-content:center;gap:1.4rem 3rem}
 /* The brand star as the bullet. It is the only list on the page that gets one. */
 .why li{position:relative;display:flex;flex-direction:column;gap:.25rem;padding-left:1.6rem}
 .why li>svg{position:absolute;left:0;top:.36rem;--logo-h:.8rem;--logo-accent:var(--browned-sugar)}
 .why strong{font-family:var(--display);font-weight:500;font-size:1.2rem;color:var(--ink)}
 .why span{font-size:1rem;color:var(--ink-soft)}
-.direct__ctas{display:flex;flex-wrap:wrap;gap:.8rem 1rem;margin-top:clamp(2rem,4vw,2.8rem)}
+.direct__ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:.8rem 1rem;margin-top:clamp(2rem,4vw,2.8rem)}
+/* centred: each point is a small centred stack, the star above its title */
+.direct .why li{align-items:center;text-align:center;padding-left:0}
+.direct .why li>svg{position:static;margin-bottom:.3rem}
 @media(max-width:699px){.why{grid-template-columns:1fr}.direct__ctas .btn{flex:1 1 100%}}
 
 /* ============================== SHEET ==============================
