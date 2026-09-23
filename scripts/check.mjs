@@ -130,8 +130,9 @@ for (const v of VIEWS) {
       const place = info[i].place;
       if (place === 'hero') { await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(900); }
       else if (place === 'hero-landing') { await page.evaluate(() => window.scrollTo(0, (document.getElementById('top').offsetHeight - innerHeight) * .71)); await page.waitForTimeout(1600); }
+      else if (place === 'header') { await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await page.waitForTimeout(900); }
       else if (place === 'item' || place === 'category') { await el.evaluate(e => e.closest('.brow').querySelector('.brow__btn').click()); await page.waitForTimeout(300); }
-      if (place !== 'hero' && place !== 'hero-landing') { await el.evaluate(e => e.scrollIntoView({ block: 'center' })); await page.waitForTimeout(150); }
+      if (place !== 'hero' && place !== 'hero-landing' && place !== 'header') { await el.evaluate(e => e.scrollIntoView({ block: 'center' })); await page.waitForTimeout(150); }
       if (!(await el.isVisible())) { console.log('  skip ' + place + ' (not shown at ' + v.name + ')'); continue; }
       const click = () => el.click({ timeout: 5000 }).catch(e => { ok(false, r + ' click ' + place + ' failed: ' + String(e).split('\n')[0]); });
       if (v.mobile) {
@@ -179,11 +180,18 @@ for (const v of VIEWS) {
     const order = await page.evaluate(() => { const a = document.querySelector('.thumbbar a'); return a.textContent.trim() + '|' + a.getAttribute('data-order'); });
     ok(order === 'Order pickup|pickup', 'sticky bar: pickup first (' + order + ')');
   }
-  /* header order visible at load and after scrolling */
-  const hdr = await page.evaluate(() => { const o = document.querySelector('.nav__order'); const r = o.getBoundingClientRect(); return { op: getComputedStyle(o).opacity, top: r.top, h: r.height }; });
-  ok(hdr.op === '1' && hdr.top >= 0 && hdr.h >= 40, 'header Order button visible at load ' + JSON.stringify(hdr));
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await page.waitForTimeout(400);
-  ok(await page.evaluate(() => getComputedStyle(document.querySelector('.nav__order')).opacity === '1' && document.querySelector('.nav__order').getBoundingClientRect().top >= 0), 'header Order button still visible mid-page');
+  /* header: out of the way during the opening intro, slides in after it,
+     hides again at the top, and shows at once when focused */
+  const navTop = () => page.evaluate(() => document.getElementById('nav').getBoundingClientRect().bottom);
+  ok((await navTop()) <= 1, 'header hidden during the opening intro (bottom ' + (await navTop()) + ')');
+  await page.focus('.nav__order'); await page.waitForTimeout(350);
+  ok((await navTop()) > 40, 'header shows at once when the Order button takes focus');
+  await page.evaluate(() => document.activeElement.blur()); await page.waitForTimeout(350);
+  ok((await navTop()) <= 1, 'header hides again when focus leaves during the intro');
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await page.waitForTimeout(900);
+  ok(await page.evaluate(() => getComputedStyle(document.querySelector('.nav__order')).opacity === '1' && document.querySelector('.nav__order').getBoundingClientRect().top >= 0), 'header Order button visible mid-page');
+  await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(1200);
+  ok((await navTop()) <= 1, 'header hides again back at the top');
 
   /* --- film deferred: no video bytes requested before load --- */
   const reqs = [];

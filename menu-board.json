@@ -3,11 +3,16 @@
     "The departures board on the home page. Edit this file only; no code change is needed.",
     "Rows appear top to bottom in this order. The first row is the signature (NOW BOARDING).",
     "status: one of on-time, now-boarding, seasonal, sold-out.",
-    "code + destination: the airport code and the place the category is inspired by. Local and American items fly HOU Houston.",
+    "code + destination: the airport code and the place the category is inspired by. Local and American items fly HOU Houston. \"TBD\" means not decided yet: the board shows it as tbdShowsAs (HOU Houston) until it is.",
+    "description: one line, only what is true of every item in the category. Leave it \"\" if unsure; the board then points to the list in the shop.",
     "items: the first three show under the category on the board; all of them show when the row is opened.",
     "price: a number such as 5.5 shows as $5.50. Leave it null to show no price. The only prices in the code today are the demo placeholders in config/ordering.js, so every price here is null until the real menu arrives.",
     "slug: used by links such as /menu/frappes. Keep it lowercase with dashes, and do not change the existing ones."
   ],
+  "tbdShowsAs": {
+    "code": "HOU",
+    "destination": "Houston"
+  },
   "rows": [
     {
       "slug": "frappes",
@@ -17,12 +22,24 @@
       "category": "The Frappes",
       "gate": "A1",
       "status": "now-boarding",
-      "description": "Blended cold, with the sauces pulled down the inside of the cup so they land in every sip.",
+      "description": "Blended and served cold.",
       "items": [
-        { "name": "Dubai Chocolate Frappe", "price": null },
-        { "name": "Pistachio Frappe", "price": null },
-        { "name": "Biscoff Frappe", "price": null },
-        { "name": "Salted Caramel Frappe", "price": null }
+        {
+          "name": "Dubai Chocolate Frappe",
+          "price": null
+        },
+        {
+          "name": "Pistachio Frappe",
+          "price": null
+        },
+        {
+          "name": "Biscoff Frappe",
+          "price": null
+        },
+        {
+          "name": "Salted Caramel Frappe",
+          "price": null
+        }
       ]
     },
     {
@@ -33,14 +50,32 @@
       "category": "Classic Coffees",
       "gate": "A2",
       "status": "on-time",
-      "description": "Espresso drinks, pulled to order.",
+      "description": "Espresso drinks.",
       "items": [
-        { "name": "Espresso", "price": null },
-        { "name": "Cappuccino", "price": null },
-        { "name": "Americano", "price": null },
-        { "name": "Affogato", "price": null },
-        { "name": "Cortado", "price": null },
-        { "name": "Leche y Leche (Spanish Cortado)", "price": null }
+        {
+          "name": "Espresso",
+          "price": null
+        },
+        {
+          "name": "Cappuccino",
+          "price": null
+        },
+        {
+          "name": "Americano",
+          "price": null
+        },
+        {
+          "name": "Affogato",
+          "price": null
+        },
+        {
+          "name": "Cortado",
+          "price": null
+        },
+        {
+          "name": "Leche y Leche (Spanish Cortado)",
+          "price": null
+        }
       ]
     },
     {
@@ -51,60 +86,111 @@
       "category": "The Matchas",
       "gate": "B1",
       "status": "on-time",
-      "description": "Matcha whisked to order, plain or layered with fruit and cream.",
+      "description": "Matcha drinks.",
       "items": [
-        { "name": "Strawberry Matcha", "price": null },
-        { "name": "Pistachio Matcha", "price": null },
-        { "name": "Biscoff Matcha", "price": null },
-        { "name": "Matcha Cortado (12 oz)", "price": null },
-        { "name": "Mango Matcha", "price": null },
-        { "name": "Banana Matcha", "price": null },
-        { "name": "Blueberry Cream Matcha", "price": null },
-        { "name": "Banana Date Matcha", "price": null }
+        {
+          "name": "Strawberry Matcha",
+          "price": null
+        },
+        {
+          "name": "Pistachio Matcha",
+          "price": null
+        },
+        {
+          "name": "Biscoff Matcha",
+          "price": null
+        },
+        {
+          "name": "Matcha Cortado (12 oz)",
+          "price": null
+        },
+        {
+          "name": "Mango Matcha",
+          "price": null
+        },
+        {
+          "name": "Banana Matcha",
+          "price": null
+        },
+        {
+          "name": "Blueberry Cream Matcha",
+          "price": null
+        },
+        {
+          "name": "Banana Date Matcha",
+          "price": null
+        }
       ]
     },
     {
       "slug": "lattes",
       "flight": "DD 104",
-      "code": "HOU",
-      "destination": "Houston",
+      "code": "MAD",
+      "destination": "Madrid",
       "category": "The Lattes",
       "gate": "B2",
       "status": "on-time",
-      "description": "Espresso and milk, with house flavors like pistachio and tiramisu.",
+      "description": "Lattes in several flavors.",
       "items": [
-        { "name": "Spanish Latte", "price": null },
-        { "name": "Pistachio Latte", "price": null },
-        { "name": "Tiramisu Latte", "price": null },
-        { "name": "Biscoff Latte", "price": null },
-        { "name": "Taro Latte", "price": null }
+        {
+          "name": "Spanish Latte",
+          "price": null
+        },
+        {
+          "name": "Pistachio Latte",
+          "price": null
+        },
+        {
+          "name": "Tiramisu Latte",
+          "price": null
+        },
+        {
+          "name": "Biscoff Latte",
+          "price": null
+        },
+        {
+          "name": "Taro Latte",
+          "price": null
+        }
       ]
     },
     {
       "slug": "refreshers",
       "flight": "DD 105",
-      "code": "HOU",
-      "destination": "Houston",
+      "code": "TBD",
+      "destination": "TBD",
       "category": "The Refreshers",
       "gate": "C1",
       "status": "on-time",
-      "description": "Cold, fruit-forward and light.",
+      "description": "",
       "items": []
     },
     {
       "slug": "smoothies",
       "flight": "DD 106",
-      "code": "HOU",
-      "destination": "Houston",
+      "code": "TBD",
+      "destination": "TBD",
       "category": "The Smoothies",
       "gate": "C2",
       "status": "on-time",
-      "description": "Fruit, blended to order.",
+      "description": "Fruit smoothies.",
       "items": [
-        { "name": "Strawberry Smoothie", "price": null },
-        { "name": "Strawberry Banana Smoothie", "price": null },
-        { "name": "Mango Smoothie", "price": null },
-        { "name": "Banana Date Smoothie", "price": null }
+        {
+          "name": "Strawberry Smoothie",
+          "price": null
+        },
+        {
+          "name": "Strawberry Banana Smoothie",
+          "price": null
+        },
+        {
+          "name": "Mango Smoothie",
+          "price": null
+        },
+        {
+          "name": "Banana Date Smoothie",
+          "price": null
+        }
       ]
     },
     {
@@ -115,7 +201,7 @@
       "category": "Breakfast Bites",
       "gate": "D1",
       "status": "on-time",
-      "description": "Something to eat with your morning coffee.",
+      "description": "",
       "items": []
     },
     {
@@ -126,7 +212,7 @@
       "category": "The Crepes",
       "gate": "D2",
       "status": "on-time",
-      "description": "Folded to order on the griddle.",
+      "description": "",
       "items": []
     },
     {
@@ -137,7 +223,7 @@
       "category": "The Waffles",
       "gate": "E1",
       "status": "on-time",
-      "description": "Made to order and topped the way you like.",
+      "description": "",
       "items": []
     },
     {
@@ -148,9 +234,12 @@
       "category": "D&D Desserts",
       "gate": "E2",
       "status": "on-time",
-      "description": "The house desserts, kunafa included.",
+      "description": "Desserts, kunafa included.",
       "items": [
-        { "name": "Kunafa", "price": null }
+        {
+          "name": "Kunafa",
+          "price": null
+        }
       ]
     }
   ]

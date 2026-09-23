@@ -152,6 +152,13 @@
       else window.addEventListener('load', function () { setTimeout(startFilm, 0); });
       window.addEventListener('scroll', startFilm, { once: true, passive: true });
     }
+    /* The nav sits out the opening intro and slides in once it has lifted
+       away (.22, the end of the wordmark's lift). Focus inside it shows it
+       at once, whatever the scroll. */
+    var introOver = false, navFocus = false;
+    function showNav() { nav.classList.toggle('is-shown', introOver || navFocus); }
+    nav.addEventListener('focusin', function () { navFocus = true; showNav(); });
+    nav.addEventListener('focusout', function (e) { if (!nav.contains(e.relatedTarget)) { navFocus = false; showNav(); } });
     function setNav(op) {
       for (var i = 0; i < fades.length; i++) {
         set(fades[i], 'opacity', op.toFixed(3));
@@ -194,6 +201,8 @@
       set(rule, 'width', (p * 100).toFixed(2) + '%');
 
       setNav(easeInOut(range(p, .84, .94)));
+      var over = p >= .22;
+      if (over !== introOver) { introOver = over; showNav(); }
     }
 
     if (reduce) {
@@ -201,6 +210,7 @@
          collapses the stage; the film seeks to its last frame on load. */
       deferFilm();
       setNav(1);
+      introOver = true; showNav();
       window.addEventListener('scroll', navStuck, { passive: true });
       navStuck();
     } else {
@@ -373,11 +383,13 @@
       }
       return html;
     }
+    var TBD = { code: 'HOU', destination: 'Houston' };
     function rowHtml(r) {
+      if (r.code === 'TBD') { var c = {}; for (var k in r) c[k] = r[k]; c.code = TBD.code; c.destination = TBD.destination; r = c; }
       var slug = esc(r.slug), status = STATUS[r.status] ? r.status : 'on-time';
       var items = r.items || [];
       var names = items.slice(0, 3).map(function (it) { return esc(it.name); }).join(' &middot; ');
-      var sub = names || esc(r.description);
+      var sub = names || esc(r.description) || 'Full list in the shop';
       var list = items.length
         ? '<ul class="bitems">' + items.map(function (it) {
             var p = price(it.price);
@@ -437,6 +449,7 @@
     }
 
     function build(data) {
+      if (data.tbdShowsAs) TBD = data.tbdShowsAs;
       boardRows.innerHTML = (data.rows || []).map(rowHtml).join('');
       rows = [].slice.call(boardRows.querySelectorAll('.brow'));
       btns = rows.map(function (r) { return r.querySelector('.brow__btn'); });
