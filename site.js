@@ -365,8 +365,16 @@
       var cells = el.children, want = pad(text), now = performance.now();
       for (var i = 0; i < cells.length; i++) {
         var ch = want.charAt(i);
-        if (delay < 0) { cells[i].firstElementChild.textContent = ch; continue; }
-        if (ch === ' ') continue;
+        if (delay < 0) {
+          /* set without a riffle: both halves of the tile carry the letter,
+             and the top leaf is squared away so nothing hides it */
+          cells[i].firstElementChild.textContent = ch;
+          var lf = cells[i].lastElementChild;
+          lf.firstElementChild.textContent = ch;
+          if (lf.getAnimations) lf.getAnimations().forEach(function (an) { an.cancel(); });
+          continue;
+        }
+        if (ch === ' ' && cells[i].firstElementChild.textContent === ' ') continue;
         jobs.push({ cell: cells[i], seq: sequence(ch, phone.matches ? 4 : 6), start: now + delay + i * (phone.matches ? 14 : 18), at: -1, done: false });
       }
       if (delay >= 0 && !flapRaf && jobs.length) flapRaf = requestAnimationFrame(runJobs);
@@ -415,8 +423,18 @@
 
     var rows = [], btns = [], openRow = null;
 
+    /* Opening a row calls its flight: the tiles riffle to NOW BOARDING (a
+       sold-out row riffles and lands on SOLD OUT again), and closing it
+       riffles them back to the row's own status. */
+    function callRow(row, on) {
+      var st = row.getAttribute('data-status');
+      var word = on && st !== 'sold-out' ? STATUS['now-boarding'] : STATUS[st];
+      flapTo(row.querySelector('.flaps'), word, reduce ? -1 : 0);
+    }
     function setRow(row, on) {
       var btn = row.querySelector('.brow__btn'), panel = row.querySelector('.bpanel');
+      settle(false);
+      callRow(row, on);
       row.classList.toggle('is-open', on);
       btn.setAttribute('aria-expanded', on ? 'true' : 'false');
       panel.hidden = !on;
@@ -794,7 +812,7 @@
 
     function bandFrame(now) {
       bandRaf = 0;
-      var dt = Math.min(.05, (now - lastT) / 1000 || .016);
+      var dt = Math.max(0, Math.min(.05, (now - lastT) / 1000 || .016));
       lastT = now;
       boost += (boostTarget - boost) * .06;
       boostTarget *= .90;
