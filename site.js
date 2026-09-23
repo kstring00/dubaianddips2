@@ -294,8 +294,8 @@
      menu can be edited without touching code. Each row is an accordion
      (one open at a time) under its own h3. The status tiles are split-flaps:
      when the board first scrolls into view they flip and settle row by
-     row, top to bottom, in about 1.2s - once per page load, never again,
-     and not at all under reduced motion. The tiles are aria-hidden; screen
+     row, top to bottom, in about 1.2s; after that single rows keep
+     refreshing (see ambient below). None of it under reduced motion. The tiles are aria-hidden; screen
      readers get the status as text. */
   var board = document.getElementById('board');
   var boardRows = document.getElementById('boardRows');
@@ -466,6 +466,26 @@
       });
     }
 
+    /* The live board: while it is on screen, one row at a time re-riffles
+       and lands back on its own status, every few seconds, like a real
+       departures board refreshing. Never under reduced motion, never while
+       the tab or the board is out of view, and never on the open row. */
+    var boardSeen = false, ambientT = 0, lastLive = -1;
+    function ambient() {
+      if (ambientT || reduce) return;
+      ambientT = setTimeout(function () {
+        ambientT = 0;
+        if (!boardSeen) return;
+        if (!document.hidden && settled && rows.length > 2) {
+          var i;
+          do { i = Math.floor(Math.random() * rows.length); } while (i === lastLive || rows[i] === openRow);
+          lastLive = i;
+          flapTo(rows[i].querySelector('.flaps'), STATUS[rows[i].getAttribute('data-status')], 0);
+        }
+        ambient();
+      }, 2200 + Math.random() * 1600);
+    }
+
     function build(data) {
       if (data.tbdShowsAs) TBD = data.tbdShowsAs;
       boardRows.innerHTML = (data.rows || []).map(rowHtml).join('');
@@ -480,6 +500,11 @@
           if (es.some(function (e) { return e.isIntersecting; })) { settle(true); sio.disconnect(); }
         }, { threshold: .2 });
         sio.observe(boardRows);
+        /* keep the board live while it is on screen */
+        new IntersectionObserver(function (es) {
+          boardSeen = es[es.length - 1].isIntersecting;
+          if (boardSeen) ambient();
+        }).observe(board);
       }
 
       var deep = /^\/menu\/([a-z0-9-]+)\/?$/.exec(location.pathname);
