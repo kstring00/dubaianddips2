@@ -81,8 +81,7 @@ window.DD_CONFIG = {
     whyTitle: "Why order direct",
     why: [
       { title: "Cheaper than the apps", text: "No third-party markup on the menu, and a lower delivery fee." },
-      { title: "Straight to our kitchen", text: "Your order prints on our ticket rail the second you place it." },
-      { title: "Rewards for regulars", text: "Points on every direct order, redeemable in the shop.", soon: "Coming soon" }
+      { title: "Straight to our kitchen", text: "Your order prints on our ticket rail the second you place it." }
     ],
     groupTitle: "Treat your office",
     groupText: "One link, everyone picks, one payment, and it all arrives together.",

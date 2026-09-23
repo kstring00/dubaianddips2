@@ -9,45 +9,56 @@
    which is right. The label is kept beside each one.
 
    TYPE
-   The brand faces are commercial (Neue Regrade, Gotham SSm Narrow, IvyMode,
-   Editor's Note). Until the licensed web fonts arrive, free stand-ins are
-   loaded under neutral family names ("DD Title" etc.). To switch to the
-   real fonts, change ONLY the src lines below - see "Licensed fonts".
+   The brand faces are commercial (Neue Regrade, Gotham SSm Narrow,
+   Editor's Note; IvyMode lives only inside the logo artwork and is never
+   loaded). Until the licensed web fonts arrive, three free Google Fonts
+   stand-ins are self-hosted from /public/fonts. At most three families
+   load; the split-flaps and boarding-pass details use the system
+   monospace, which costs nothing.
+
+   TRADEMARK
+   The mark after "Dubai & Dips" is set here too (--tm), so switching
+   from ™ to ® is one line. Markup carries <span class="tm"></span>.
    ===================================================================== */
 
 /* ------------------------------------------------------------ fonts ----
-   Licensed fonts: drop the .woff2 files into /assets/fonts/brand/ and
-   replace each src with the commented line under it (keep the family
-   name). If a file name differs, edit the path here - nowhere else. Then
-   update the one <link rel="preload" as="font"> in each page's <head>. */
+   Stand-ins (OFL, from Google Fonts), self-hosted:
+     Neue Regrade       -> Albert Sans                 titles, body, nav, buttons
+     Gotham SSm Narrow  -> Encode Sans, semi-condensed eyebrows, small labels
+     Editor's Note ital -> Playfair Display Italic     accent words, marquee */
+@font-face{font-family:"Albert Sans";font-style:normal;font-weight:300 700;font-display:swap;
+  src:url(/public/fonts/albert-sans.woff2) format("woff2")}
+/* Encode Sans is variable in width; the descriptor pins it at 87.5%
+   (semi-condensed), the width Gotham Narrow sits at. */
+@font-face{font-family:"Encode Sans SemiCondensed";font-style:normal;font-weight:300 700;font-stretch:87.5%;font-display:swap;
+  src:url(/public/fonts/encode-sans.woff2) format("woff2")}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:400 600;font-display:swap;
+  src:url(/public/fonts/playfair-display-italic.woff2) format("woff2")}
 
-/* Titles and body. Stand-in: Instrument Sans */
-@font-face{font-family:"DD Title";font-style:normal;font-weight:400 700;font-display:swap;
-  src:url(/assets/fonts/instrumentsans.woff2) format("woff2")}
-  /* src:url(/assets/fonts/brand/NeueRegrade-Variable.woff2) format("woff2") */
+/* Licensed faces, declared ahead of time. A face is only downloaded once a
+   family below names it, so these cost nothing until the switch flips.
+   Drop the files into /public/fonts with these names (or edit a path). */
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:300;font-display:swap;src:url(/public/fonts/NeueRegrade-Light.woff2) format("woff2")}
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:400;font-display:swap;src:url(/public/fonts/NeueRegrade-Regular.woff2) format("woff2")}
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:500;font-display:swap;src:url(/public/fonts/NeueRegrade-Medium.woff2) format("woff2")}
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:600 700;font-display:swap;src:url(/public/fonts/NeueRegrade-Semibold.woff2) format("woff2")}
+@font-face{font-family:"Gotham SSm Narrow";font-style:normal;font-weight:400 500;font-display:swap;src:url(/public/fonts/GothamSSmNarrow-Book.woff2) format("woff2")}
+@font-face{font-family:"Gotham SSm Narrow";font-style:normal;font-weight:600 700;font-display:swap;src:url(/public/fonts/GothamSSmNarrow-Medium.woff2) format("woff2")}
+@font-face{font-family:"Editor's Note";font-style:italic;font-weight:400 600;font-display:swap;src:url(/public/fonts/EditorsNote-Italic.woff2) format("woff2")}
 
-/* Subheads, labels. Stand-in: Barlow Semi Condensed */
-@font-face{font-family:"DD Sub";font-style:normal;font-weight:500;font-display:swap;
-  src:url(/assets/fonts/barlowsc-500.woff2) format("woff2")}
-  /* src:url(/assets/fonts/brand/GothamSSmNarrow-Book.woff2) format("woff2") */
-@font-face{font-family:"DD Sub";font-style:normal;font-weight:600;font-display:swap;
-  src:url(/assets/fonts/barlowsc-600.woff2) format("woff2")}
-  /* src:url(/assets/fonts/brand/GothamSSmNarrow-Medium.woff2) format("woff2") */
+/* ==== THE FONT SWITCH: the one line to change ========================
+   Stand-ins now. When the licensed files are in /public/fonts, replace the
+   line below with the commented one under it. (Optional, for speed: point
+   the font preloads in each page's <head> at the new files too.) */
+:root{--face-title:"Albert Sans";--face-sub:"Encode Sans SemiCondensed";--face-accent:"Playfair Display"}
+/* :root{--face-title:"Neue Regrade","Albert Sans";--face-sub:"Gotham SSm Narrow","Encode Sans SemiCondensed";--face-accent:"Editor's Note","Playfair Display"} */
 
-/* Decorative display. Stand-in: Cormorant */
-@font-face{font-family:"DD Display";font-style:normal;font-weight:500 600;font-display:swap;
-  src:url(/assets/fonts/cormorant.woff2) format("woff2")}
-  /* src:url(/assets/fonts/brand/IvyMode-Regular.woff2) format("woff2") */
-
-/* Decorative italic accents. Stand-in: Instrument Serif Italic */
-@font-face{font-family:"DD Accent";font-style:italic;font-weight:400;font-display:swap;
-  src:url(/assets/fonts/instrumentserif-italic.woff2) format("woff2")}
-  /* src:url(/assets/fonts/brand/EditorsNote-Italic.woff2) format("woff2") */
-
-/* Flight data on the departures board (not a brand face; it stands in
-   for the typewriter lines on the boarding passes). */
-@font-face{font-family:"DD Data";font-style:normal;font-weight:300 400;font-display:swap;
-  src:url(/assets/fonts/plexmono-2.woff2) format("woff2")}
+/* ==== THE TRADEMARK: the one line to change ===========================
+   ™ until the federal registration is confirmed; then use the line under it. */
+:root{--tm:"\2122";--tm-kind:""}
+/* :root{--tm:"\00AE";--tm-kind:"registered "} */
+.tm::after{content:var(--tm)}
+.tm-kind::before{content:var(--tm-kind)}
 
 :root{
   /* ---- brand palette (sampled) ---- */
@@ -71,14 +82,14 @@
   --courtyard-deep:#3C4B38;  /* Courtyard, 15% toward black: pressed/hover, board panels */
   --bark-deep:#3B312B;       /* Bark, 20% toward black: hover on Bark */
   --bark-soft:#655A53;       /* Bark, 15% toward Off-White: secondary text, AA on Off-White and Natural */
+  --browned-sugar-deep:#8C6B4A; /* Browned Sugar, 20% toward Bark: the NOW BOARDING tiles; the lightest step that carries Off-White letters at AA (4.7:1) */
 
-  /* ---- type stacks ---- */
-  --font-title:"DD Title",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  /* ---- type stacks (the faces come from the switch above) ---- */
+  --font-title:var(--face-title),-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   --font-body:var(--font-title);
-  --font-sub:"DD Sub","Arial Narrow","Helvetica Neue",Arial,sans-serif;
-  --font-display:"DD Display",Georgia,"Times New Roman",serif;
-  --font-accent:"DD Accent",Georgia,"Times New Roman",serif;
-  --font-data:"DD Data",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --font-sub:var(--face-sub),"Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --font-accent:var(--face-accent),Georgia,"Times New Roman",serif;
+  --font-data:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","Courier New",monospace;
 
   /* ---- logo protection area ----
      Clear space on every side = the cap height of the "D". As a fraction

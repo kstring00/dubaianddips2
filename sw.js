@@ -7,17 +7,16 @@
 
    Never cached: anything off this origin (so never a Toast page), the two
    films, and any non-GET request. Bump VERSION to drop old caches. */
-var VERSION = 'dd-2026-09-22-brand';
+var VERSION = 'dd-2026-09-23-board';
 var SHELL = [
   '/', '/index.html', '/order-demo', '/404.html',
   '/site.js', '/track.js', '/demo.js', '/config/ordering.js', '/manifest.webmanifest',
   '/brand.css', '/assets/dd-favicon.svg', '/assets/dd-apple-touch-icon.png', '/assets/dd-icon-192.png', '/assets/dd-icon-512.png', '/assets/dd-icon-maskable-512.png',
-  '/public/brand/pattern/pattern-dark.svg',
+  '/public/brand/pattern/pattern-sugar.svg', '/menu-board.json',
   '/assets/hero-poster.webp', '/assets/craft-poster.webp',
-  '/assets/fonts/instrumentsans.woff2', '/assets/fonts/barlowsc-500.woff2', '/assets/fonts/barlowsc-600.woff2',
-  '/assets/fonts/cormorant.woff2', '/assets/fonts/instrumentserif-italic.woff2', '/assets/fonts/plexmono-2.woff2'
+  '/public/fonts/albert-sans.woff2', '/public/fonts/encode-sans.woff2', '/public/fonts/playfair-display-italic.woff2'
 ];
-var NETWORK_FIRST = /\.(html|js|css|webmanifest)$|\/$|\/order-demo$|\/menu\//;
+var NETWORK_FIRST = /\.(html|js|css|json|webmanifest)$|\/$|\/order-demo$|\/menu\//;
 var NEVER = /\.(mp4|webm|mov)$/;
 
 self.addEventListener('install', function (e) {

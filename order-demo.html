@@ -7,7 +7,7 @@
 <title>Order Pickup &amp; Delivery Demo | Dubai &amp; Dips, Houston</title>
 <meta name="description" content="A demo of online ordering for Dubai &amp; Dips in Clear Lake, Houston: pickup or delivery, the menu, a cart, and the hand-off to Toast. No payments are taken on this site.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#475842">
+<meta name="theme-color" content="#E3DED0">
 <link rel="canonical" href="https://dubaianddips.com/order-demo">
 <link rel="icon" href="/assets/dd-favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/dd-favicon-32.png" sizes="32x32" type="image/png">
@@ -23,8 +23,8 @@
 <meta property="og:image" content="https://dubaianddips.com/assets/dd-og.png">
 <meta property="og:image:alt" content="The Dubai &amp; Dips logo in off-white on Courtyard green, over the brand's four-pointed star pattern.">
 <meta property="og:url" content="https://dubaianddips.com/order-demo">
-<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/instrumentsans.woff2" crossorigin>
-<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/barlowsc-600.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/public/fonts/albert-sans.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/public/fonts/encode-sans.woff2" crossorigin>
 <link rel="stylesheet" href="/brand.css">
 <style>
 /* Same roles as the site, mapped onto the brand tokens in /brand.css.
@@ -41,22 +41,25 @@
   --display:var(--font-title);
   --body:var(--font-body);
   --mono:var(--font-sub);
-  --data:var(--font-data);
+  --data:var(--font-body);
   --ease:cubic-bezier(.22,.61,.36,1);--ease-out:cubic-bezier(.16,1,.3,1);
   --head:56px;--bar:0px;--gutter:1rem;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:var(--surface)}
-body{margin:0;min-height:100svh;background:var(--surface);color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-top:calc(var(--head) + env(safe-area-inset-top,0px));padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom,0px))}
+body{margin:0;min-height:100svh;background:var(--surface);color:var(--ink);font-family:var(--body);font-weight:300;font-variant-numeric:tabular-nums;font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-top:calc(var(--head) + env(safe-area-inset-top,0px));padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom,0px))}
 img,svg{display:block;max-width:100%}
 a{color:inherit}
 h1,h2,h3{font-family:var(--display);font-weight:500;line-height:1.05;margin:0;letter-spacing:-.02em}
 h1{font-size:clamp(1.75rem,7vw,2.4rem)}
 h2{font-size:clamp(1.6rem,6vw,2.1rem)}
-h1 em,h2 em{font-family:var(--font-accent);font-style:italic;font-weight:400;letter-spacing:0;font-size:1.08em;color:var(--accent-ink)}
+h1 em,h2 em{font-family:var(--font-accent);font-style:italic;font-weight:400;letter-spacing:-.01em;color:var(--accent-ink)}
+strong,b{font-weight:600}
 p{margin:0}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px;border-radius:3px}
+/* step headings take focus so a screen reader announces the new step; they are not controls, so no ring */
+h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus{outline:none}
 .vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 .label{font-family:var(--mono);font-weight:600;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink)}
 .shell{width:min(640px,100% - 2*var(--gutter));margin-inline:auto}
@@ -68,8 +71,10 @@ button{font:inherit;color:inherit}
 .pill[hidden]{display:none}
 
 /* Header */
-.dhead{position:fixed;z-index:100;top:0;left:0;right:0;height:calc(var(--head) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:56px 1fr 56px;align-items:center;background:var(--deep);color:var(--on-dark);--logo-ink:var(--off-white);--logo-accent:var(--mint)}
-.dhead__btn{display:grid;place-items:center;width:56px;height:56px;border:0;background:transparent;color:var(--off-white);text-decoration:none;font-size:1.3rem;cursor:pointer}
+/* The same solid Natural bar as the site: Bark icons, Bark logo with the
+   Browned Sugar Burj and star, a Bark hairline at 10%. */
+.dhead{position:fixed;z-index:100;top:0;left:0;right:0;height:calc(var(--head) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:56px 1fr 56px;align-items:center;background:var(--natural);color:var(--bark);border-bottom:1px solid rgb(var(--bark-rgb)/.1);--logo-ink:var(--bark);--logo-accent:var(--browned-sugar)}
+.dhead__btn{display:grid;place-items:center;width:56px;height:56px;border:0;background:transparent;color:var(--bark);text-decoration:none;font-size:1.3rem;cursor:pointer}
 .dhead__btn svg{width:22px;height:22px}
 /* The header is compact, so it carries the D-star logomark on a phone and
    the primary logo from 700px up. The link's padding is the protection
@@ -121,7 +126,7 @@ button{font:inherit;color:inherit}
 .items{list-style:none;margin:0;padding:0;display:grid;gap:.8rem}
 .item{display:grid;grid-template-columns:84px 1fr;gap:.8rem;padding:.8rem;background:var(--surface-raised);border:1px solid var(--natural);border-radius:8px;box-shadow:var(--lift-1)}
 .item img,.item__plate{width:84px;height:84px;border-radius:6px;object-fit:cover;filter:contrast(1.07) saturate(1.06) brightness(.985)}
-.item__plate{display:grid;place-items:center;background:var(--deep);font-family:var(--font-display);font-size:2.2rem;color:var(--mint)}
+.item__plate{display:grid;place-items:center;background:var(--deep);font-family:var(--font-accent);font-style:italic;font-size:2.2rem;color:var(--mint)}
 .item__body{display:flex;flex-direction:column;gap:.45rem;min-width:0}
 .item__top{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}
 .item__name{font-family:var(--display);font-weight:500;font-size:1.1rem;line-height:1.15}
@@ -260,7 +265,7 @@ body.has-bar{--bar:80px}
       <svg class="diagram" viewBox="0 0 640 200" role="img" aria-labelledby="diag-title">
         <title id="diag-title">Diagram: the website hands the order to Toast, and Toast sends it to the kitchen and to the driver.</title>
         <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="#C4DECC"/></marker></defs>
-        <g font-family="'DD Title',Helvetica,Arial,sans-serif" font-size="22" fill="#FCFBF9" text-anchor="middle">
+        <g font-family="'Albert Sans',Helvetica,Arial,sans-serif" font-size="22" fill="#FCFBF9" text-anchor="middle">
           <rect x="20" y="70" width="160" height="60" rx="8" fill="none" stroke="#C4DECC" stroke-width="1.5"/><text x="100" y="107">Website</text>
           <rect x="240" y="70" width="160" height="60" rx="8" fill="#C4DECC"/><text x="320" y="107" fill="#475842" font-weight="700">Toast</text>
           <rect x="460" y="18" width="160" height="60" rx="8" fill="none" stroke="#C4DECC" stroke-width="1.5"/><text x="540" y="55">Kitchen</text>
@@ -269,7 +274,7 @@ body.has-bar{--bar:80px}
         <g stroke="#C4DECC" stroke-width="2" fill="none" marker-end="url(#arr)">
           <path d="M180 100H238"/><path d="M400 100C430 100 430 48 458 48"/><path d="M400 100C430 100 430 152 458 152"/>
         </g>
-        <g font-family="'DD Sub','Arial Narrow',sans-serif" font-size="11" fill="#C4DECC" text-anchor="middle" letter-spacing="1">
+        <g font-family="'Encode Sans SemiCondensed','Arial Narrow',sans-serif" font-size="11" fill="#C4DECC" text-anchor="middle" letter-spacing="1">
           <text x="209" y="90">ORDER</text><text x="430" y="36">TICKET</text><text x="430" y="180">DISPATCH</text>
         </g>
       </svg>

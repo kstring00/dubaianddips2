@@ -13,6 +13,15 @@
       ]
     },
     {
+      "source": "/public/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
       "source": "/public/brand/(.*)",
       "headers": [
         {
@@ -22,7 +31,7 @@
       ]
     },
     {
-      "source": "/(index.html|order-demo.html|site.js|demo.js|track.js|404.html|manifest.webmanifest|brand.css)",
+      "source": "/(index.html|order-demo.html|site.js|demo.js|track.js|404.html|manifest.webmanifest|brand.css|menu-board.json)",
       "headers": [
         {
           "key": "Cache-Control",

@@ -34,6 +34,8 @@ every side) and the ground colour, ready for social avatars, slides, etc.
 
 ### Pattern
 
+`pattern-sugar` is the tile the site uses, behind the menu only: Browned
+Sugar strokes at 22% on the Off-White ground.
 `pattern-on-courtyard` / `pattern-on-bark` are the two treatments the PDF
 shows (stroke a shade darker on Courtyard at 18%, a shade lighter on Bark at
 14%). `pattern-dark` / `pattern-light` are the same strokes on a transparent
