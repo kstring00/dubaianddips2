@@ -1,0 +1,111 @@
+/* =====================================================================
+   Dubai & Dips brand layer. Shared by every page; each page's own <style>
+   only maps these onto its components.
+
+   COLOURS
+   Sampled from the swatches and the artwork in "Dubai & Dips Branding &
+   Guidelines" (Oct 2025). Four of the printed hex labels do not match the
+   swatch they sit on; the sampled value is used until the owner confirms
+   which is right. The label is kept beside each one.
+
+   TYPE
+   The brand faces are commercial (Neue Regrade, Gotham SSm Narrow,
+   Editor's Note; IvyMode lives only inside the logo artwork and is never
+   loaded). Until the licensed web fonts arrive, three free Google Fonts
+   stand-ins are self-hosted from /public/fonts. At most three families
+   load; the split-flaps and boarding-pass details use the system
+   monospace, which costs nothing.
+
+   TRADEMARK
+   The mark after "Dubai & Dips" is set here too (--tm), so switching
+   from ™ to ® is one line. Markup carries <span class="tm"></span>.
+   ===================================================================== */
+
+/* ------------------------------------------------------------ fonts ----
+   Stand-ins (OFL, from Google Fonts), self-hosted:
+     Neue Regrade       -> Albert Sans                 titles, body, nav, buttons
+     Gotham SSm Narrow  -> Encode Sans, semi-condensed eyebrows, small labels
+     Editor's Note ital -> Playfair Display Italic     accent words, marquee */
+@font-face{font-family:"Albert Sans";font-style:normal;font-weight:300 700;font-display:swap;
+  src:url(/public/fonts/albert-sans.woff2) format("woff2")}
+/* Encode Sans is variable in width; the descriptor pins it at 87.5%
+   (semi-condensed), the width Gotham Narrow sits at. */
+@font-face{font-family:"Encode Sans SemiCondensed";font-style:normal;font-weight:300 700;font-stretch:87.5%;font-display:swap;
+  src:url(/public/fonts/encode-sans.woff2) format("woff2")}
+@font-face{font-family:"Playfair Display";font-style:italic;font-weight:400 600;font-display:swap;
+  src:url(/public/fonts/playfair-display-italic.woff2) format("woff2")}
+
+/* Licensed faces, declared ahead of time. A face is only downloaded once a
+   family below names it, so these cost nothing until the switch flips.
+   Drop the files into /public/fonts with these names (or edit a path). */
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:300;font-display:swap;src:url(/public/fonts/NeueRegrade-Light.woff2) format("woff2")}
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:400;font-display:swap;src:url(/public/fonts/NeueRegrade-Regular.woff2) format("woff2")}
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:500;font-display:swap;src:url(/public/fonts/NeueRegrade-Medium.woff2) format("woff2")}
+@font-face{font-family:"Neue Regrade";font-style:normal;font-weight:600 700;font-display:swap;src:url(/public/fonts/NeueRegrade-Semibold.woff2) format("woff2")}
+@font-face{font-family:"Gotham SSm Narrow";font-style:normal;font-weight:400 500;font-display:swap;src:url(/public/fonts/GothamSSmNarrow-Book.woff2) format("woff2")}
+@font-face{font-family:"Gotham SSm Narrow";font-style:normal;font-weight:600 700;font-display:swap;src:url(/public/fonts/GothamSSmNarrow-Medium.woff2) format("woff2")}
+@font-face{font-family:"Editor's Note";font-style:italic;font-weight:400 600;font-display:swap;src:url(/public/fonts/EditorsNote-Italic.woff2) format("woff2")}
+
+/* ==== THE FONT SWITCH: the one line to change ========================
+   Stand-ins now. When the licensed files are in /public/fonts, replace the
+   line below with the commented one under it. (Optional, for speed: point
+   the font preloads in each page's <head> at the new files too.) */
+:root{--face-title:"Albert Sans";--face-sub:"Encode Sans SemiCondensed";--face-accent:"Playfair Display"}
+/* :root{--face-title:"Neue Regrade","Albert Sans";--face-sub:"Gotham SSm Narrow","Encode Sans SemiCondensed";--face-accent:"Editor's Note","Playfair Display"} */
+
+/* ==== THE TRADEMARK: the one line to change ===========================
+   ™ until the federal registration is confirmed; then use the line under it. */
+:root{--tm:"\2122";--tm-kind:""}
+/* :root{--tm:"\00AE";--tm-kind:"registered "} */
+.tm::after{content:var(--tm)}
+.tm-kind::before{content:var(--tm-kind)}
+
+:root{
+  /* ---- brand palette (sampled) ---- */
+  --courtyard:#475842;       /* label 475842 - matches */
+  --mint:#C4DECC;            /* label D1E3D2 - swatch differs (CMYK 23/3/22/0) */
+  --bark:#4A3D36;            /* label 493C35 - matches within rounding */
+  --browned-sugar:#9C774F;   /* label C2835F - swatch differs */
+  --off-white:#FCFBF9;       /* label E6DBC6 - swatch differs (CMYK 1/1/2/0) */
+  --natural:#E3DED0;         /* label E3D3D0 - swatch differs */
+
+  /* Channels, so tints stay variables */
+  --courtyard-rgb:71 88 66;
+  --mint-rgb:196 222 204;
+  --bark-rgb:74 61 54;
+  --browned-sugar-rgb:156 119 79;
+  --off-white-rgb:252 251 249;
+  --natural-rgb:227 222 208;
+
+  /* ---- steps derived from the palette, for UI states only ----
+     Never used on a logo. */
+  --courtyard-deep:#3C4B38;  /* Courtyard, 15% toward black: pressed/hover, board panels */
+  --bark-deep:#3B312B;       /* Bark, 20% toward black: hover on Bark */
+  --bark-soft:#655A53;       /* Bark, 15% toward Off-White: secondary text, AA on Off-White and Natural */
+  --browned-sugar-deep:#8C6B4A; /* Browned Sugar, 20% toward Bark: the NOW BOARDING tiles; the lightest step that carries Off-White letters at AA (4.7:1) */
+
+  /* ---- type stacks (the faces come from the switch above) ---- */
+  --font-title:var(--face-title),-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-body:var(--font-title);
+  --font-sub:var(--face-sub),"Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --font-accent:var(--face-accent),Georgia,"Times New Roman",serif;
+  --font-data:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","Courier New",monospace;
+
+  /* ---- logo protection area ----
+     Clear space on every side = the cap height of the "D". As a fraction
+     of each lockup's own height (measured off the master artwork): */
+  --clear-primary:.812;      /* D cap 54.33 / lockup 66.92 */
+  --clear-stacked:.427;      /* D cap 62.49 / lockup 146.46 */
+  --clear-mark:.870;         /* D cap 162.84 / mark 187.18 */
+}
+
+/* A logo is always drawn from the sprite in the page, so it can take the
+   palette from context without a second file. Ink and accent are set by
+   the container; nothing else about a logo is ever styled. */
+.logo{display:block;height:var(--logo-h);width:auto;flex:0 0 auto;overflow:visible}
+.logo--primary{aspect-ratio:399.38/66.92}
+.logo--stacked{aspect-ratio:243.43/146.46}
+.logo--mark{aspect-ratio:173.75/187.18}
+.logo--star{aspect-ratio:48.28/48.69}
+.on-light{--logo-ink:var(--bark);--logo-accent:var(--browned-sugar)}
+.on-dark{--logo-ink:var(--off-white);--logo-accent:var(--mint)}

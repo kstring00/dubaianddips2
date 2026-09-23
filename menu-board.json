@@ -1,0 +1,246 @@
+{
+  "_howto": [
+    "The departures board on the home page. Edit this file only; no code change is needed.",
+    "Rows appear top to bottom in this order. The first row is the signature (NOW BOARDING).",
+    "status: one of on-time, now-boarding, seasonal, sold-out.",
+    "code + destination: the airport code and the place the category is inspired by. Local and American items fly HOU Houston. \"TBD\" means not decided yet: the board shows it as tbdShowsAs (HOU Houston) until it is.",
+    "description: one line, only what is true of every item in the category. Leave it \"\" if unsure; the board then points to the list in the shop.",
+    "items: the first three show under the category on the board; all of them show when the row is opened.",
+    "price: a number such as 5.5 shows as $5.50. Leave it null to show no price. The only prices in the code today are the demo placeholders in config/ordering.js, so every price here is null until the real menu arrives.",
+    "slug: used by links such as /menu/frappes. Keep it lowercase with dashes, and do not change the existing ones."
+  ],
+  "tbdShowsAs": {
+    "code": "HOU",
+    "destination": "Houston"
+  },
+  "rows": [
+    {
+      "slug": "frappes",
+      "flight": "DD 101",
+      "code": "DXB",
+      "destination": "Dubai",
+      "category": "The Frappes",
+      "gate": "A1",
+      "status": "now-boarding",
+      "description": "Blended and served cold.",
+      "items": [
+        {
+          "name": "Dubai Chocolate Frappe",
+          "price": null
+        },
+        {
+          "name": "Pistachio Frappe",
+          "price": null
+        },
+        {
+          "name": "Biscoff Frappe",
+          "price": null
+        },
+        {
+          "name": "Salted Caramel Frappe",
+          "price": null
+        }
+      ]
+    },
+    {
+      "slug": "classic-coffees",
+      "flight": "DD 102",
+      "code": "FCO",
+      "destination": "Italy",
+      "category": "Classic Coffees",
+      "gate": "A2",
+      "status": "on-time",
+      "description": "Espresso drinks.",
+      "items": [
+        {
+          "name": "Espresso",
+          "price": null
+        },
+        {
+          "name": "Cappuccino",
+          "price": null
+        },
+        {
+          "name": "Americano",
+          "price": null
+        },
+        {
+          "name": "Affogato",
+          "price": null
+        },
+        {
+          "name": "Cortado",
+          "price": null
+        },
+        {
+          "name": "Leche y Leche (Spanish Cortado)",
+          "price": null
+        }
+      ]
+    },
+    {
+      "slug": "matchas",
+      "flight": "DD 103",
+      "code": "NRT",
+      "destination": "Japan",
+      "category": "The Matchas",
+      "gate": "B1",
+      "status": "on-time",
+      "description": "Matcha drinks.",
+      "items": [
+        {
+          "name": "Strawberry Matcha",
+          "price": null
+        },
+        {
+          "name": "Pistachio Matcha",
+          "price": null
+        },
+        {
+          "name": "Biscoff Matcha",
+          "price": null
+        },
+        {
+          "name": "Matcha Cortado (12 oz)",
+          "price": null
+        },
+        {
+          "name": "Mango Matcha",
+          "price": null
+        },
+        {
+          "name": "Banana Matcha",
+          "price": null
+        },
+        {
+          "name": "Blueberry Cream Matcha",
+          "price": null
+        },
+        {
+          "name": "Banana Date Matcha",
+          "price": null
+        }
+      ]
+    },
+    {
+      "slug": "lattes",
+      "flight": "DD 104",
+      "code": "MAD",
+      "destination": "Madrid",
+      "category": "The Lattes",
+      "gate": "B2",
+      "status": "on-time",
+      "description": "Lattes in several flavors.",
+      "items": [
+        {
+          "name": "Spanish Latte",
+          "price": null
+        },
+        {
+          "name": "Pistachio Latte",
+          "price": null
+        },
+        {
+          "name": "Tiramisu Latte",
+          "price": null
+        },
+        {
+          "name": "Biscoff Latte",
+          "price": null
+        },
+        {
+          "name": "Taro Latte",
+          "price": null
+        }
+      ]
+    },
+    {
+      "slug": "refreshers",
+      "flight": "DD 105",
+      "code": "TBD",
+      "destination": "TBD",
+      "category": "The Refreshers",
+      "gate": "C1",
+      "status": "on-time",
+      "description": "",
+      "items": []
+    },
+    {
+      "slug": "smoothies",
+      "flight": "DD 106",
+      "code": "TBD",
+      "destination": "TBD",
+      "category": "The Smoothies",
+      "gate": "C2",
+      "status": "on-time",
+      "description": "Fruit smoothies.",
+      "items": [
+        {
+          "name": "Strawberry Smoothie",
+          "price": null
+        },
+        {
+          "name": "Strawberry Banana Smoothie",
+          "price": null
+        },
+        {
+          "name": "Mango Smoothie",
+          "price": null
+        },
+        {
+          "name": "Banana Date Smoothie",
+          "price": null
+        }
+      ]
+    },
+    {
+      "slug": "breakfast-bites",
+      "flight": "DD 107",
+      "code": "HOU",
+      "destination": "Houston",
+      "category": "Breakfast Bites",
+      "gate": "D1",
+      "status": "on-time",
+      "description": "",
+      "items": []
+    },
+    {
+      "slug": "crepes",
+      "flight": "DD 108",
+      "code": "CDG",
+      "destination": "Paris",
+      "category": "The Crepes",
+      "gate": "D2",
+      "status": "on-time",
+      "description": "",
+      "items": []
+    },
+    {
+      "slug": "waffles",
+      "flight": "DD 109",
+      "code": "BRU",
+      "destination": "Brussels",
+      "category": "The Waffles",
+      "gate": "E1",
+      "status": "on-time",
+      "description": "",
+      "items": []
+    },
+    {
+      "slug": "desserts",
+      "flight": "DD 110",
+      "code": "IST",
+      "destination": "Turkey",
+      "category": "D&D Desserts",
+      "gate": "E2",
+      "status": "on-time",
+      "description": "Desserts, kunafa included.",
+      "items": [
+        {
+          "name": "Kunafa",
+          "price": null
+        }
+      ]
+    }
+  ]
+}

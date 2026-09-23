@@ -19,7 +19,7 @@ minimum, radius, phone number or Toast link lives anywhere else.
 | `TOAST_GROUP_URL` | `""` | Toast group-ordering link once one exists; until then the "Treat your office" card uses `TOAST_ORDER_URL` |
 | `PHONE` | `(281) 555-0147` / `+12815550147` | the shop's real number (this is the placeholder that was already on the site) |
 | `SHOP.address`, `SHOP.directions` | placeholder address | the real address and Google Maps link |
-| `REWARDS_LIVE` | `false` (rewards labelled "Coming soon") | `true` once Toast loyalty is on |
+| `REWARDS_LIVE` | `false` (the rewards point is no longer on the site) | `true` once Toast loyalty is on, if rewards come back |
 | `ANALYTICS_ENDPOINT` | `""` | optional: a URL that accepts a JSON POST per event (see below) |
 | `DEMO_ITEMS[].price` | demo prices | real menu prices (no price on the boards was legible) |
 | `DEMO_TAX_RATE` | `0.0825` | confirm Houston combined sales tax |
@@ -31,10 +31,12 @@ Already set as asked: `DELIVERY_MINIMUM: 15`, `DELIVERY_RADIUS_MILES: 5`,
 ## Where the Order buttons are
 
 Every element with `data-order="pickup|delivery|group"` is an Order button:
-header, hero (opening state and landing copy), the featured item, every
-menu item and every category on the board, the delivery card, the group
-card, the Visit section, the footer, the phone thumb bar, and the 404 page.
-`site.js` sets each one's `href` from config. With a URL, the click opens
+header, hero (opening state and landing copy), every row on the departures
+board, the first-class feature card, the three Order Direct buttons (pickup,
+delivery, group), the Visit section, the footer, the phone thumb bar, and
+the 404 page. `site.js` sets each one's `href` from config; the board's
+buttons are built from `menu-board.json` and wired the same way
+(`DD.wireOrder`). With a URL, the click opens
 Toast in the same tab on a phone and a new tab on a desktop. Without one,
 the click opens the sheet.
 
@@ -69,3 +71,12 @@ anything off this origin, so Toast pages are never cached.
 node scripts/check.mjs       # static checks + Playwright walk of every order button, both config states, the demo, 360px layout
 node scripts/serve.mjs 8787  # local server with the same rewrites as vercel.json
 ```
+
+## The menu board
+
+The departures board on the home page is built from **`menu-board.json`**
+(flight, airport code and destination, category, items, gate, status, and a
+one-line description per row). Edit that file only; the page reads it on
+load. Prices show when an item's `price` is a number; they are all `null`
+until the real menu arrives (the prices in `DEMO_ITEMS` above are demo
+placeholders and are not shown on the board).

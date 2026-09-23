@@ -152,6 +152,13 @@
       else window.addEventListener('load', function () { setTimeout(startFilm, 0); });
       window.addEventListener('scroll', startFilm, { once: true, passive: true });
     }
+    /* The nav sits out the opening intro and slides in once it has lifted
+       away (.22, the end of the wordmark's lift). Focus inside it shows it
+       at once, whatever the scroll. */
+    var introOver = false, navFocus = false;
+    function showNav() { nav.classList.toggle('is-shown', introOver || navFocus); }
+    nav.addEventListener('focusin', function () { navFocus = true; showNav(); });
+    nav.addEventListener('focusout', function (e) { if (!nav.contains(e.relatedTarget)) { navFocus = false; showNav(); } });
     function setNav(op) {
       for (var i = 0; i < fades.length; i++) {
         set(fades[i], 'opacity', op.toFixed(3));
@@ -194,6 +201,8 @@
       set(rule, 'width', (p * 100).toFixed(2) + '%');
 
       setNav(easeInOut(range(p, .84, .94)));
+      var over = p >= .22;
+      if (over !== introOver) { introOver = over; showNav(); }
     }
 
     if (reduce) {
@@ -201,6 +210,7 @@
          collapses the stage; the film seeks to its last frame on load. */
       deferFilm();
       setNav(1);
+      introOver = true; showNav();
       window.addEventListener('scroll', navStuck, { passive: true });
       navStuck();
     } else {
@@ -232,6 +242,10 @@
     var cset = writer();
     var cscrub = scrubber(cv, function (dur) { if (reduce) cscrub.seek(dur); });
     var loaded = false;
+    /* the star loader in the stage goes once the film has a frame */
+    function craftReady() { craft.classList.add('is-ready'); }
+    cv.addEventListener('loadeddata', craftReady);
+    cv.addEventListener('error', craftReady, true);
     function loadCraft() {
       if (loaded) return; loaded = true;
       cv.src = cv.getAttribute('data-src');
@@ -276,19 +290,24 @@
   }
 
   /* ------------------------------------------------------- departures
-     The menu as a departures board. A row expands in place; no route
-     change and no overlay. The status cell is the only value that changes
-     when a row activates, so it is the only cell that flaps - riffling a
-     cell that is landing on the character it already showed would be
-     motion for its own sake, which the board is meant to avoid. */
+     The menu as a departures board, built from /menu-board.json so the
+     menu can be edited without touching code. Each row is an accordion
+     (one open at a time) under its own h3. The status tiles are split-flaps:
+     when the board first scrolls into view they flip and settle row by
+     row, top to bottom, in about 1.2s - once per page load, never again,
+     and not at all under reduced motion. The tiles are aria-hidden; screen
+     readers get the status as text. */
   var board = document.getElementById('board');
-  if (board) {
+  var boardRows = document.getElementById('boardRows');
+  if (board && boardRows) {
     var CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var WIDTH = 12;       /* tiles per status, the length of NOW BOARDING */
     var STEP = 55;        /* ms per flap in a riffle */
-    var LEAD = 38;        /* per-character stagger, left to right */
-    var STEPS_WIDE = 8;   /* riffle length on a desktop-class screen */
-    var STEPS_SMALL = 4;  /* fewer cells animated on a phone, per the frame budget */
-    var MAX_CELLS = 40;   /* past this, set the rest instantly */
+    var STATUS = {
+      'on-time': 'ON TIME', 'now-boarding': 'NOW BOARDING',
+      'seasonal': 'SEASONAL', 'sold-out': 'SOLD OUT'
+    };
+    var SPOKEN = { 'on-time': 'On time', 'now-boarding': 'Now boarding', 'seasonal': 'Seasonal', 'sold-out': 'Sold out' };
 
     var jobs = [], flapRaf = 0, audio = null, soundOn = false;
 
@@ -323,69 +342,84 @@
         if (j.done) continue;
         var idx = Math.floor((now - j.start) / STEP);
         if (idx < 0) { alive = true; continue; }
-        if (idx >= j.seq.length) { j.done = true; continue; }
+        /* a dropped frame can jump past the end: always land the last letter */
+        if (idx >= j.seq.length) { if (j.at !== j.seq.length - 1) paint(j.cell, j.seq[j.seq.length - 1], true); j.done = true; continue; }
         if (idx !== j.at) { j.at = idx; paint(j.cell, j.seq[idx], idx === j.seq.length - 1); }
         alive = true;
       }
       if (alive) flapRaf = requestAnimationFrame(runJobs);
       else jobs = [];
     }
-    /* walk the character set from the old letter to the new one */
-    function sequence(from, to, cap) {
-      var a = CHARS.indexOf(from), b = CHARS.indexOf(to);
-      if (a < 0) a = 0;
+    /* A short riffle ending on the wanted letter. */
+    function sequence(to, steps) {
+      var b = CHARS.indexOf(to), out = [];
       if (b < 0) b = 0;
-      var steps = (b - a + CHARS.length) % CHARS.length;
-      var out = [];
-      if (steps === 0 || steps > cap) {
-        var n = Math.min(cap, steps || cap);
-        for (var k = n; k > 0; k--) out.push(CHARS[(b - k + CHARS.length) % CHARS.length]);
-      } else {
-        for (var i = 1; i <= steps; i++) out.push(CHARS[(a + i) % CHARS.length]);
-      }
+      for (var k = steps; k > 0; k--) out.push(CHARS[(b - k + CHARS.length * 2) % CHARS.length]);
       out.push(to);
       return out;
     }
-    function flapTo(el, next) {
-      var cells = el.children, len = cells.length;
-      var cur = el.getAttribute('data-value') || '';
-      next = String(next).toUpperCase();
-      var pad = next.length >= len ? next.slice(0, len) : next + Array(len - next.length + 1).join(' ');
-      el.setAttribute('data-value', pad);
-      var changed = [];
-      for (var i = 0; i < len; i++) {
-        var f = cur.charAt(i) || ' ', t = pad.charAt(i) || ' ';
-        if (f !== t) changed.push([i, f, t]);
+    function pad(text) { text = String(text).toUpperCase().slice(0, WIDTH); return text + Array(WIDTH - text.length + 1).join(' '); }
+
+    /* Set a row's tiles: at once, or as a riffle starting after `delay`. */
+    function flapTo(el, text, delay) {
+      var cells = el.children, want = pad(text), now = performance.now();
+      for (var i = 0; i < cells.length; i++) {
+        var ch = want.charAt(i);
+        if (delay < 0) { cells[i].firstElementChild.textContent = ch; continue; }
+        if (ch === ' ') continue;
+        jobs.push({ cell: cells[i], seq: sequence(ch, phone.matches ? 4 : 6), start: now + delay + i * (phone.matches ? 14 : 18), at: -1, done: false });
       }
-      if (reduce || !board.isConnected) {
-        changed.forEach(function (c) { cells[c[0]].firstElementChild.textContent = c[2]; });
-        return;
-      }
-      var small = phone.matches;
-      var cap = small ? STEPS_SMALL : STEPS_WIDE;
-      var lead = small ? 26 : LEAD;
-      var now = performance.now(), budget = MAX_CELLS - jobs.filter(function (j) { return !j.done; }).length;
-      changed.forEach(function (c, n) {
-        if (n >= budget) { cells[c[0]].firstElementChild.textContent = c[2]; return; }
-        jobs.push({ cell: cells[c[0]], seq: sequence(c[1], c[2], cap), start: now + c[0] * lead, at: -1, done: false });
-      });
-      if (!flapRaf && jobs.length) flapRaf = requestAnimationFrame(runJobs);
+      if (delay >= 0 && !flapRaf && jobs.length) flapRaf = requestAnimationFrame(runJobs);
     }
 
-    var rows = [].slice.call(board.querySelectorAll('.brow'));
-    var btns = rows.map(function (r) { return r.querySelector('.brow__btn'); });
-    var openRow = null;
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function price(p) { return typeof p === 'number' && p > 0 ? money(p) : ''; }
+    function tiles(status) {
+      var word = STATUS[status] || STATUS['on-time'], html = '';
+      for (var i = 0; i < WIDTH; i++) {
+        html += '<span class="flap' + (i >= word.length ? ' flap--pad' : '') + '"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span>';
+      }
+      return html;
+    }
+    var TBD = { code: 'HOU', destination: 'Houston' };
+    function rowHtml(r) {
+      if (r.code === 'TBD') { var c = {}; for (var k in r) c[k] = r[k]; c.code = TBD.code; c.destination = TBD.destination; r = c; }
+      var slug = esc(r.slug), status = STATUS[r.status] ? r.status : 'on-time';
+      var items = r.items || [];
+      var names = items.slice(0, 3).map(function (it) { return esc(it.name); }).join(' &middot; ');
+      var sub = names || esc(r.description) || 'Full list in the shop';
+      var list = items.length
+        ? '<ul class="bitems">' + items.map(function (it) {
+            var p = price(it.price);
+            return '<li class="bitem"><span>' + esc(it.name) + '</span>' + (p ? '<span class="bitem__price">' + p + '</span>' : '') + '</li>';
+          }).join('') + '</ul>'
+        : '<p class="bpanel__soon">The full list is on the boards in the shop.</p>';
+      var order = status === 'sold-out'
+        ? '<p class="bpanel__soon">Sold out for today.</p>'
+        : '<p class="bpanel__order"><a class="btn btn--primary btn--sm" href="#order" data-order="pickup" data-place="category" data-category="' + esc(r.category) + '" aria-label="Order for pickup: ' + esc(r.category) + '">Order</a></p>';
+      return '<li class="brow" data-slug="' + slug + '" data-status="' + status + '">' +
+        '<h3 class="brow__h"><button class="brow__btn" type="button" id="brow-' + slug + '" aria-expanded="false" aria-controls="bpanel-' + slug + '">' +
+          '<span class="brow__cell brow__flight">' + esc(r.flight) + '</span>' +
+          '<span class="brow__cell brow__dest"><span class="brow__code">' + esc(r.code) + '</span>' + esc(r.destination) + '</span>' +
+          '<span class="brow__cell brow__on"><span class="brow__cat">' + esc(r.category) + '</span><span class="brow__items">' + sub + '</span>' +
+            '<span class="brow__fold" aria-hidden="true"><span><b>' + esc(r.code) + '</b>' + esc(r.destination) + '</span><span><i>Gate</i><b>' + esc(r.gate) + '</b></span></span></span>' +
+          '<span class="brow__cell brow__gate"><span class="vh">Gate </span>' + esc(r.gate) + '</span>' +
+          '<span class="brow__cell brow__status"><span class="flaps" aria-hidden="true">' + tiles(status) + '</span><span class="vh">, ' + SPOKEN[status] + '</span></span>' +
+        '</button></h3>' +
+        '<div class="bpanel" id="bpanel-' + slug + '" role="region" aria-labelledby="brow-' + slug + '" hidden><div class="bpanel__in">' +
+          (r.description ? '<p class="bpanel__desc">' + esc(r.description) + '</p>' : '') + list + order +
+        '</div></div></li>';
+    }
+
+    var rows = [], btns = [], openRow = null;
 
     function setRow(row, on) {
-      var btn = row.querySelector('.brow__btn');
-      var panel = row.querySelector('.bpanel');
-      var flaps = row.querySelector('.flaps');
-      var note = row.querySelector('.brow__status .vh');
+      var btn = row.querySelector('.brow__btn'), panel = row.querySelector('.bpanel');
       row.classList.toggle('is-open', on);
       btn.setAttribute('aria-expanded', on ? 'true' : 'false');
       panel.hidden = !on;
-      if (note) note.textContent = on ? 'Now boarding' : 'On time';
-      flapTo(flaps, on ? 'NOW BOARDING' : 'ON TIME');
       if (on && !reduce && panel.animate) {
         panel.firstElementChild.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }],
           { duration: 260, easing: 'cubic-bezier(.16,1,.3,1)' });
@@ -398,12 +432,52 @@
       openRow = row;
       if (focusIt) row.querySelector('.brow__btn').focus();
     }
-    btns.forEach(function (b, i) {
-      b.addEventListener('click', function () { openBoardRow(rows[i], false); });
-    });
+    function rowFor(slug) {
+      for (var i = 0; i < rows.length; i++) if (rows[i].getAttribute('data-slug') === slug) return rows[i];
+      return null;
+    }
+
+    /* The settle: every row's status riffles in, one row after the next. */
+    var settled = false;
+    function settle(animate) {
+      if (settled) return;
+      settled = true;
+      var stagger = phone.matches ? 50 : 60;
+      rows.forEach(function (row, i) {
+        flapTo(row.querySelector('.flaps'), STATUS[row.getAttribute('data-status')], animate ? i * stagger : -1);
+      });
+    }
+
+    function build(data) {
+      if (data.tbdShowsAs) TBD = data.tbdShowsAs;
+      boardRows.innerHTML = (data.rows || []).map(rowHtml).join('');
+      rows = [].slice.call(boardRows.querySelectorAll('.brow'));
+      btns = rows.map(function (r) { return r.querySelector('.brow__btn'); });
+      btns.forEach(function (b, i) { b.addEventListener('click', function () { openBoardRow(rows[i], false); }); });
+      if (window.DD && window.DD.wireOrder) window.DD.wireOrder(boardRows);
+
+      if (reduce || !('IntersectionObserver' in window)) settle(false);
+      else {
+        var sio = new IntersectionObserver(function (es) {
+          if (es.some(function (e) { return e.isIntersecting; })) { settle(true); sio.disconnect(); }
+        }, { threshold: .2 });
+        sio.observe(boardRows);
+      }
+
+      var deep = /^\/menu\/([a-z0-9-]+)\/?$/.exec(location.pathname);
+      if (deep) {
+        var dr = rowFor(deep[1]);
+        if (dr) {
+          settle(false);
+          openBoardRow(dr, false);
+          requestAnimationFrame(function () { board.scrollIntoView({ block: 'center' }); dr.querySelector('.brow__btn').focus(); });
+        }
+      }
+    }
+
     board.addEventListener('keydown', function (e) {
       var i = btns.indexOf(document.activeElement);
-      if (e.key === 'Escape' && openRow) { setRow(openRow, false); openRow = null; e.preventDefault(); return; }
+      if (e.key === 'Escape' && openRow) { setRow(openRow, false); openRow.querySelector('.brow__btn').focus(); openRow = null; e.preventDefault(); return; }
       if (i < 0) return;
       if (e.key === 'ArrowDown') { btns[Math.min(btns.length - 1, i + 1)].focus(); e.preventDefault(); }
       else if (e.key === 'ArrowUp') { btns[Math.max(0, i - 1)].focus(); e.preventDefault(); }
@@ -421,28 +495,24 @@
 
     /* A link anywhere on the page that names a category opens its row in
        place. Opened in a new tab it is a real URL, and the rewrite serves
-       the page, which is what the on-load branch below picks up. */
-    function rowFor(slug) {
-      for (var i = 0; i < rows.length; i++) if (rows[i].getAttribute('data-slug') === slug) return rows[i];
-      return null;
-    }
+       the page, which is what the deep-link branch in build() picks up. */
     document.addEventListener('click', function (e) {
       var link = e.target.closest ? e.target.closest('[data-sheet]') : null;
       if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
       var row = rowFor(link.getAttribute('data-sheet'));
       if (!row) return;
       e.preventDefault();
+      settle(false);
       board.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-      openBoardRow(row, true);
+      if (openRow !== row) openBoardRow(row, true);
     });
-    var deep = /^\/menu\/([a-z0-9-]+)\/?$/.exec(location.pathname);
-    if (deep) {
-      var dr = rowFor(deep[1]);
-      if (dr) {
-        openBoardRow(dr, false);
-        requestAnimationFrame(function () { board.scrollIntoView({ block: 'center' }); dr.querySelector('.brow__btn').focus(); });
-      }
-    }
+
+    fetch('/menu-board.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(build)
+      .catch(function () {
+        boardRows.innerHTML = '<li class="brow"><p class="board__foot">The board did not load. Refresh the page, or call the shop and we will read it to you.</p></li>';
+      });
   }
 
   /* ---------------------------------------------------------- hours
@@ -512,15 +582,6 @@
     if (url.charAt(0) !== '/' || mode === 'pickup') return url;
     return url + (url.indexOf('?') > -1 ? '&' : '?') + 'mode=' + mode;
   }
-  function feeSentence() {
-    var tiers = (CFG.DELIVERY_FEE_TIERS || []).slice().sort(function (a, b) { return a.min - b.min; });
-    if (!tiers.length) return '';
-    var parts = tiers.map(function (t, i) {
-      var fee = t.fee > 0 ? money(t.fee) : 'free';
-      return i === 0 ? fee + ' on orders over ' + money(t.min) : fee + ' over ' + money(t.min);
-    });
-    return 'Delivery fee ' + parts.join(', ') + '.';
-  }
   function hoursRows() {
     return (CFG.HOURS_LABELS || []).map(function (h) {
       return '<tr><th>' + h.days + '</th><td>' + clockLabel(h.open).replace(' ', '') + ' to ' + clockLabel(h.close).replace(' ', '') + '</td></tr>';
@@ -544,16 +605,6 @@
     var list = document.querySelector('[data-hours-list]');
     if (list && CFG.HOURS_LABELS) list.innerHTML = CFG.HOURS_LABELS.map(function (x) {
       return '<li><span>' + x.days + '</span><span>' + clockLabel(x.open).replace(' ', '') + ' to ' + clockLabel(x.close).replace(' ', '') + '</span></li>';
-    }).join('');
-
-    var dc = document.getElementById('deliveryCopy');
-    if (dc) dc.textContent = 'Delivery within ' + CFG.DELIVERY_RADIUS_MILES + ' miles. ' + money(CFG.DELIVERY_MINIMUM) + ' minimum. ' + feeSentence() + ' ' + (COPY.deliveryCover || '');
-    var gc = document.getElementById('groupCopy');
-    if (gc) gc.textContent = 'Orders ' + money(CFG.GROUP_ORDER_MINIMUM) + '+ get free delivery. ' + (COPY.groupText || '');
-    var why = document.getElementById('whyList');
-    if (why && COPY.why) why.innerHTML = COPY.why.slice(0, 3).map(function (w) {
-      var soon = w.soon && !CFG.REWARDS_LIVE ? '<span class="tag">' + w.soon + '</span>' : '';
-      return '<li><strong>' + w.title + '</strong><span>' + w.text + '</span>' + soon + '</li>';
     }).join('');
 
     /* the sheet */
@@ -583,20 +634,24 @@
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
     }
 
-    /* the buttons */
-    var btns = document.querySelectorAll('[data-order]');
-    for (var b = 0; b < btns.length; b++) {
-      var mode = btns[b].getAttribute('data-order') || 'pickup';
-      var url = orderUrl(mode);
-      if (url) {
-        btns[b].setAttribute('href', withMode(url, mode));
-        if (phone.matches) { btns[b].removeAttribute('target'); btns[b].removeAttribute('rel'); }
-        else { btns[b].setAttribute('target', '_blank'); btns[b].setAttribute('rel', 'noopener'); }
-      } else {
-        btns[b].setAttribute('href', '#order');
-        btns[b].setAttribute('data-order-soon', '');
+    /* the buttons. wireOrder is also called by the board, whose Order
+       buttons arrive after the menu file loads. */
+    function wireOrder(root) {
+      var btns = root.querySelectorAll('[data-order]');
+      for (var b = 0; b < btns.length; b++) {
+        var mode = btns[b].getAttribute('data-order') || 'pickup';
+        var url = orderUrl(mode);
+        if (url) {
+          btns[b].setAttribute('href', withMode(url, mode));
+          if (phone.matches) { btns[b].removeAttribute('target'); btns[b].removeAttribute('rel'); }
+          else { btns[b].setAttribute('target', '_blank'); btns[b].setAttribute('rel', 'noopener'); }
+        } else {
+          btns[b].setAttribute('href', '#order');
+          btns[b].setAttribute('data-order-soon', '');
+        }
       }
     }
+    wireOrder(document);
     document.addEventListener('click', function (e) {
       var el = e.target.closest ? e.target.closest('[data-order],[data-call]') : null;
       if (!el) return;
@@ -611,7 +666,7 @@
       if (!live) { e.preventDefault(); openSheet(el.getAttribute('data-place') || ''); }
     });
     window.DD = window.DD || {};
-    window.DD.openSheet = openSheet; window.DD.closeSheet = closeSheet; window.DD.orderUrl = orderUrl;
+    window.DD.openSheet = openSheet; window.DD.closeSheet = closeSheet; window.DD.orderUrl = orderUrl; window.DD.wireOrder = wireOrder;
   })();
 
   /* Installable: the service worker caches the shell and the posters, never
@@ -706,15 +761,15 @@
     else window.addEventListener('load', function () { requestAnimationFrame(armFooter); });
   }
 
-  /* -------------------------------------------------------------- band
-     The packaging ticker. Two identical sets ride in one flex track; the
-     track is translated and wrapped by exactly one set width, so the loop
-     has no reset seam. Drifts right, against the ticket rail above it.
-     Scroll velocity adds a little speed and decays back to base. Transform
-     only, and the rAF stops whenever the band is off screen or hovered. */
-  var band = document.getElementById('band');
-  if (band && !reduce) {
-    var track = document.getElementById('bandTrack');
+  /* ------------------------------------------------------------- bands
+     The packaging ticker, used as the seam under the hero and as the
+     divider between sections. Two identical sets ride in one flex track;
+     the track is translated and wrapped by exactly one set width, so the
+     loop has no reset seam. Drifts right. Scroll velocity adds a little
+     speed and decays back to base. Transform only, and each band's rAF
+     stops whenever it is off screen or hovered. */
+  function marquee(band) {
+    var track = band.querySelector('.band__track');
     var setA = track.firstElementChild;
     var setB = null, setW = 0, x = 0, boost = 0, boostTarget = 0;
     var bandRaf = 0, lastT = 0, hovered = false, onScreen = false, lastY = scrollY();
@@ -779,6 +834,7 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fill(); bandWake(); });
     bandWake();
   }
+  if (!reduce) [].forEach.call(document.querySelectorAll('.band'), marquee);
 
   /* ------------------------------------------------------------ reviews
      The ticket rail. The rail is a native horizontal scroll container, so

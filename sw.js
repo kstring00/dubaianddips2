@@ -1,20 +1,22 @@
 /* Dubai & Dips service worker.
    Makes the site installable and fast to reopen: the shell (pages, scripts,
    config, fonts, posters, icons) is cached; navigations and scripts are
-   network-first so a config change (the Toast link) lands on the next open;
+   network-first so a config change (the Toast link, the brand fonts in
+   /brand.css) lands on the next open;
    images and fonts are cache-first.
 
    Never cached: anything off this origin (so never a Toast page), the two
    films, and any non-GET request. Bump VERSION to drop old caches. */
-var VERSION = 'dd-2026-09-19a';
+var VERSION = 'dd-2026-09-23-board';
 var SHELL = [
   '/', '/index.html', '/order-demo', '/404.html',
   '/site.js', '/track.js', '/demo.js', '/config/ordering.js', '/manifest.webmanifest',
-  '/assets/favicon.svg', '/assets/apple-touch-icon.png', '/assets/icon-192.png', '/assets/icon-512.png', '/assets/icon-maskable-512.png',
+  '/brand.css', '/assets/dd-favicon.svg', '/assets/dd-apple-touch-icon.png', '/assets/dd-icon-192.png', '/assets/dd-icon-512.png', '/assets/dd-icon-maskable-512.png',
+  '/public/brand/pattern/pattern-sugar.svg', '/menu-board.json',
   '/assets/hero-poster.webp', '/assets/craft-poster.webp',
-  '/assets/fonts/fraunces-2.woff2', '/assets/fonts/sourcesans-2.woff2', '/assets/fonts/plexmono-2.woff2'
+  '/public/fonts/albert-sans.woff2', '/public/fonts/encode-sans.woff2', '/public/fonts/playfair-display-italic.woff2'
 ];
-var NETWORK_FIRST = /\.(html|js|webmanifest)$|\/$|\/order-demo$|\/menu\//;
+var NETWORK_FIRST = /\.(html|js|css|json|webmanifest)$|\/$|\/order-demo$|\/menu\//;
 var NEVER = /\.(mp4|webm|mov)$/;
 
 self.addEventListener('install', function (e) {

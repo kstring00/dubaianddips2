@@ -90,7 +90,7 @@
         '<div class="item__body"><div class="item__top"><span class="item__name">' + esc(it.name) + '</span><span class="item__price">' + money(it.price) + '</span></div>' +
         '<span class="item__cat">' + esc(it.category) + '</span>' +
         '<fieldset class="mods"><legend>' + esc(it.modifier.label) + '</legend>' + mods + '</fieldset>' +
-        '<div class="item__act"><span class="item__sub" data-sub></span><button class="btn btn--gold" type="button" data-add aria-label="Add ' + esc(it.name) + '">Add</button></div></div></li>';
+        '<div class="item__act"><span class="item__sub" data-sub></span><button class="btn btn--line" type="button" data-add aria-label="Add ' + esc(it.name) + '">Add</button></div></div></li>';
     }).join('');
   }
   function itemById(id) { for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].id === id) return ITEMS[i]; return null; }
