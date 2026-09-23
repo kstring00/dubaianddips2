@@ -619,6 +619,8 @@ body.sheet-open{overflow:hidden}
 .flap__leaf{position:absolute;z-index:2;left:0;right:0;top:0;height:50%;overflow:hidden;transform-origin:50% 100%;backface-visibility:hidden;background:inherit;will-change:transform}
 .flap__leaf>span{position:absolute;left:0;right:0;top:0;height:200%}
 .brow[data-status="now-boarding"] .flap{background:var(--browned-sugar-deep)}
+/* an opened row is called: its tiles flip to NOW BOARDING in Browned Sugar */
+.brow.is-open:not([data-status="sold-out"]) .flap{background:var(--browned-sugar-deep);color:var(--off-white)}
 .brow[data-status="seasonal"] .flap{color:var(--mint)}
 .brow[data-status="sold-out"] .flap{background:var(--bark);color:var(--natural)}
 
@@ -674,6 +676,7 @@ body.sheet-open{overflow:hidden}
   .flap{font-size:.72rem;width:.9em}
   .flaps{gap:1px}
   .flap--pad{display:none}
+  .brow.is-open:not([data-status="sold-out"]) .flap--pad{display:block}
   .bpanel__in{grid-template-columns:1fr;padding:.2rem .8rem 1.3rem calc(.7rem + 3px)}
   .bitems{grid-template-columns:1fr}
 }
