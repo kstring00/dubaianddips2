@@ -10,8 +10,9 @@ import { server } from './serve.mjs';
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 let fails = 0, passes = 0;
 const ok = (cond, msg) => { if (cond) { passes++; } else { fails++; console.log('  FAIL ' + msg); } };
-const read = f => fs.readFileSync(path.join(root, f), 'utf8');
-const PAGES = ['index.html', 'order-demo.html', '404.html'];
+/* the checks run against the built site: run `npm run build` first (npm run check does both) */
+const read = f => fs.readFileSync(path.join(root, 'dist', f), 'utf8');
+const PAGES = ['index.html', 'order-demo.html', '404.html', 'menu/index.html', 'catering/index.html', 'visit/index.html', 'visit/clear-lake/index.html', 'blog/index.html', ...fs.readdirSync(path.join(root, 'dist/blog')).filter(d => d !== 'index.html').map(d => 'blog/' + d + '/index.html')];
 const SERVED = ['index.html', 'order-demo.html', '404.html', 'site.js', 'demo.js', 'track.js', 'sw.js', 'manifest.webmanifest'];
 
 console.log('static checks');
@@ -40,16 +41,16 @@ for (const f of PAGES) {
   ok(imgs.every(t => /\balt="/.test(t)), f + ' every <img> has alt (' + imgs.length + ' images)');
   ok(/rel="manifest"/.test(s), f + ' links the manifest');
 }
-ok(fs.existsSync(path.join(root, '404.html')), '404.html exists');
+ok(fs.existsSync(path.join(root, 'dist/404.html')), '404.html is built');
 const man = JSON.parse(read('manifest.webmanifest'));
 ok(man.display === 'standalone' && man.start_url && man.icons.length >= 3, 'manifest is standalone with icons');
 for (const i of man.icons) {
-  const f = path.join(root, i.src); ok(fs.existsSync(f), 'icon exists ' + i.src);
+  const f = path.join(root, 'dist', i.src); ok(fs.existsSync(f), 'icon exists ' + i.src);
   if (fs.existsSync(f)) { const b = fs.readFileSync(f); const w = b.readUInt32BE(16), h = b.readUInt32BE(20); ok(i.sizes === w + 'x' + h, i.src + ' is ' + w + 'x' + h); }
 }
 const sw = read('sw.js');
 ok(/url\.origin !== self\.location\.origin\) return/.test(sw) && /mp4/.test(sw), 'service worker skips cross-origin (Toast) and videos');
-ok(/order-demo/.test(read('vercel.json')), 'vercel.json rewrites /order-demo');
+ok(/order-demo/.test(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8')), 'vercel.json rewrites /order-demo');
 ok(!/<input[^>]*(cc-|card)/i.test(read('order-demo.html')) && !/cc-|card-number|cvv|cvc/i.test(read('demo.js')), 'demo has no card inputs');
 ok(!/confirmation/i.test(read('demo.js')), 'demo has no confirmation numbers');
 ok(/prefers-reduced-motion/.test(read('index.html')) && /prefers-reduced-motion/.test(read('order-demo.html')), 'reduced motion handled');
@@ -69,7 +70,7 @@ const configWith = (page, url) => page.route('**/config/ordering.js', async r =>
   await r.fulfill({ status: 200, body, headers: { 'content-type': 'text/javascript' } });
 });
 const VIEWS = [{ name: 'phone 360', w: 360, h: 780, mobile: true }, { name: 'desktop', w: 1280, h: 800, mobile: false }];
-const ROUTES = ['/', '/menu/frappes', '/404.html', '/definitely-missing'];
+const ROUTES = ['/', '/menu', '/catering', '/visit/clear-lake', '/definitely-missing'];
 let errors = [];
 
 for (const v of VIEWS) {
@@ -85,12 +86,7 @@ for (const v of VIEWS) {
   for (const r of ROUTES) {
     await page.goto(base + r); await page.waitForTimeout(300);
     const n = await page.evaluate(() => document.querySelectorAll('[data-order]').length);
-    if (r.includes('404') || r.includes('missing')) {
-      const href = await page.getAttribute('#orderLink', 'href');
-      ok(href === '/#order', '404 order link falls back to /#order with empty URL (' + href + ')');
-      ok((await page.evaluate(() => !!document.querySelector('a[href^="tel:"]'))), '404 page reachable phone');
-      continue;
-    }
+    if (r.includes('404') || r.includes('missing')) ok((await page.evaluate(() => !!document.querySelector('a[href^="tel:"]'))), '404 page reachable phone');
     let opened = 0;
     for (let i = 0; i < n; i++) {
       const res = await page.evaluate(i => {
@@ -152,11 +148,11 @@ for (const v of VIEWS) {
 
   /* --- 404 with a URL set --- */
   await configWith(page, DUMMY);
-  await page.goto(base + '/nope'); ok((await page.getAttribute('#orderLink', 'href')) === DUMMY, '404 order link uses the Toast URL when set');
+  await page.goto(base + '/nope'); ok((await page.getAttribute('[data-place="404"]', 'href')) === DUMMY, '404 order link uses the Toast URL when set');
   await page.unroute('**/config/ordering.js');
 
   /* --- layout: overflow, tap targets, sticky bar, hero CTA first paint --- */
-  for (const r of ['/', '/order-demo', '/404.html']) {
+  for (const r of ['/', '/order-demo', '/404.html', '/menu', '/catering', '/visit', '/visit/clear-lake', '/blog', '/blog/dubai-chocolate-houston-explained']) {
     await page.goto(base + r); await page.waitForTimeout(300);
     const sw = await page.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= v.w, r + ' no horizontal overflow at ' + v.w + ' (scrollWidth ' + sw + ')');

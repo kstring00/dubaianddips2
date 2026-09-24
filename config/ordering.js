@@ -43,13 +43,70 @@ window.DD_CONFIG = {
 
   /* ---- The shop ------------------------------------------------------ */
   PHONE: { display: "(281) 555-0147", tel: "+12815550147" },
+  /* The site's one public address, used for canonical URLs, the sitemap
+     and structured data. Taken from the canonical link already on the
+     homepage; confirm it is the domain the site will live on. */
+  SITE_URL: "https://dubaianddips.com",
+
   SHOP: {
     name: "Dubai & Dips",
     area: "Clear Lake",
     city: "Houston",
+    /* PLACEHOLDER: the street address below was already on the site and is
+       not confirmed. Every page, the footer and the structured data read it
+       from here, so fixing it once fixes it everywhere. */
+    street: "1234 Bay Area Blvd, Suite 100",
+    locality: "Houston",
+    region: "TX",
+    postalCode: "77058",
+    country: "US",
     address: "1234 Bay Area Blvd, Suite 100, Houston, TX 77058",
-    timezone: "America/Chicago"
+    timezone: "America/Chicago",
+    /* For structured data. Empty values are left out, never guessed. */
+    priceRange: "",          /* MISSING: e.g. "$" or "$$" */
+    servesCuisine: ["Desserts", "Coffee", "Matcha", "Gelato"]
   },
+
+  /* ---- Locations -------------------------------------------------------
+     One entry per shop. Each one gets its own page at /visit/<slug> and its
+     own Restaurant structured data. Clear Lake uses SHOP, PHONE and HOURS
+     above. A location is only published once slug, street, locality,
+     postalCode and phone are all filled in - nothing is invented. */
+  LOCATIONS: [
+    {
+      slug: "clear-lake",
+      name: "Dubai & Dips Clear Lake",
+      area: "Clear Lake",
+      primary: true,           /* address, phone and hours come from SHOP, PHONE, HOURS */
+      geo: null,               /* MISSING: { lat: 29.xxxx, lng: -95.xxxx } from the Google profile */
+      googleProfile: "",       /* MISSING: the shop's Google Business Profile link */
+      mapQuery: "Dubai and Dips Clear Lake Houston TX",
+      parking: "Free lot right out front, and more spaces around the side of the building.",
+      landmark: "",            /* MISSING: a landmark to look for, e.g. the shopping centre name */
+      photo: "/assets/visit-clear-lake.webp",
+      photoAlt: "Inside Dubai & Dips Clear Lake: the deep green wall with the gold DUBAI & DIPS sign over the pastry counter, white chairs and marble tables."
+    },
+    {
+      /* MISSING: the second shop. Fill these in and its page, card and
+         structured data appear on the next deploy. */
+      slug: "",                /* e.g. "katy" - lowercase, hyphens */
+      name: "",
+      area: "",
+      street: "",
+      locality: "",
+      region: "TX",
+      postalCode: "",
+      phone: { display: "", tel: "" },
+      hours: null,             /* same shape as HOURS; null = same as HOURS */
+      geo: null,
+      googleProfile: "",
+      mapQuery: "",
+      parking: "",
+      landmark: "",
+      photo: "",
+      photoAlt: ""
+    }
+  ],
 
   /* ---- Hours: the ONE source ------------------------------------------
      Everything that shows or depends on the hours reads this: the nav's
@@ -65,6 +122,10 @@ window.DD_CONFIG = {
   HOURS: [[10, 22], [9, 22], [9, 22], [9, 22], [9, 22], [9, 24], [9, 24]],
   /* The board's row 1 says FINAL CALL for this many minutes before close. */
   CLOSING_SOON_MINUTES: 30,
+  /* Holidays and one-off days. { date: "2026-12-25", closed: true } or
+     { date: "2026-12-24", open: 9, close: 17 }. They override HOURS on that
+     date everywhere, including the structured data. */
+  SPECIAL_HOURS: [],
 
   /* ---- Links: the ONE source ------------------------------------------
      Every footer link (and the social wall) reads these. The phone comes
@@ -75,9 +136,19 @@ window.DD_CONFIG = {
     directions: "https://www.google.com/maps/dir/?api=1&destination=Dubai+and+Dips+Clear+Lake+Houston+TX",
     instagram: "https://www.instagram.com/dubaianddips/",
     tiktok: "https://www.tiktok.com/@dubai.dips",
-    catering: "#contact",
+    catering: "/catering",
     googleReviews: "",   /* MISSING: the Google Business "Leave a review" link (g.page/r/.../review) */
     privacyPolicy: ""    /* MISSING: there is no privacy policy page yet */
+  },
+
+  /* ---- Catering requests (/catering) ---------------------------------
+     The form posts JSON to formEndpoint (Formspree, a Vercel function,
+     anything that answers 2xx). While it is empty the form never pretends
+     to send: it says so and offers the phone instead. */
+  CATERING: {
+    formEndpoint: "",        /* MISSING: where catering requests go */
+    noticeHours: null,       /* MISSING: how much notice a large order needs, e.g. 48 */
+    email: ""                /* MISSING: an inbox for catering questions */
   },
 
   /* ---- Delivery ------------------------------------------------------ */

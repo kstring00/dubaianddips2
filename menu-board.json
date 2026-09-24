@@ -7,7 +7,9 @@
     "description: one line, only what is true of every item in the category. Leave it \"\" if unsure; the board then points to the list in the shop.",
     "items: the first three show under the category on the board; all of them show when the row is opened.",
     "price: a number such as 5.5 shows as $5.50. Leave it null to show no price. The only prices in the code today are the demo placeholders in config/ordering.js, so every price here is null until the real menu arrives.",
-    "slug: used by links such as /menu/frappes. Keep it lowercase with dashes, and do not change the existing ones."
+    "slug: used by links such as /menu/frappes. Keep it lowercase with dashes, and do not change the existing ones.",
+    "photo / photoAlt (category) and photo / alt (item): optional pictures for the /menu page. Leave them out and the page draws a boarding-pass plate instead. Only real photos of this shop's food.",
+    "This file is the one menu for the whole site: the homepage board and the /menu page both read it."
   ],
   "tbdShowsAs": {
     "code": "HOU",
@@ -26,21 +28,29 @@
       "items": [
         {
           "name": "Dubai Chocolate Frappe",
-          "price": null
+          "price": null,
+          "photo": "/assets/rev-dubai-frappe.webp",
+          "alt": "The Dubai Chocolate Frappe in a clear cup, whipped cream with pistachio and dark chocolate drizzled over the top."
         },
         {
           "name": "Pistachio Frappe",
-          "price": null
+          "price": null,
+          "photo": "/assets/rev-pistachio-frappe.webp",
+          "alt": "A pistachio frappe in a clear cup, whipped cream on top with green pistachio sauce drizzled over it."
         },
         {
           "name": "Biscoff Frappe",
-          "price": null
+          "price": null,
+          "photo": "/assets/rev-biscoff-frappe.webp",
+          "alt": "A Biscoff frappe in a clear cup, cookie butter swirled through it with whipped cream and a whole Biscoff cookie on top."
         },
         {
           "name": "Salted Caramel Frappe",
           "price": null
         }
-      ]
+      ],
+      "photo": "/assets/menu-dubai-frappe.webp",
+      "photoAlt": "The Dubai Chocolate Frappe in a clear cup on marble: a tan blended base with pistachio and dark chocolate pulled down the inside, whipped cream and both drizzles on top."
     },
     {
       "slug": "classic-coffees",
@@ -90,7 +100,9 @@
       "items": [
         {
           "name": "Strawberry Matcha",
-          "price": null
+          "price": null,
+          "photo": "/assets/rev-strawberry-matcha.webp",
+          "alt": "A strawberry matcha in a clear cup, a pink strawberry layer over green matcha with matcha dusted on the foam."
         },
         {
           "name": "Pistachio Matcha",
@@ -238,9 +250,13 @@
       "items": [
         {
           "name": "Kunafa",
-          "price": null
+          "price": null,
+          "photo": "/assets/rev-kunafa.webp",
+          "alt": "A round kunafa on a gold board, crisp golden pastry with a mound of crushed green pistachio in the middle."
         }
-      ]
+      ],
+      "photo": "/assets/menu-kunafa.webp",
+      "photoAlt": "A round golden kunafa topped with a mound of crushed pistachio, on a gold board on white marble."
     }
   ]
 }

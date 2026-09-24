@@ -113,6 +113,47 @@
     nav.classList.toggle('is-stuck', scrollY() > edge);
   }
 
+  /* ---------------------------------------------------------- nav sheet
+     Phones: the menu button opens a full-screen sheet listing every nav
+     link as a departure row, copied from the header's own links so there
+     is one list to keep, with Order and Call at the foot. Esc or the
+     button closes it; focus stays inside while open and returns to the
+     button after. */
+  var burger = document.querySelector('.nav__burger');
+  var navSheet = document.getElementById('navSheet');
+  if (burger && navSheet) {
+    var sheetList = document.getElementById('navSheetList');
+    var sheetFoot = navSheet.querySelector('.navsheet__foot');
+    sheetList.innerHTML = [].map.call(document.querySelectorAll('.nav__links a'), function (a, i) {
+      var cur = a.getAttribute('aria-current');
+      return '<li style="--i:' + i + '"><a href="' + a.getAttribute('href') + '"' + (cur ? ' aria-current="' + cur + '"' : '') + '><b aria-hidden="true">' + (i < 9 ? '0' : '') + (i + 1) + '</b><span>' + a.textContent + '</span><i aria-hidden="true">&rarr;</i></a></li>';
+    }).join('');
+    var ord = document.querySelector('.nav__order'), tel = (CFG.PHONE || {}).tel;
+    sheetFoot.innerHTML = '<a class="btn btn--primary" href="' + (ord ? ord.getAttribute('href') : '/#order') + '" data-order="pickup" data-place="menu-sheet">' + (COPY.pickupShort || 'Order pickup') + '</a>' +
+      (tel ? '<a class="btn btn--line" href="tel:' + tel + '" data-call="menu-sheet">' + (COPY.callCta || 'Call') + '</a>' : '');
+    function sheetFocusables() { return [burger].concat([].slice.call(navSheet.querySelectorAll('a[href]'))); }
+    function setSheet(open) {
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      burger.querySelector('.nav__burger-label').textContent = open ? 'Close' : 'Menu';
+      navSheet.hidden = !open;
+      navSheet.classList.toggle('is-open', open);
+      document.documentElement.classList.toggle('navsheet-open', open);
+      if (nav) nav.classList.toggle('is-menu', open);
+      if (open) { var first = navSheet.querySelector('a'); if (first) first.focus({ preventScroll: true }); }
+    }
+    burger.addEventListener('click', function () { setSheet(burger.getAttribute('aria-expanded') !== 'true'); });
+    navSheet.addEventListener('click', function (e) { if (e.target.closest('a')) setSheet(false); });
+    document.addEventListener('keydown', function (e) {
+      if (navSheet.hidden) return;
+      if (e.key === 'Escape') { setSheet(false); burger.focus(); return; }
+      if (e.key !== 'Tab') return;
+      var f = sheetFocusables(), i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { f[f.length - 1].focus(); e.preventDefault(); }
+      else if (!e.shiftKey && i === f.length - 1) { f[0].focus(); e.preventDefault(); }
+    });
+    phone.addEventListener && phone.addEventListener('change', function () { if (!window.matchMedia("(max-width: 1099px)").matches) setSheet(false); });
+  }
+
   /* --------------------------------------------------------------- hero
      Beats, as a fraction of the hero's scroll travel:
        .00 to .03   the bar, the wordmark, nothing moves
@@ -290,101 +331,17 @@
   }
 
   /* ---------------------------------------------------------- hours
-     The one clock. HOURS in config/ordering.js is the only place the hours
-     live; this turns them into OPEN / CLOSING SOON / CLOSED, worked out in
-     the shop's own timezone (America/Chicago), never the visitor's. Anything
-     that shows the hours registers with onShopMinute() and is called again
-     at the top of every minute.
-     To check a state by hand, add ?at=2026-09-26T23:45 to the URL: the
-     clock then runs from that shop-local time. */
+     The one clock lives in /hours.js (shared with the location pages and
+     the build). HOURS and SPECIAL_HOURS in config/ordering.js are the only
+     place the hours live. Anything that shows the hours registers with
+     onShopMinute() and is called again at the top of every minute. */
   var HOURS = CFG.HOURS || [];
-  var SHOP_TZ = (CFG.SHOP && CFG.SHOP.timezone) || 'America/Chicago';
-  var SOON = CFG.CLOSING_SOON_MINUTES || 30;
-  var DAY = 1440, WEEK = 10080;
-  var DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  var DAY_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-  /* The week as [start, end) in minutes from Sunday 00:00. A close of 24
-     ends the day at midnight; a close before the open runs past midnight. */
-  var spans = [];
-  HOURS.forEach(function (h, d) {
-    if (!h) return;
-    var o = Math.round(h[0] * 60), c = Math.round(h[1] * 60);
-    if (c <= o) c += DAY;
-    spans.push({ start: d * DAY + o, end: d * DAY + c });
-  });
-
-  var atParam = /[?&]at=(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d)/.exec(location.search);
-  var clockStart = Date.now();
-  /* Minutes since Sunday 00:00, shop time, with seconds as a fraction. */
-  function shopNow() {
-    if (atParam) {
-      var wd = new Date(Date.UTC(+atParam[1], +atParam[2] - 1, +atParam[3])).getUTCDay();
-      return (wd * DAY + (+atParam[4]) * 60 + (+atParam[5]) + (Date.now() - clockStart) / 60000) % WEEK;
-    }
-    try {
-      var o = {};
-      new Intl.DateTimeFormat('en-US', { timeZone: SHOP_TZ, hourCycle: 'h23', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        .formatToParts(new Date()).forEach(function (x) { o[x.type] = x.value; });
-      return DAY_SHORT.indexOf(o.weekday) * DAY + (parseInt(o.hour, 10) % 24) * 60 + parseInt(o.minute, 10) + parseInt(o.second, 10) / 60;
-    } catch (e) {
-      var n = new Date();
-      return n.getDay() * DAY + n.getHours() * 60 + n.getMinutes();
-    }
-  }
-  /* 600 -> "10 AM", 570 -> "9:30 AM", 1440 -> "12 AM" */
-  function clockText(min) {
-    min = ((min % DAY) + DAY) % DAY;
-    var h = Math.floor(min / 60), m = min % 60, ap = h >= 12 ? 'PM' : 'AM';
-    return ((h % 12) || 12) + (m ? ':' + (m < 10 ? '0' : '') + m : '') + ' ' + ap;
-  }
-  function spanText(s) { return clockText(s.start) + ' to ' + clockText(s.end); }
-  /* "2h 14m", "24m" */
-  function durText(min) {
-    min = Math.max(1, Math.ceil(min));
-    var h = Math.floor(min / 60), m = min % 60;
-    return (h ? h + 'h ' : '') + (h && !m ? '' : m + 'm');
-  }
-  function shopState() {
-    var t = shopNow(), cur = null, next = null, today = Math.floor(t / DAY), doneToday = false;
-    spans.forEach(function (s) {
-      for (var k = -1; k <= 1; k++) {
-        var a = s.start + k * WEEK, b = s.end + k * WEEK;
-        if (t >= a && t < b) cur = { start: a, end: b };
-        if (a > t && (!next || a < next.start)) next = { start: a };
-        if (b <= t && a >= today * DAY) doneToday = true;
-      }
-    });
-    var st = { t: t, open: !!cur, soon: false, mode: 'closed' };
-    if (cur) {
-      st.closesIn = cur.end - t;
-      st.soon = st.closesIn <= SOON;
-      st.mode = st.soon ? 'soon' : 'open';
-      st.closeText = clockText(cur.end);
-      st.progress = (t - cur.start) / (cur.end - cur.start);
-    } else {
-      st.progress = doneToday ? 1 : 0;
-      if (next) {
-        var sameDay = Math.floor(next.start / DAY) === today, wd = Math.floor(next.start / DAY) % 7;
-        st.opensIn = next.start - t;
-        st.openText = (sameDay ? '' : DAY_SHORT[wd] + ' ') + clockText(next.start);
-        st.openSpoken = (sameDay ? '' : DAY_LONG[wd] + ' ') + clockText(next.start);
-      }
-    }
-    return st;
-  }
-  /* The door sign's rows, grouped from HOURS: Mon to Thu, Fri to Sat, Sun. */
-  function hoursGroups() {
-    var order = [1, 2, 3, 4, 5, 6, 0], out = [];
-    order.forEach(function (d) {
-      var h = HOURS[d], text = h ? spanText({ start: h[0] * 60, end: h[1] * 60 }) : 'Closed', last = out[out.length - 1];
-      if (last && last.text === text) { last.to = d; }
-      else out.push({ from: d, to: d, text: text });
-    });
-    return out.map(function (g) {
-      return { days: DAY_SHORT[g.from] + (g.to !== g.from ? ' to ' + DAY_SHORT[g.to] : ''), text: g.text };
-    });
-  }
+  var H = window.DD_HOURS;
+  var DAY = H.DAY, DAY_SHORT = H.DAY_SHORT, DAY_LONG = H.DAY_LONG;
+  var clockText = H.clockText, durText = H.durText;
+  var shop = H.create({ hours: HOURS, special: CFG.SPECIAL_HOURS, tz: CFG.SHOP && CFG.SHOP.timezone, soon: CFG.CLOSING_SOON_MINUTES });
+  function shopState() { return shop.state(); }
+  function hoursGroups() { return shop.groups(); }
   var minuteFns = [];
   function onShopMinute(fn) { minuteFns.push(fn); fn(shopState()); }
   (function minuteTick() {
@@ -678,10 +635,7 @@
          use, the closed set, and the words row 1 locks to. */
       var words = CLOSED_SET.concat([FINAL, SOLD, SEASON]);
       list.forEach(function (r) { var code = r.code === 'TBD' ? TBD.code : r.code; words = words.concat(OPEN_SETS[code] || OPEN_SETS.GENERAL); });
-      spans.forEach(function (s) {
-        var wd = Math.floor(s.start / DAY) % 7;
-        words.push(opensWord({ openText: clockText(s.start) }), opensWord({ openText: DAY_SHORT[wd] + ' ' + clockText(s.start) }));
-      });
+      shop.openingTexts().forEach(function (t) { words.push(opensWord({ openText: t })); });
       WIDTH = Math.min(MAXW, Math.max.apply(null, words.map(function (w) { return w.length; })));
 
       boardRows.innerHTML = list.map(rowHtml).join('');
@@ -908,7 +862,7 @@
         : 'Closed \u00b7 opens ' + (st.openText || 'soon');
       gCount.textContent = st.open ? 'Closes in ' + durText(st.closesIn) : st.opensIn != null ? 'Opens in ' + durText(st.opensIn) : '';
       gFill.style.transform = 'scaleX(' + clamp(st.progress, 0, 1).toFixed(4) + ')';
-      var today = Math.floor(st.t / DAY) % 7;
+      var today = st.weekday;
       weekRows.forEach(function (li) {
         var on = +li.getAttribute('data-day') === today;
         li.classList.toggle('is-today', on);
