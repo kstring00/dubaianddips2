@@ -69,7 +69,8 @@ export const REVIEWS = [...HOME.matchAll(/<blockquote>&ldquo;([\s\S]*?)&rdquo;<\
 /* Inner-page header: always visible (no intro), homepage anchors become
    /#anchor, and the current page is marked. */
 function header(current) {
-  let h = HEADER.replace(' nav--intro', '').replace(/href="#/g, 'href="/#');
+  /* only links (<a>) point back at the homepage; <use href="#dd-..."> stays local */
+  let h = HEADER.replace(' nav--intro', '').replace(/(<a\b[^>]*?\shref=")#/g, '$1/#');
   if (current) {
     let done = false;
     h = h.replace(/<a href="([^"]+)">([^<]+)<\/a>/g, (m, href, text) => {
@@ -79,7 +80,7 @@ function header(current) {
   }
   return h;
 }
-const footer = () => FOOTER.replace(/href="#/g, 'href="/#');
+const footer = () => FOOTER.replace(/(<a\b[^>]*?\shref=")#/g, '$1/#');
 
 /* ---- structured data ---- */
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

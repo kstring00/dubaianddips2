@@ -35,6 +35,9 @@ for (const f of PAGES) {
   ok(/Dubai &amp; Dips/.test(desc) && /Houston/.test(desc), f + ' description mentions Dubai & Dips and Houston');
   ok(!titles.has(title) && !descs.has(desc), f + ' title/description unique'); titles.add(title); descs.add(desc);
   ok(/rel="icon"/.test(s), f + ' has a favicon');
+  /* every logo <use> points at the sprite on the same page */
+  const uses = [...s.matchAll(/<use href="([^"]+)"/g)].map(m => m[1]);
+  ok(uses.every(u => u.startsWith('#') && s.includes('id="' + u.slice(1) + '"')), f + ' every <use> resolves on the page (' + uses.filter(u => !u.startsWith('#')).join(',') + ')');
   ok(/property="og:image"/.test(s), f + ' has an OG image');
   ok(/href="tel:\+?\d+"/.test(s), f + ' has a tel: link');
   const imgs = s.match(/<img\b[^>]*>/g) || [];
