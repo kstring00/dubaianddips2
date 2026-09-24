@@ -17,8 +17,6 @@
      TOAST_PICKUP_URL  optional: a Toast deep link straight to pickup
      TOAST_DELIVERY_URL optional: a Toast deep link straight to delivery
      TOAST_GROUP_URL   optional: a Toast group-ordering link
-     PHONE             the shop's real number (the current one is the
-                       placeholder that was already on the site)
      SHOP.address      the real street address (also a placeholder)
      HOURS             confirm against the door sign
      LINKS             googleReviews and privacyPolicy are still empty
@@ -42,7 +40,7 @@ window.DD_CONFIG = {
   TOAST_GROUP_URL: "",              /* optional; falls back to TOAST_ORDER_URL */
 
   /* ---- The shop ------------------------------------------------------ */
-  PHONE: { display: "(281) 555-0147", tel: "+12815550147" },
+  PHONE: { display: "(281) 786-1157", tel: "+12817861157" },
   /* The site's one public address, used for canonical URLs, the sitemap
      and structured data. Taken from the canonical link already on the
      homepage; confirm it is the domain the site will live on. */
