@@ -513,14 +513,12 @@ body.sheet-open{overflow:hidden}
    together. Decoration only - hidden from screen readers, not a link. */
 .band--divider{cursor:default}
 
-/* The seam under the hero. A short Off-White lead-in rides on top of the
-   band and covers the last of the hero's fade as it scrolls away, so no
-   washed-out strip of the room shows above the band. It belongs to the
-   page after the hero; the hero itself is untouched. */
-.hero+main::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:36vh;pointer-events:none;background:linear-gradient(to top,var(--surface) 0%,var(--surface) 80%,rgb(var(--surface-rgb)/0) 100%)}
+/* The seam under the hero: the band rides up over the last 40px of the
+   hero's fade, so the room fades straight onto the green with no seam and
+   no empty strip at any scroll position. */
+.hero+main{margin-top:-40px}
 
 @media(prefers-reduced-motion:reduce){
-  .hero+main::before{display:none}
   .band__track{width:auto;transform:none!important;justify-content:center;flex:1}
   .band__set:nth-child(2){display:none}
   .band__item:nth-child(n+3){display:none}
