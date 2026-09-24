@@ -7,7 +7,7 @@
 
    Never cached: anything off this origin (so never a Toast page), the two
    films, and any non-GET request. Bump VERSION to drop old caches. */
-var VERSION = 'dd-2026-09-23-live';
+var VERSION = 'dd-2026-09-24-social';
 var SHELL = [
   '/', '/index.html', '/order-demo', '/404.html',
   '/site.js', '/track.js', '/demo.js', '/config/ordering.js', '/manifest.webmanifest',

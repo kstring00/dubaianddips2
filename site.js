@@ -1023,4 +1023,299 @@
     startup(revs);
   }
 
+  /* ------------------------------------------------------------- social
+     NOW BOARDING: the TikTok and Instagram wall, built from
+     /assets/social/posts.json.
+
+     To add or swap a post (no code change):
+       1. Drop the photo in assets/social/, e.g. social-09.jpg. A tall photo
+          at least 1080px wide looks best; any size works.
+       2. Add an entry to assets/social/posts.json:
+            "platform": "tiktok" or "instagram"
+            "url":      the post's link (in the app: Share > Copy link)
+            "poster":   "assets/social/social-09.jpg"
+            "focus":    the point of the photo to keep in the crop, "50% 50%"
+            "caption":  under 60 characters
+            "alt":      what the photo shows, for screen readers
+       3. Run `python3 scripts/social-posters.py` to cut the 9:16 WebP crops.
+     A post with an empty url still shows; it opens the profile in a new
+     tab instead of the post. Posts show in the file's order, with the two
+     follow tickets after the 3rd and the 6th.
+
+     Nothing from TikTok or Instagram loads with the page. Opening a post
+     shows our poster and an "Open on ..." button at once; the official
+     embed script loads only then, and the embed replaces the poster once
+     it has rendered. If it never does (blocked, offline) the poster stays. */
+  var wall = document.getElementById('socialWall');
+  var social = document.getElementById('social');
+  if (wall && social) (function () {
+    var PROFILE = { tiktok: 'https://www.tiktok.com/@dubai.dips', instagram: 'https://www.instagram.com/dubaianddips/' };
+    var NAME = { tiktok: 'TikTok', instagram: 'Instagram' };
+    var HANDLE = { tiktok: '@dubai.dips', instagram: '@dubaianddips' };
+    var ROUTES = ['DXB', 'FCO', 'NRT', 'CAI'];
+    var ROT = [-1.6, 1.2, -.7, 1.8, -1.9, .8, -1.2, 1.5, -.4, 2, -1, .6];
+    var SPEED = [.8, -1.25, 1];            /* per column; negative moves down as you scroll */
+    var VALID = /^https:\/\/(www\.|m\.|vm\.)?(tiktok\.com|instagram\.com)\//i;
+    var wide = window.matchMedia('(min-width: 768px)');
+    var pin = document.getElementById('socialPin'), stage = pin.firstElementChild;
+    var posts = [], slots = [], tops = [], over = [0, 0, 0], D = 0, pinned = false;
+
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function plat(p) { return p.platform === 'instagram' ? 'instagram' : 'tiktok'; }
+    function url(p) { return VALID.test(p.url || '') ? p.url : ''; }
+    function path(p) { return '/' + String(p).replace(/^\/+/, ''); }
+    function webp(poster, w) { return path(poster).replace(/\.(jpe?g|png)$/i, '') + '-' + w + '.webp'; }
+    function picture(p, lazy, sizes) {
+      return '<picture><source type="image/webp" srcset="' + esc(webp(p.poster, 720)) + ' 720w, ' + esc(webp(p.poster, 1080)) + ' 1080w" sizes="' + sizes + '">' +
+        '<img src="' + esc(path(p.poster)) + '" alt="' + esc(p.alt) + '" width="720" height="1280"' + (lazy ? ' loading="lazy"' : '') +
+        ' decoding="async" style="object-position:' + esc(p.focus || '50% 50%') + '"></picture>';
+    }
+    function star(cls) { return '<svg class="logo logo--star ' + (cls || '') + '" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg>'; }
+
+    function postCard(p, n) {
+      var pl = plat(p), link = url(p), route = ROUTES[n % ROUTES.length];
+      var cap = esc(String(p.caption || '').slice(0, 60));
+      var action = link ? 'Watch on ' + NAME[pl] : 'See ' + HANDLE[pl] + ' on ' + NAME[pl] + ' (opens in a new tab)';
+      var tag = link ? 'button' : 'a';
+      var attrs = link ? ' type="button" data-post="' + n + '"' : ' href="' + PROFILE[pl] + '" target="_blank" rel="noopener"';
+      return '<' + tag + ' class="bp"' + attrs + '>' +
+        '<span class="bp__stub bp__top" aria-hidden="true">' +
+          '<span class="bp__badge bp__badge--' + pl + '">' + (pl === 'tiktok' ? 'TT' : 'IG') + '</span>' +
+          '<span class="bp__route">' + route + ' <i>&rarr;</i> HOU</span>' +
+          '<span class="bp__gate"><i>Gate</i>' + (n < 9 ? '0' : '') + (n + 1) + '</span>' +
+        '</span>' +
+        '<span class="bp__photo">' + picture(p, true, '(min-width: 768px) 300px, 72vw') +
+          '<span class="bp__none" aria-hidden="true">' + star() + '<b>' + route + '</b></span>' +
+          '<span class="bp__play" aria-hidden="true">' + (link ? '&#9654;' : '&nearr;') + '</span>' +
+        '</span>' +
+        '<span class="bp__stub bp__bot"><i class="bp__notch bp__notch--l" aria-hidden="true"></i><i class="bp__notch bp__notch--r" aria-hidden="true"></i>' +
+          '<span class="bp__cap">' + cap + '</span><span class="vh">. ' + action + '</span>' +
+          '<span class="bp__meta" aria-hidden="true"><span>D&amp;D Airlines</span><span>' + NAME[pl] + '</span></span>' +
+          '<span class="bp__code" aria-hidden="true"></span>' +
+        '</span></' + tag + '>';
+    }
+    function followCard(pl) {
+      return '<a class="bp bp--follow" href="' + PROFILE[pl] + '" target="_blank" rel="noopener">' +
+        '<span class="bp__frow bp__frow--top" aria-hidden="true"><span>Boarding pass</span><span>HOU &rarr; ' + (pl === 'tiktok' ? 'TT' : 'IG') + '</span></span>' +
+        '<span class="bp__follow">' + star() +
+        '<span class="bp__big">Board on <em>' + NAME[pl] + '</em></span>' +
+        '<span class="bp__handle">' + HANDLE[pl] + '</span>' +
+        '<span class="bp__count">10k+ travelers</span>' +
+        '<span class="bp__go" aria-hidden="true">Follow &nearr;</span><span class="vh"> (opens in a new tab)</span>' +
+        '</span><span class="bp__frow bp__frow--bot" aria-hidden="true"><span>D&amp;D Airlines</span><span class="bp__code"></span></span></a>';
+    }
+
+    /* ---- the shear. Each column travels at its SPEED times D, and stops
+       once its own last card is in view (over[c] is how far that is), so
+       a column of four and a column of three both show every card. */
+    function progress() {
+      var dist = pin.offsetHeight - stage.offsetHeight;
+      return dist > 0 ? clamp(-pin.getBoundingClientRect().top / dist, 0, 1) : 0;
+    }
+    function offset(c, p) {
+      var run = Math.min(over[c], Math.abs(SPEED[c]) * D * p);
+      return SPEED[c] > 0 ? -run : run - over[c];
+    }
+    function paintWall(p) {
+      if (!pinned) return;
+      for (var i = 0; i < slots.length; i++) slots[i].style.transform = 'translate3d(0,' + offset(i % 3, p).toFixed(1) + 'px,0)';
+    }
+    var wallLoop = loop(progress, paintWall, .14);
+    function measure() {
+      pinned = !reduce && wide.matches && slots.length > 3;
+      social.classList.toggle('is-pinned', pinned);
+      slots.forEach(function (s) { s.style.transform = ''; });
+      if (!pinned) return;
+      var st = stage.getBoundingClientRect(), vh = stage.clientHeight, bottom = [0, 0, 0];
+      tops = slots.map(function (s, i) {
+        var r = s.getBoundingClientRect();
+        bottom[i % 3] = Math.max(bottom[i % 3], r.bottom - st.top);
+        return r.top - st.top;
+      });
+      D = 0;
+      for (var c = 0; c < 3; c++) {
+        over[c] = Math.max(0, bottom[c] + 56 - vh);
+        D = Math.max(D, over[c] / Math.abs(SPEED[c]));
+      }
+      wallLoop.reset();
+    }
+    /* Tabbing to a card scrolls the page to the point where that card sits
+       in the middle of the stage, so keyboard order never lands off screen. */
+    wall.addEventListener('focusin', function (e) {
+      if (!pinned || !D) return;
+      var slot = e.target.closest('.sw-slot'), i = slots.indexOf(slot);
+      try { if (i < 0 || !e.target.matches(':focus-visible')) return; } catch (err) { return; }
+      stage.scrollTop = 0;                         /* focus may have scrolled the clipped stage itself */
+      requestAnimationFrame(function () {
+        stage.scrollTop = 0;
+        var c = i % 3, s = SPEED[c], vh = stage.clientHeight;
+        var want = (vh - slot.offsetHeight) / 2 - tops[i];
+        var run = clamp(s > 0 ? -want : want + over[c], 0, over[c]);
+        var p = clamp(run / (Math.abs(s) * D), 0, 1);
+        var dist = pin.offsetHeight - vh;
+        window.scrollTo({ top: pin.getBoundingClientRect().top + scrollY() + p * dist, behavior: 'instant' });
+        wallLoop.reset();
+      });
+    });
+
+    /* ---- the title flips in, letter by letter, when it comes into view */
+    var FLIP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    function flipTitle() {
+      var cells = [];
+      [].forEach.call(social.querySelectorAll('[data-flap]'), function (el) {
+        var text = el.getAttribute('data-flap');
+        el.textContent = '';
+        text.split(' ').forEach(function (word, w) {
+          if (w) el.appendChild(document.createTextNode(' '));
+          var wd = document.createElement('span');
+          wd.className = 'sf-word';
+          for (var k = 0; k < word.length; k++) {
+            var c = document.createElement('span');
+            c.className = 'sf-ch';
+            c.textContent = ' ';
+            c.setAttribute('data-to', word.charAt(k));
+            wd.appendChild(c);
+            cells.push(c);
+          }
+          el.appendChild(wd);
+        });
+      });
+      function run() {
+        var t0 = performance.now();
+        (function frame() {
+          var now = performance.now(), alive = false;
+          for (var i = 0; i < cells.length; i++) {
+            var to = cells[i].getAttribute('data-to'), n = Math.floor((now - t0 - i * 38) / 48);
+            if (n < 0) { alive = true; continue; }
+            if (n >= 6) { if (cells[i].textContent !== to) cells[i].textContent = to; continue; }
+            var ch = FLIP.charAt(Math.floor(Math.random() * FLIP.length));
+            cells[i].textContent = to === to.toLowerCase() && to !== to.toUpperCase() ? ch.toLowerCase() : ch;
+            alive = true;
+          }
+          if (alive) requestAnimationFrame(frame);
+        })();
+      }
+      if (!('IntersectionObserver' in window)) return run();
+      var io = new IntersectionObserver(function (es) {
+        if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); run(); }
+      }, { threshold: .6 });
+      io.observe(social.querySelector('.social__title'));
+    }
+    if (!reduce) flipTitle();
+
+    /* ---- the modal */
+    var modal = document.getElementById('swm'), mBody = document.getElementById('swmBody'), mTitle = document.getElementById('swmTitle');
+    var lastCard = null, loads = {}, watch = null, giveUp = 0;
+    function load(src, again) {
+      if (loads[src] && !again) return loads[src];
+      var old = document.querySelector('script[data-embed="' + src + '"]');
+      if (old) old.parentNode.removeChild(old);
+      return (loads[src] = new Promise(function (ok, no) {
+        var s = document.createElement('script');
+        s.src = src; s.async = true; s.setAttribute('data-embed', src);
+        s.onload = ok;
+        s.onerror = function () { delete loads[src]; no(); };
+        document.body.appendChild(s);
+      }));
+    }
+    function focusables() {
+      return [].filter.call(modal.querySelectorAll('a[href],button,iframe,[tabindex]:not([tabindex="-1"])'),
+        function (el) { return el.offsetParent !== null || el === document.activeElement; });
+    }
+    function openPost(n, card) {
+      var p = posts[n], pl = plat(p), link = url(p);
+      if (!link) return;
+      lastCard = card;
+      mTitle.textContent = NAME[pl] + ' · ' + String(p.caption || '').slice(0, 60);
+      mBody.innerHTML = '<div class="swm__embed" id="swmEmbed"></div>' +
+        '<figure class="swm__fallback">' + picture(p, false, '(min-width: 600px) 360px, 80vw') +
+        '<figcaption><a class="btn btn--line swm__open" href="' + esc(link) + '" target="_blank" rel="noopener">Open on ' + NAME[pl] + '<span class="vh"> (opens in a new tab)</span></a></figcaption></figure>';
+      modal.classList.remove('has-embed');
+      modal.hidden = false;
+      document.documentElement.classList.add('swm-open');
+      modal.querySelector('.swm__close').focus();
+      emit('social_open', { platform: pl });
+
+      var box = document.getElementById('swmEmbed'), id = /\/video\/(\d+)/.exec(link);
+      if (pl === 'tiktok' && id) {
+        box.innerHTML = '<blockquote class="tiktok-embed" cite="' + esc(link) + '" data-video-id="' + id[1] + '" style="max-width:605px;min-width:300px"><section></section></blockquote>';
+      } else if (pl === 'instagram') {
+        box.innerHTML = '<blockquote class="instagram-media" data-instgrm-permalink="' + esc(link) + '" data-instgrm-version="14" style="max-width:540px;min-width:300px;width:100%"></blockquote>';
+      } else return;                               /* a TikTok link with no video id: the poster and the button it is */
+      /* the embed replaces the poster only once its iframe exists */
+      if (window.MutationObserver) {
+        watch = new MutationObserver(function () {
+          if (box.querySelector('iframe')) { modal.classList.add('has-embed'); watch.disconnect(); clearTimeout(giveUp); }
+        });
+        watch.observe(box, { childList: true, subtree: true });
+        giveUp = setTimeout(function () { if (watch) watch.disconnect(); }, 12000);
+      }
+      if (pl === 'tiktok') load('https://www.tiktok.com/embed.js', true).catch(function () {});
+      else load('https://www.instagram.com/embed.js').then(function () {
+        if (window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process();
+      }).catch(function () {});
+    }
+    function closePost() {
+      if (modal.hidden) return;
+      if (watch) watch.disconnect();
+      clearTimeout(giveUp);
+      modal.hidden = true;
+      mBody.innerHTML = '';                        /* stops the video */
+      document.documentElement.classList.remove('swm-open');
+      if (lastCard) lastCard.focus({ preventScroll: true });
+    }
+    modal.addEventListener('click', function (e) { if (e.target.closest('[data-swm-close]')) closePost(); });
+    modal.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); closePost(); return; }
+      if (e.key !== 'Tab') return;
+      var f = focusables();
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) { last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+    });
+    /* focus that escapes (into an embed's iframe and out again) is brought back */
+    document.addEventListener('focusin', function (e) {
+      if (!modal.hidden && !modal.contains(e.target)) modal.querySelector('.swm__close').focus();
+    });
+    wall.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-post]');
+      if (b) openPost(parseInt(b.getAttribute('data-post'), 10), b);
+      else if (e.target.closest('a.bp')) emit('social_follow', { href: e.target.closest('a.bp').href });
+    });
+
+    function build(list) {
+      posts = (Array.isArray(list) ? list : []).filter(function (p) { return p && p.poster; });
+      var html = [];
+      posts.forEach(function (p, n) {
+        html.push(postCard(p, n));
+        if (n === 2) html.push(followCard('tiktok'));
+        if (n === 5) html.push(followCard('instagram'));
+      });
+      if (posts.length < 3) html.push(followCard('tiktok'));
+      if (posts.length < 6) html.push(followCard('instagram'));
+      wall.innerHTML = html.map(function (h, k) {
+        return '<li class="sw-slot">' + h.replace('class="bp', 'style="--rot:' + ROT[k % ROT.length] + 'deg" class="bp') + '</li>';
+      }).join('');
+      slots = [].slice.call(wall.children);
+      [].forEach.call(wall.querySelectorAll('.bp__photo img'), function (img) {
+        img.addEventListener('error', function () { img.closest('.bp').classList.add('is-noposter'); });
+      });
+      measure();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    }
+
+    if (!reduce) {
+      window.addEventListener('scroll', function () { if (pinned) wallLoop.wake(); }, { passive: true });
+      window.addEventListener('resize', measure, { passive: true });
+      if (wide.addEventListener) wide.addEventListener('change', measure);
+    }
+    fetch('/assets/social/posts.json', { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(build)
+      .catch(function () { build([]); });
+  })();
+
 })();

@@ -204,6 +204,38 @@ for (const v of VIEWS) {
   ok(!reqs.some(q => /craft\.mp4/.test(q.url)), 'craft video not requested at load');
   await p2.close();
 
+  /* --- social wall: built from posts.json, follow links right, no embed
+     script until a card is opened, the modal falls back to the poster --- */
+  {
+    const sc = await browser.newContext({ viewport: { width: v.w, height: v.h }, isMobile: v.mobile, hasTouch: v.mobile });
+    const sp = await sc.newPage(), ext = [];
+    sp.on('request', q => { if (/tiktok\.com|instagram\.com/.test(q.url())) ext.push(q.url()); });
+    await sp.route('**/assets/social/posts.json', async r => { const j = await (await r.fetch()).json(); j[0].url = 'https://www.tiktok.com/@dubai.dips/video/7300000000000000000'; r.fulfill({ json: j }); });
+    await sp.route(/(tiktok|instagram)\.com\/embed\.js/, r => r.abort());
+    await sp.goto(base + '/'); await sp.evaluate(() => document.getElementById('social').scrollIntoView()); await sp.waitForTimeout(900);
+    const w = await sp.evaluate(() => ({
+      cards: document.querySelectorAll('#socialWall .bp').length,
+      follow: [...document.querySelectorAll('#socialWall .bp--follow')].map(a => a.href + '|' + a.target + '|' + a.rel),
+      links: [...document.querySelectorAll('#socialWall a.bp')].every(a => /^https:\/\/www\.(tiktok\.com\/@dubai\.dips|instagram\.com\/dubaianddips\/)$/.test(a.href) && a.target === '_blank' && /noopener/.test(a.rel)),
+      imgs: [...document.querySelectorAll('#socialWall img')].every(i => i.alt.length > 10 && i.loading === 'lazy' && i.decoding === 'async' && i.width && i.height),
+      over: document.documentElement.scrollWidth - innerWidth,
+      nav: !!document.querySelector('.nav__links a[href="#social"]'),
+      h2: document.getElementById('social-title').tagName
+    }));
+    ok(w.cards === 10, 'social: 8 posts + 2 follow tickets (' + w.cards + ')');
+    ok(w.follow.join() === 'https://www.tiktok.com/@dubai.dips|_blank|noopener,https://www.instagram.com/dubaianddips/|_blank|noopener', 'social: follow tickets link the right profiles in a new tab');
+    ok(w.links && w.imgs, 'social: every card link opens a profile in a new tab; every image has alt, lazy, async, size');
+    ok(w.over <= 0, 'social: no horizontal overflow (' + w.over + ')');
+    ok(w.nav && w.h2 === 'H2', 'social: nav links the section, title is an h2');
+    ok(ext.length === 0, 'social: no TikTok/Instagram request before a card is opened');
+    await sp.click('#socialWall button[data-post="0"]'); await sp.waitForTimeout(400);
+    ok(await sp.evaluate(() => !document.getElementById('swm').hidden && document.activeElement.classList.contains('swm__close') && getComputedStyle(document.querySelector('.swm__fallback')).display !== 'none' && /Open on TikTok/.test(document.querySelector('.swm__open').textContent)), 'social: modal opens on the poster fallback with an Open on TikTok button');
+    ok(ext.some(u => /tiktok\.com\/embed\.js/.test(u)), 'social: TikTok embed script requested only after the click');
+    await sp.keyboard.press('Escape');
+    ok(await sp.evaluate(() => document.getElementById('swm').hidden && document.activeElement.getAttribute('data-post') === '0'), 'social: Esc closes and returns focus to the card');
+    await sc.close();
+  }
+
   /* --- reduced motion: CTA visible --- */
   const rm = await browser.newContext({ viewport: { width: v.w, height: v.h }, isMobile: v.mobile, hasTouch: v.mobile, reducedMotion: 'reduce' });
   const rp = await rm.newPage(); await rp.goto(base + '/'); await rp.waitForTimeout(300);
