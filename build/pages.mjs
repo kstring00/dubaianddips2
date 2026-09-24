@@ -21,7 +21,7 @@ const IMG = {
   '/assets/menu-dubai-frappe.webp': [1400, 700], '/assets/menu-kunafa.webp': [1000, 563],
   '/assets/rev-dubai-frappe.webp': [260, 260], '/assets/rev-pistachio-frappe.webp': [260, 260], '/assets/rev-biscoff-frappe.webp': [260, 260],
   '/assets/rev-strawberry-matcha.webp': [260, 260], '/assets/rev-kunafa.webp': [260, 260],
-  '/assets/visit-clear-lake.webp': [1360, 765], '/assets/blog-lineup.webp': [1360, 765], '/assets/visit-clear-lake-800.webp': [800, 450],
+  '/assets/visit-clear-lake.webp': [1360, 765], '/assets/blog-lineup.webp': [1360, 765], '/assets/blog-gelato.webp': [765, 478], '/assets/visit-clear-lake-800.webp': [800, 450],
   '/assets/hero-poster.webp': [1280, 704], '/assets/craft-poster.webp': [1280, 714],
   '/assets/social/social-01-720.webp': [430, 765], '/assets/social/social-02-720.webp': [430, 765], '/assets/social/social-03-720.webp': [430, 765],
   '/assets/social/social-04-720.webp': [430, 765], '/assets/social/social-05-720.webp': [574, 1020], '/assets/social/social-06-720.webp': [430, 765]
