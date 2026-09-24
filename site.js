@@ -151,7 +151,7 @@
       if (e.shiftKey && i <= 0) { f[f.length - 1].focus(); e.preventDefault(); }
       else if (!e.shiftKey && i === f.length - 1) { f[0].focus(); e.preventDefault(); }
     });
-    phone.addEventListener && phone.addEventListener('change', function () { if (!window.matchMedia("(max-width: 1099px)").matches) setSheet(false); });
+    phone.addEventListener && phone.addEventListener('change', function () { if (!phone.matches) setSheet(false); });
   }
 
   /* --------------------------------------------------------------- hero

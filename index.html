@@ -204,7 +204,7 @@ p{margin:0}
 html.navsheet-open{overflow:hidden}
 .js .nav.is-menu{transform:none}
 html.navsheet-open .thumbbar{visibility:hidden}
-@media(max-width:1099px){
+@media(max-width:899px){
   .js .nav__burger{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;min-width:44px;padding:0 .2rem 0 .4rem;margin-left:-.4rem;border:0;background:transparent;color:var(--bark);font-family:var(--body);font-size:.95rem;font-weight:500;cursor:pointer}
   .nav__burger-lines{position:relative;display:inline-block;width:18px;height:10px}
   .nav__burger-lines i{position:absolute;left:0;right:0;height:1.5px;border-radius:2px;background:currentColor;transition:transform .3s var(--ease-out)}
@@ -216,10 +216,9 @@ html.navsheet-open .thumbbar{visibility:hidden}
 @media(max-width:380px){.nav__burger-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
 @media(prefers-reduced-motion:reduce){.js .navsheet.is-open .navsheet__list li{animation:none}.nav__burger-lines i{transition:none}}
 /* the hours label gives way first, so the seven section links stay on one line */
-@media(max-width:1399px){.nav__hours{display:none}}
-@media(max-width:1279px){.nav__call{display:none}.nav__links{gap:1.05rem}}
-/* under 1100px the nine links move into the menu sheet */
-@media(max-width:1099px){.js .nav__links{display:none}}
+@media(max-width:1199px){.nav__hours{display:none}}
+/* phones and small tablets: the links move into the menu sheet */
+@media(max-width:899px){.js .nav__links{display:none}}
 @media(max-width:899px){:root{--nav-h:72px}
   .nav__links,.nav__call{display:none}.nav{padding-top:env(safe-area-inset-top,0px)}
   .nav__brand{--logo-h:26px;--clear:calc(var(--logo-h) * var(--clear-mark))}
@@ -959,7 +958,7 @@ html.swm-open{overflow:hidden}
 <header class="nav nav--intro" id="nav">
   <a class="nav__brand" href="#top"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg><svg class="logo logo--mark" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-mark"/></svg></a>
   <nav class="nav__links" aria-label="Primary">
-    <a href="/menu">The menu</a><a href="#order">Delivery</a><a href="#craft">The craft</a><a href="/visit">Visit</a><a href="#reviews">Reviews</a><a href="#social">Follow</a><a href="/visit">Contact</a><a href="/catering">Catering</a><a href="/blog">Blog</a>
+    <a href="/menu">The menu</a><a href="/visit">Visit</a><a href="/catering">Catering</a><a href="/blog">Blog</a><a href="/visit">Contact</a>
   </nav>
   <div class="nav__right">
     <span class="nav__meta">

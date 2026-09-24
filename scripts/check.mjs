@@ -217,14 +217,14 @@ for (const v of VIEWS) {
       links: [...document.querySelectorAll('#socialWall a.bp')].every(a => /^https:\/\/www\.(tiktok\.com\/@dubai\.dips|instagram\.com\/dubaianddips\/)$/.test(a.href) && a.target === '_blank' && /noopener/.test(a.rel)),
       imgs: [...document.querySelectorAll('#socialWall img')].every(i => i.alt.length > 10 && i.loading === 'lazy' && i.decoding === 'async' && i.width && i.height),
       over: document.documentElement.scrollWidth - innerWidth,
-      nav: !!document.querySelector('.nav__links a[href="#social"]'),
+      nav: ![...document.querySelectorAll('.nav__links a')].some(a => a.getAttribute('href').startsWith('#')),
       h2: document.getElementById('social-title').tagName
     }));
     ok(w.cards === 10, 'social: 8 posts + 2 follow tickets (' + w.cards + ')');
     ok(w.follow.join() === 'https://www.tiktok.com/@dubai.dips|_blank|noopener,https://www.instagram.com/dubaianddips/|_blank|noopener', 'social: follow tickets link the right profiles in a new tab');
     ok(w.links && w.imgs, 'social: every card link opens a profile in a new tab; every image has alt, lazy, async, size');
     ok(w.over <= 0, 'social: no horizontal overflow (' + w.over + ')');
-    ok(w.nav && w.h2 === 'H2', 'social: nav links the section, title is an h2');
+    ok(w.nav && w.h2 === 'H2', 'nav has page links only (no scroll-to-section links); social title is an h2');
     ok(ext.length === 0, 'social: no TikTok/Instagram request before a card is opened');
     await sp.click('#socialWall button[data-post="0"]'); await sp.waitForTimeout(400);
     ok(await sp.evaluate(() => !document.getElementById('swm').hidden && document.activeElement.classList.contains('swm__close') && getComputedStyle(document.querySelector('.swm__fallback')).display !== 'none' && /Open on TikTok/.test(document.querySelector('.swm__open').textContent)), 'social: modal opens on the poster fallback with an Open on TikTok button');
