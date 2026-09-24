@@ -7,12 +7,12 @@ of the deploy (see `.vercelignore`).
 | File | What it is | Where it ended up |
 | --- | --- | --- |
 | `herovideo.mp4` | 1920x1080, 5.04s, 24fps, no audio. The first Higgsfield push-in. | Retired. The hero is now the chocolate-bar film (`assets/hero.mp4`, poster `assets/hero-poster.webp`, share card `assets/og.jpg` from its last frame). |
-| `herodd.jpg` | The room photo, 1360x765. | Not shipped since the video hero. Keep it for print or socials. |
-| `ddd.jpg` | Frappe with whipped cream and both a pistachio and a dark chocolate drizzle. | `assets/menu-dubai-frappe.webp`, the featured panel at the top of the menu. Used as the Dubai Chocolate Frappe on the strength of the visual match with the hero panel on the in-store board. **Confirm this is that drink and not the Pistachio Frappe.** |
-| `biscoff.jpg` | Biscoff frappe studio shot. | Not shipped. It was cropped for the old "known for" row, which is gone. It is the obvious photo for a future The Frappes card. |
-| `foodd-lineup.jpg` | The six drink lineup. | Not shipped. The right-hand cup crops cleanly to a strawberry matcha (pink over green, matcha on the foam) and is the obvious photo for a future The Matchas card. |
-| `safforn.jpg` | Kunafa on a gold board. | `assets/menu-kunafa.webp`, the image at the top of the D&D Desserts panel. |
-| `unnamed.jpg` | Counter shot: pistachio gelato, branded cup and bag. | Not shipped. It is a phone snapshot and sits below the studio shots in quality. |
+| `herodd.jpg` | The room photo, 1360x765. | `assets/social/social-04.jpg`, the green-wall card on the social wall. |
+| `ddd.jpg` | Frappe with whipped cream and both a pistachio and a dark chocolate drizzle. | `assets/menu-dubai-frappe.webp`, the featured panel at the top of the menu, and `assets/social/social-02.jpg`. Used as the Dubai Chocolate Frappe on the strength of the visual match with the hero panel on the in-store board. **Confirm this is that drink and not the Pistachio Frappe.** |
+| `biscoff.jpg` | Biscoff frappe studio shot. | `assets/social/social-06.jpg` on the social wall. It is also the obvious photo for a future The Frappes card. |
+| `foodd-lineup.jpg` | The six drink lineup. | `assets/social/social-03.jpg` on the social wall. The right-hand cup crops cleanly to a strawberry matcha (pink over green, matcha on the foam) and is the obvious photo for a future The Matchas card. |
+| `safforn.jpg` | Kunafa on a gold board. | `assets/menu-kunafa.webp`, the image at the top of the D&D Desserts panel, and `assets/social/social-01.jpg`. |
+| `unnamed.jpg` | Counter shot: pistachio gelato, branded cup and bag. | `assets/social/social-05.jpg` on the social wall, where a phone snapshot fits. |
 
 The two Higgsfield films (the chocolate bar opening into the room, and the
 matcha cup coming apart) were delivered as 1280-wide H.264 with a single

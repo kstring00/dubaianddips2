@@ -10,8 +10,9 @@ import { server } from './serve.mjs';
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 let fails = 0, passes = 0;
 const ok = (cond, msg) => { if (cond) { passes++; } else { fails++; console.log('  FAIL ' + msg); } };
-const read = f => fs.readFileSync(path.join(root, f), 'utf8');
-const PAGES = ['index.html', 'order-demo.html', '404.html'];
+/* the checks run against the built site: run `npm run build` first (npm run check does both) */
+const read = f => fs.readFileSync(path.join(root, 'dist', f), 'utf8');
+const PAGES = ['index.html', 'order-demo.html', '404.html', 'menu/index.html', 'catering/index.html', 'visit/index.html', 'visit/clear-lake/index.html', 'blog/index.html', ...fs.readdirSync(path.join(root, 'dist/blog')).filter(d => d !== 'index.html').map(d => 'blog/' + d + '/index.html')];
 const SERVED = ['index.html', 'order-demo.html', '404.html', 'site.js', 'demo.js', 'track.js', 'sw.js', 'manifest.webmanifest'];
 
 console.log('static checks');
@@ -34,22 +35,25 @@ for (const f of PAGES) {
   ok(/Dubai &amp; Dips/.test(desc) && /Houston/.test(desc), f + ' description mentions Dubai & Dips and Houston');
   ok(!titles.has(title) && !descs.has(desc), f + ' title/description unique'); titles.add(title); descs.add(desc);
   ok(/rel="icon"/.test(s), f + ' has a favicon');
+  /* every logo <use> points at the sprite on the same page */
+  const uses = [...s.matchAll(/<use href="([^"]+)"/g)].map(m => m[1]);
+  ok(uses.every(u => u.startsWith('#') && s.includes('id="' + u.slice(1) + '"')), f + ' every <use> resolves on the page (' + uses.filter(u => !u.startsWith('#')).join(',') + ')');
   ok(/property="og:image"/.test(s), f + ' has an OG image');
   ok(/href="tel:\+?\d+"/.test(s), f + ' has a tel: link');
   const imgs = s.match(/<img\b[^>]*>/g) || [];
   ok(imgs.every(t => /\balt="/.test(t)), f + ' every <img> has alt (' + imgs.length + ' images)');
   ok(/rel="manifest"/.test(s), f + ' links the manifest');
 }
-ok(fs.existsSync(path.join(root, '404.html')), '404.html exists');
+ok(fs.existsSync(path.join(root, 'dist/404.html')), '404.html is built');
 const man = JSON.parse(read('manifest.webmanifest'));
 ok(man.display === 'standalone' && man.start_url && man.icons.length >= 3, 'manifest is standalone with icons');
 for (const i of man.icons) {
-  const f = path.join(root, i.src); ok(fs.existsSync(f), 'icon exists ' + i.src);
+  const f = path.join(root, 'dist', i.src); ok(fs.existsSync(f), 'icon exists ' + i.src);
   if (fs.existsSync(f)) { const b = fs.readFileSync(f); const w = b.readUInt32BE(16), h = b.readUInt32BE(20); ok(i.sizes === w + 'x' + h, i.src + ' is ' + w + 'x' + h); }
 }
 const sw = read('sw.js');
 ok(/url\.origin !== self\.location\.origin\) return/.test(sw) && /mp4/.test(sw), 'service worker skips cross-origin (Toast) and videos');
-ok(/order-demo/.test(read('vercel.json')), 'vercel.json rewrites /order-demo');
+ok(/order-demo/.test(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8')), 'vercel.json rewrites /order-demo');
 ok(!/<input[^>]*(cc-|card)/i.test(read('order-demo.html')) && !/cc-|card-number|cvv|cvc/i.test(read('demo.js')), 'demo has no card inputs');
 ok(!/confirmation/i.test(read('demo.js')), 'demo has no confirmation numbers');
 ok(/prefers-reduced-motion/.test(read('index.html')) && /prefers-reduced-motion/.test(read('order-demo.html')), 'reduced motion handled');
@@ -69,7 +73,7 @@ const configWith = (page, url) => page.route('**/config/ordering.js', async r =>
   await r.fulfill({ status: 200, body, headers: { 'content-type': 'text/javascript' } });
 });
 const VIEWS = [{ name: 'phone 360', w: 360, h: 780, mobile: true }, { name: 'desktop', w: 1280, h: 800, mobile: false }];
-const ROUTES = ['/', '/menu/frappes', '/404.html', '/definitely-missing'];
+const ROUTES = ['/', '/menu', '/catering', '/visit/clear-lake', '/definitely-missing'];
 let errors = [];
 
 for (const v of VIEWS) {
@@ -85,12 +89,7 @@ for (const v of VIEWS) {
   for (const r of ROUTES) {
     await page.goto(base + r); await page.waitForTimeout(300);
     const n = await page.evaluate(() => document.querySelectorAll('[data-order]').length);
-    if (r.includes('404') || r.includes('missing')) {
-      const href = await page.getAttribute('#orderLink', 'href');
-      ok(href === '/#order', '404 order link falls back to /#order with empty URL (' + href + ')');
-      ok((await page.evaluate(() => !!document.querySelector('a[href^="tel:"]'))), '404 page reachable phone');
-      continue;
-    }
+    if (r.includes('404') || r.includes('missing')) ok((await page.evaluate(() => !!document.querySelector('a[href^="tel:"]'))), '404 page reachable phone');
     let opened = 0;
     for (let i = 0; i < n; i++) {
       const res = await page.evaluate(i => {
@@ -132,9 +131,11 @@ for (const v of VIEWS) {
       else if (place === 'hero-landing') { await page.evaluate(() => window.scrollTo(0, (document.getElementById('top').offsetHeight - innerHeight) * .71)); await page.waitForTimeout(1600); }
       else if (place === 'header') { await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await page.waitForTimeout(900); }
       else if (place === 'item' || place === 'category') { await el.evaluate(e => e.closest('.brow').querySelector('.brow__btn').click()); await page.waitForTimeout(300); }
-      if (place !== 'hero' && place !== 'hero-landing' && place !== 'header') { await el.evaluate(e => e.scrollIntoView({ block: 'center' })); await page.waitForTimeout(150); }
+      /* the footer's mailing-box lid opens once most of the footer is in view */
+      else if (place === 'footer') { await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(1500); }
+      if (place !== 'hero' && place !== 'hero-landing' && place !== 'header' && place !== 'footer') { await el.evaluate(e => e.scrollIntoView({ block: 'center' })); await page.waitForTimeout(150); }
       if (!(await el.isVisible())) { console.log('  skip ' + place + ' (not shown at ' + v.name + ')'); continue; }
-      const click = () => el.click({ timeout: 5000 }).catch(e => { ok(false, r + ' click ' + place + ' failed: ' + String(e).split('\n')[0]); });
+      const click = () => el.click({ timeout: 5000 }).catch(e => { ok(false, r + ' click ' + place + ' failed: ' + String(e).split('\n').slice(0, 14).join(' | ')); });
       if (v.mobile) {
         await Promise.all([page.waitForURL(u => u.href.startsWith(DUMMY), { timeout: 5000 }).catch(() => null), click()]);
         ok(page.url().startsWith(DUMMY), r + ' click ' + place + ' navigates same tab on phone (' + page.url() + ')');
@@ -150,11 +151,11 @@ for (const v of VIEWS) {
 
   /* --- 404 with a URL set --- */
   await configWith(page, DUMMY);
-  await page.goto(base + '/nope'); ok((await page.getAttribute('#orderLink', 'href')) === DUMMY, '404 order link uses the Toast URL when set');
+  await page.goto(base + '/nope'); ok((await page.getAttribute('[data-place="404"]', 'href')) === DUMMY, '404 order link uses the Toast URL when set');
   await page.unroute('**/config/ordering.js');
 
   /* --- layout: overflow, tap targets, sticky bar, hero CTA first paint --- */
-  for (const r of ['/', '/order-demo', '/404.html']) {
+  for (const r of ['/', '/order-demo', '/404.html', '/menu', '/catering', '/visit', '/visit/clear-lake', '/blog', '/blog/dubai-chocolate-houston-explained']) {
     await page.goto(base + r); await page.waitForTimeout(300);
     const sw = await page.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= v.w, r + ' no horizontal overflow at ' + v.w + ' (scrollWidth ' + sw + ')');
@@ -203,6 +204,59 @@ for (const v of VIEWS) {
   ok(reqs.some(q => /hero\.mp4/.test(q.url)), 'hero video requested after load');
   ok(!reqs.some(q => /craft\.mp4/.test(q.url)), 'craft video not requested at load');
   await p2.close();
+
+  /* --- social wall: built from posts.json, follow links right, no embed
+     script until a card is opened, the modal falls back to the poster --- */
+  {
+    const sc = await browser.newContext({ viewport: { width: v.w, height: v.h }, isMobile: v.mobile, hasTouch: v.mobile });
+    const sp = await sc.newPage(), ext = [];
+    sp.on('request', q => { if (/tiktok\.com|instagram\.com/.test(q.url())) ext.push(q.url()); });
+    await sp.route('**/assets/social/posts.json', async r => { const j = await (await r.fetch()).json(); j[0].url = 'https://www.tiktok.com/@dubai.dips/video/7300000000000000000'; r.fulfill({ json: j }); });
+    await sp.route(/(tiktok|instagram)\.com\/embed\.js/, r => r.abort());
+    await sp.goto(base + '/'); await sp.evaluate(() => document.getElementById('social').scrollIntoView()); await sp.waitForTimeout(900);
+    const w = await sp.evaluate(() => ({
+      cards: document.querySelectorAll('#socialWall .bp').length,
+      follow: [...document.querySelectorAll('#socialWall .bp--follow')].map(a => a.href + '|' + a.target + '|' + a.rel),
+      links: [...document.querySelectorAll('#socialWall a.bp')].every(a => /^https:\/\/www\.(tiktok\.com\/@dubai\.dips|instagram\.com\/dubaianddips\/)$/.test(a.href) && a.target === '_blank' && /noopener/.test(a.rel)),
+      imgs: [...document.querySelectorAll('#socialWall img')].every(i => i.alt.length > 10 && i.loading === 'lazy' && i.decoding === 'async' && i.width && i.height),
+      over: document.documentElement.scrollWidth - innerWidth,
+      nav: ![...document.querySelectorAll('.nav__links a')].some(a => a.getAttribute('href').startsWith('#')),
+      h2: document.getElementById('social-title').tagName
+    }));
+    ok(w.cards === 10, 'social: 8 posts + 2 follow tickets (' + w.cards + ')');
+    ok(w.follow.join() === 'https://www.tiktok.com/@dubai.dips|_blank|noopener,https://www.instagram.com/dubaianddips/|_blank|noopener', 'social: follow tickets link the right profiles in a new tab');
+    ok(w.links && w.imgs, 'social: every card link opens a profile in a new tab; every image has alt, lazy, async, size');
+    ok(w.over <= 0, 'social: no horizontal overflow (' + w.over + ')');
+    ok(w.nav && w.h2 === 'H2', 'nav has page links only (no scroll-to-section links); social title is an h2');
+    ok(ext.length === 0, 'social: no TikTok/Instagram request before a card is opened');
+    await sp.click('#socialWall button[data-post="0"]'); await sp.waitForTimeout(400);
+    ok(await sp.evaluate(() => !document.getElementById('swm').hidden && document.activeElement.classList.contains('swm__close') && getComputedStyle(document.querySelector('.swm__fallback')).display !== 'none' && /Open on TikTok/.test(document.querySelector('.swm__open').textContent)), 'social: modal opens on the poster fallback with an Open on TikTok button');
+    ok(ext.some(u => /tiktok\.com\/embed\.js/.test(u)), 'social: TikTok embed script requested only after the click');
+    await sp.keyboard.press('Escape');
+    ok(await sp.evaluate(() => document.getElementById('swm').hidden && document.activeElement.getAttribute('data-post') === '0'), 'social: Esc closes and returns focus to the card');
+    await sc.close();
+  }
+
+  /* --- the board and the footer gate tell the truth about the hours
+     (shop time via ?at=, America/Chicago) --- */
+  for (const [at, want] of [['2026-09-28T14:10', 'open'], ['2026-09-28T21:45', 'soon'], ['2026-09-28T22:30', 'closed'], ['2026-09-26T00:30', 'closed-sat']]) {
+    const hc = await browser.newContext({ viewport: { width: v.w, height: v.h }, isMobile: v.mobile, hasTouch: v.mobile });
+    const hp = await hc.newPage();
+    await hp.goto(base + '/?at=' + at); await hp.evaluate(() => document.getElementById('board').scrollIntoView()); await hp.waitForTimeout(1400);
+    const got = await hp.evaluate(() => ({
+      row1: [...document.querySelector('.brow').querySelectorAll('.flap__ch')].map(c => c.textContent).join('').trim(),
+      nb: [...document.querySelectorAll('.brow')].some(r => [...r.querySelectorAll('.flap__ch')].map(c => c.textContent).join('').includes('NOW BOARDING')),
+      sr: document.querySelector('.brow__sr').textContent,
+      gate: document.getElementById('gateState').textContent + ' | ' + document.getElementById('gateCount').textContent,
+      over: document.documentElement.scrollWidth - document.documentElement.clientWidth
+    }));
+    if (want === 'open') ok(got.row1 === 'NOW BOARDING' && /Open now/.test(got.sr) && /Open now · closes 10 PM \| Closes in 7h 50m/.test(got.gate), 'hours open: ' + JSON.stringify(got));
+    if (want === 'soon') ok(got.row1 === 'FINAL CALL' && /Final call · closes 10 PM \| Closes in 15m/.test(got.gate), 'hours closing soon: ' + JSON.stringify(got));
+    if (want === 'closed') ok(got.row1 === 'OPENS TUE 9AM' && !got.nb && /Closed, opens Tuesday 9 AM/.test(got.sr) && /Closed · opens Tue 9 AM \| Opens in 10h 30m/.test(got.gate), 'hours closed: ' + JSON.stringify(got));
+    if (want === 'closed-sat') ok(got.row1 === 'OPENS 9AM' && !got.nb && /Opens in 8h 30m/.test(got.gate), 'hours closed after Friday midnight: ' + JSON.stringify(got));
+    ok(got.over <= 0, 'no horizontal overflow with the board at ' + at);
+    await hc.close();
+  }
 
   /* --- reduced motion: CTA visible --- */
   const rm = await browser.newContext({ viewport: { width: v.w, height: v.h }, isMobile: v.mobile, hasTouch: v.mobile, reducedMotion: 'reduce' });

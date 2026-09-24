@@ -7,12 +7,12 @@
 
    Never cached: anything off this origin (so never a Toast page), the two
    films, and any non-GET request. Bump VERSION to drop old caches. */
-var VERSION = 'dd-2026-09-23-live';
+var VERSION = 'dd-2026-09-24-pages';
 var SHELL = [
   '/', '/index.html', '/order-demo', '/404.html',
-  '/site.js', '/track.js', '/demo.js', '/config/ordering.js', '/manifest.webmanifest',
+  '/site.js', '/track.js', '/demo.js', '/config/ordering.js', '/config/departures.js', '/hours.js', '/manifest.webmanifest',
   '/brand.css', '/assets/dd-favicon.svg', '/assets/dd-apple-touch-icon.png', '/assets/dd-icon-192.png', '/assets/dd-icon-512.png', '/assets/dd-icon-maskable-512.png',
-  '/public/brand/pattern/pattern-sugar.svg', '/menu-board.json',
+  '/public/brand/pattern/pattern-sugar.svg', '/public/brand/pattern/pattern-light.svg', '/public/brand/boarding-pass/bpass-dubai.svg', '/menu-board.json',
   '/assets/hero-poster.webp', '/assets/craft-poster.webp',
   '/public/fonts/albert-sans.woff2', '/public/fonts/encode-sans.woff2', '/public/fonts/playfair-display-italic.woff2'
 ];

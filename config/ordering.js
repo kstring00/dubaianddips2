@@ -17,8 +17,9 @@
      TOAST_PICKUP_URL  optional: a Toast deep link straight to pickup
      TOAST_DELIVERY_URL optional: a Toast deep link straight to delivery
      TOAST_GROUP_URL   optional: a Toast group-ordering link
-     PHONE             the shop's real number (the current one is the
-                       placeholder that was already on the site)
+     SHOP.address      the real street address (also a placeholder)
+     HOURS             confirm against the door sign
+     LINKS             googleReviews and privacyPolicy are still empty
      REWARDS_LIVE      true once Toast loyalty is switched on
      DEMO_ITEMS prices these are demo prices; no price on the boards was
                        legible, so confirm against the real menu
@@ -39,24 +40,114 @@ window.DD_CONFIG = {
   TOAST_GROUP_URL: "",              /* optional; falls back to TOAST_ORDER_URL */
 
   /* ---- The shop ------------------------------------------------------ */
-  PHONE: { display: "(281) 555-0147", tel: "+12815550147" },
+  PHONE: { display: "(281) 786-1157", tel: "+12817861157" },
+  /* The site's one public address, used for canonical URLs, the sitemap
+     and structured data. Taken from the canonical link already on the
+     homepage; confirm it is the domain the site will live on. */
+  SITE_URL: "https://dubaianddips.com",
+
   SHOP: {
     name: "Dubai & Dips",
     area: "Clear Lake",
     city: "Houston",
+    /* PLACEHOLDER: the street address below was already on the site and is
+       not confirmed. Every page, the footer and the structured data read it
+       from here, so fixing it once fixes it everywhere. */
+    street: "1234 Bay Area Blvd, Suite 100",
+    locality: "Houston",
+    region: "TX",
+    postalCode: "77058",
+    country: "US",
     address: "1234 Bay Area Blvd, Suite 100, Houston, TX 77058",
     timezone: "America/Chicago",
-    directions: "https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX"
+    /* For structured data. Empty values are left out, never guessed. */
+    priceRange: "",          /* MISSING: e.g. "$" or "$$" */
+    servesCuisine: ["Desserts", "Coffee", "Matcha", "Gelato"]
   },
-  /* Index is day of week, 0 = Sunday. [open, close] in 24-hour shop time.
-     The label groups the rows the way the door sign does. */
-  /* A close of 24 is midnight. */
-  HOURS: [[10, 22], [9, 22], [9, 22], [9, 22], [9, 22], [9, 24], [9, 24]],
-  HOURS_LABELS: [
-    { days: "Mon to Thu", open: 9, close: 22 },
-    { days: "Fri to Sat", open: 9, close: 24 },
-    { days: "Sun", open: 10, close: 22 }
+
+  /* ---- Locations -------------------------------------------------------
+     One entry per shop. Each one gets its own page at /visit/<slug> and its
+     own Restaurant structured data. Clear Lake uses SHOP, PHONE and HOURS
+     above. A location is only published once slug, street, locality,
+     postalCode and phone are all filled in - nothing is invented. */
+  LOCATIONS: [
+    {
+      slug: "clear-lake",
+      name: "Dubai & Dips Clear Lake",
+      area: "Clear Lake",
+      primary: true,           /* address, phone and hours come from SHOP, PHONE, HOURS */
+      geo: null,               /* MISSING: { lat: 29.xxxx, lng: -95.xxxx } from the Google profile */
+      googleProfile: "",       /* MISSING: the shop's Google Business Profile link */
+      mapQuery: "Dubai and Dips Clear Lake Houston TX",
+      parking: "Free lot right out front, and more spaces around the side of the building.",
+      landmark: "",            /* MISSING: a landmark to look for, e.g. the shopping centre name */
+      photo: "/assets/visit-clear-lake.webp",
+      photoAlt: "Inside Dubai & Dips Clear Lake: the deep green wall with the gold DUBAI & DIPS sign over the pastry counter, white chairs and marble tables."
+    },
+    {
+      /* MISSING: the second shop. Fill these in and its page, card and
+         structured data appear on the next deploy. */
+      slug: "",                /* e.g. "katy" - lowercase, hyphens */
+      name: "",
+      area: "",
+      street: "",
+      locality: "",
+      region: "TX",
+      postalCode: "",
+      phone: { display: "", tel: "" },
+      hours: null,             /* same shape as HOURS; null = same as HOURS */
+      geo: null,
+      googleProfile: "",
+      mapQuery: "",
+      parking: "",
+      landmark: "",
+      photo: "",
+      photoAlt: ""
+    }
   ],
+
+  /* ---- Hours: the ONE source ------------------------------------------
+     Everything that shows or depends on the hours reads this: the nav's
+     "Open until", the departures board (NOW BOARDING / FINAL CALL / OPENS),
+     the footer gate, the Visit table, the ordering sheet and the demo's
+     pickup times. Open or closed is always worked out in SHOP.timezone,
+     never the visitor's own clock.
+     Index is day of week, 0 = Sunday. [open, close] in 24-hour shop time;
+     half hours are fine (9.5 is 9:30). A close of 24 is midnight: open to
+     the end of that day. A close earlier than the open runs past midnight
+     (e.g. [18, 2]). null means closed all day. The "Mon to Thu" style rows
+     are grouped from this automatically. */
+  HOURS: [[10, 22], [9, 22], [9, 22], [9, 22], [9, 22], [9, 24], [9, 24]],
+  /* The board's row 1 says FINAL CALL for this many minutes before close. */
+  CLOSING_SOON_MINUTES: 30,
+  /* Holidays and one-off days. { date: "2026-12-25", closed: true } or
+     { date: "2026-12-24", open: 9, close: 17 }. They override HOURS on that
+     date everywhere, including the structured data. */
+  SPECIAL_HOURS: [],
+
+  /* ---- Links: the ONE source ------------------------------------------
+     Every footer link (and the social wall) reads these. The phone comes
+     from PHONE above and Order ahead from TOAST_* above. An empty value
+     hides its link rather than leaving a dead one - fill it in and the
+     link appears. */
+  LINKS: {
+    directions: "https://www.google.com/maps/dir/?api=1&destination=Dubai+and+Dips+Clear+Lake+Houston+TX",
+    instagram: "https://www.instagram.com/dubaianddips/",
+    tiktok: "https://www.tiktok.com/@dubai.dips",
+    catering: "/catering",
+    googleReviews: "",   /* MISSING: the Google Business "Leave a review" link (g.page/r/.../review) */
+    privacyPolicy: ""    /* MISSING: there is no privacy policy page yet */
+  },
+
+  /* ---- Catering requests (/catering) ---------------------------------
+     The form posts JSON to formEndpoint (Formspree, a Vercel function,
+     anything that answers 2xx). While it is empty the form never pretends
+     to send: it says so and offers the phone instead. */
+  CATERING: {
+    formEndpoint: "",        /* MISSING: where catering requests go */
+    noticeHours: null,       /* MISSING: how much notice a large order needs, e.g. 48 */
+    email: ""                /* MISSING: an inbox for catering questions */
+  },
 
   /* ---- Delivery ------------------------------------------------------ */
   DELIVERY_MINIMUM: 15,

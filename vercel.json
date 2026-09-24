@@ -1,7 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "outputDirectory": ".",
+  "installCommand": "npm install",
+  "buildCommand": "node build/build.mjs",
+  "outputDirectory": "dist",
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -9,6 +12,24 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/social/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/assets/social/posts.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },
@@ -31,7 +52,7 @@
       ]
     },
     {
-      "source": "/(index.html|order-demo.html|site.js|demo.js|track.js|404.html|manifest.webmanifest|brand.css|menu-board.json)",
+      "source": "/(index.html|order-demo.html|site.js|pages.js|pages.css|hours.js|demo.js|track.js|404.html|manifest.webmanifest|brand.css|menu-board.json|sitemap.xml|robots.txt)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -64,12 +85,15 @@
   ],
   "rewrites": [
     {
-      "source": "/menu/:slug",
-      "destination": "/index.html"
-    },
-    {
       "source": "/order-demo",
       "destination": "/order-demo.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/menu/:slug",
+      "destination": "/menu#:slug",
+      "permanent": true
     }
   ]
 }
