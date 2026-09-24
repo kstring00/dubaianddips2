@@ -132,9 +132,11 @@ for (const v of VIEWS) {
       else if (place === 'hero-landing') { await page.evaluate(() => window.scrollTo(0, (document.getElementById('top').offsetHeight - innerHeight) * .71)); await page.waitForTimeout(1600); }
       else if (place === 'header') { await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await page.waitForTimeout(900); }
       else if (place === 'item' || place === 'category') { await el.evaluate(e => e.closest('.brow').querySelector('.brow__btn').click()); await page.waitForTimeout(300); }
-      if (place !== 'hero' && place !== 'hero-landing' && place !== 'header') { await el.evaluate(e => e.scrollIntoView({ block: 'center' })); await page.waitForTimeout(150); }
+      /* the footer's mailing-box lid opens once most of the footer is in view */
+      else if (place === 'footer') { await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(1500); }
+      if (place !== 'hero' && place !== 'hero-landing' && place !== 'header' && place !== 'footer') { await el.evaluate(e => e.scrollIntoView({ block: 'center' })); await page.waitForTimeout(150); }
       if (!(await el.isVisible())) { console.log('  skip ' + place + ' (not shown at ' + v.name + ')'); continue; }
-      const click = () => el.click({ timeout: 5000 }).catch(e => { ok(false, r + ' click ' + place + ' failed: ' + String(e).split('\n')[0]); });
+      const click = () => el.click({ timeout: 5000 }).catch(e => { ok(false, r + ' click ' + place + ' failed: ' + String(e).split('\n').slice(0, 14).join(' | ')); });
       if (v.mobile) {
         await Promise.all([page.waitForURL(u => u.href.startsWith(DUMMY), { timeout: 5000 }).catch(() => null), click()]);
         ok(page.url().startsWith(DUMMY), r + ' click ' + place + ' navigates same tab on phone (' + page.url() + ')');
@@ -234,6 +236,27 @@ for (const v of VIEWS) {
     await sp.keyboard.press('Escape');
     ok(await sp.evaluate(() => document.getElementById('swm').hidden && document.activeElement.getAttribute('data-post') === '0'), 'social: Esc closes and returns focus to the card');
     await sc.close();
+  }
+
+  /* --- the board and the footer gate tell the truth about the hours
+     (shop time via ?at=, America/Chicago) --- */
+  for (const [at, want] of [['2026-09-28T14:10', 'open'], ['2026-09-28T21:45', 'soon'], ['2026-09-28T22:30', 'closed'], ['2026-09-26T00:30', 'closed-sat']]) {
+    const hc = await browser.newContext({ viewport: { width: v.w, height: v.h }, isMobile: v.mobile, hasTouch: v.mobile });
+    const hp = await hc.newPage();
+    await hp.goto(base + '/?at=' + at); await hp.evaluate(() => document.getElementById('board').scrollIntoView()); await hp.waitForTimeout(1400);
+    const got = await hp.evaluate(() => ({
+      row1: [...document.querySelector('.brow').querySelectorAll('.flap__ch')].map(c => c.textContent).join('').trim(),
+      nb: [...document.querySelectorAll('.brow')].some(r => [...r.querySelectorAll('.flap__ch')].map(c => c.textContent).join('').includes('NOW BOARDING')),
+      sr: document.querySelector('.brow__sr').textContent,
+      gate: document.getElementById('gateState').textContent + ' | ' + document.getElementById('gateCount').textContent,
+      over: document.documentElement.scrollWidth - document.documentElement.clientWidth
+    }));
+    if (want === 'open') ok(got.row1 === 'NOW BOARDING' && /Open now/.test(got.sr) && /Open now · closes 10 PM \| Closes in 7h 50m/.test(got.gate), 'hours open: ' + JSON.stringify(got));
+    if (want === 'soon') ok(got.row1 === 'FINAL CALL' && /Final call · closes 10 PM \| Closes in 15m/.test(got.gate), 'hours closing soon: ' + JSON.stringify(got));
+    if (want === 'closed') ok(got.row1 === 'OPENS TUE 9AM' && !got.nb && /Closed, opens Tuesday 9 AM/.test(got.sr) && /Closed · opens Tue 9 AM \| Opens in 10h 30m/.test(got.gate), 'hours closed: ' + JSON.stringify(got));
+    if (want === 'closed-sat') ok(got.row1 === 'OPENS 9AM' && !got.nb && /Opens in 8h 30m/.test(got.gate), 'hours closed after Friday midnight: ' + JSON.stringify(got));
+    ok(got.over <= 0, 'no horizontal overflow with the board at ' + at);
+    await hc.close();
   }
 
   /* --- reduced motion: CTA visible --- */

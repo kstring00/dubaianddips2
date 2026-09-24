@@ -1,8 +1,8 @@
 {
   "_howto": [
     "The departures board on the home page. Edit this file only; no code change is needed.",
-    "Rows appear top to bottom in this order. The first row is the signature (NOW BOARDING).",
-    "status: one of on-time, now-boarding, seasonal, sold-out.",
+    "Rows appear top to bottom in this order. Row 1 is the signature: it says NOW BOARDING while the shop is open, FINAL CALL in the last half hour, and the real next opening time when closed.",
+    "status: one of on-time, seasonal, sold-out. What the tiles say comes from config/departures.js (by destination code) and the hours in config/ordering.js; seasonal adds SEASONAL to the row's sayings and sold-out shows SOLD OUT while the shop is open.",
     "code + destination: the airport code and the place the category is inspired by. Local and American items fly HOU Houston. \"TBD\" means not decided yet: the board shows it as tbdShowsAs (HOU Houston) until it is.",
     "description: one line, only what is true of every item in the category. Leave it \"\" if unsure; the board then points to the list in the shop.",
     "items: the first three show under the category on the board; all of them show when the row is opened.",
@@ -21,7 +21,7 @@
       "destination": "Dubai",
       "category": "The Frappes",
       "gate": "A1",
-      "status": "now-boarding",
+      "status": "on-time",
       "description": "Blended and served cold.",
       "items": [
         {

@@ -289,25 +289,156 @@
     }
   }
 
+  /* ---------------------------------------------------------- hours
+     The one clock. HOURS in config/ordering.js is the only place the hours
+     live; this turns them into OPEN / CLOSING SOON / CLOSED, worked out in
+     the shop's own timezone (America/Chicago), never the visitor's. Anything
+     that shows the hours registers with onShopMinute() and is called again
+     at the top of every minute.
+     To check a state by hand, add ?at=2026-09-26T23:45 to the URL: the
+     clock then runs from that shop-local time. */
+  var HOURS = CFG.HOURS || [];
+  var SHOP_TZ = (CFG.SHOP && CFG.SHOP.timezone) || 'America/Chicago';
+  var SOON = CFG.CLOSING_SOON_MINUTES || 30;
+  var DAY = 1440, WEEK = 10080;
+  var DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var DAY_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  /* The week as [start, end) in minutes from Sunday 00:00. A close of 24
+     ends the day at midnight; a close before the open runs past midnight. */
+  var spans = [];
+  HOURS.forEach(function (h, d) {
+    if (!h) return;
+    var o = Math.round(h[0] * 60), c = Math.round(h[1] * 60);
+    if (c <= o) c += DAY;
+    spans.push({ start: d * DAY + o, end: d * DAY + c });
+  });
+
+  var atParam = /[?&]at=(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d)/.exec(location.search);
+  var clockStart = Date.now();
+  /* Minutes since Sunday 00:00, shop time, with seconds as a fraction. */
+  function shopNow() {
+    if (atParam) {
+      var wd = new Date(Date.UTC(+atParam[1], +atParam[2] - 1, +atParam[3])).getUTCDay();
+      return (wd * DAY + (+atParam[4]) * 60 + (+atParam[5]) + (Date.now() - clockStart) / 60000) % WEEK;
+    }
+    try {
+      var o = {};
+      new Intl.DateTimeFormat('en-US', { timeZone: SHOP_TZ, hourCycle: 'h23', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        .formatToParts(new Date()).forEach(function (x) { o[x.type] = x.value; });
+      return DAY_SHORT.indexOf(o.weekday) * DAY + (parseInt(o.hour, 10) % 24) * 60 + parseInt(o.minute, 10) + parseInt(o.second, 10) / 60;
+    } catch (e) {
+      var n = new Date();
+      return n.getDay() * DAY + n.getHours() * 60 + n.getMinutes();
+    }
+  }
+  /* 600 -> "10 AM", 570 -> "9:30 AM", 1440 -> "12 AM" */
+  function clockText(min) {
+    min = ((min % DAY) + DAY) % DAY;
+    var h = Math.floor(min / 60), m = min % 60, ap = h >= 12 ? 'PM' : 'AM';
+    return ((h % 12) || 12) + (m ? ':' + (m < 10 ? '0' : '') + m : '') + ' ' + ap;
+  }
+  function spanText(s) { return clockText(s.start) + ' to ' + clockText(s.end); }
+  /* "2h 14m", "24m" */
+  function durText(min) {
+    min = Math.max(1, Math.ceil(min));
+    var h = Math.floor(min / 60), m = min % 60;
+    return (h ? h + 'h ' : '') + (h && !m ? '' : m + 'm');
+  }
+  function shopState() {
+    var t = shopNow(), cur = null, next = null, today = Math.floor(t / DAY), doneToday = false;
+    spans.forEach(function (s) {
+      for (var k = -1; k <= 1; k++) {
+        var a = s.start + k * WEEK, b = s.end + k * WEEK;
+        if (t >= a && t < b) cur = { start: a, end: b };
+        if (a > t && (!next || a < next.start)) next = { start: a };
+        if (b <= t && a >= today * DAY) doneToday = true;
+      }
+    });
+    var st = { t: t, open: !!cur, soon: false, mode: 'closed' };
+    if (cur) {
+      st.closesIn = cur.end - t;
+      st.soon = st.closesIn <= SOON;
+      st.mode = st.soon ? 'soon' : 'open';
+      st.closeText = clockText(cur.end);
+      st.progress = (t - cur.start) / (cur.end - cur.start);
+    } else {
+      st.progress = doneToday ? 1 : 0;
+      if (next) {
+        var sameDay = Math.floor(next.start / DAY) === today, wd = Math.floor(next.start / DAY) % 7;
+        st.opensIn = next.start - t;
+        st.openText = (sameDay ? '' : DAY_SHORT[wd] + ' ') + clockText(next.start);
+        st.openSpoken = (sameDay ? '' : DAY_LONG[wd] + ' ') + clockText(next.start);
+      }
+    }
+    return st;
+  }
+  /* The door sign's rows, grouped from HOURS: Mon to Thu, Fri to Sat, Sun. */
+  function hoursGroups() {
+    var order = [1, 2, 3, 4, 5, 6, 0], out = [];
+    order.forEach(function (d) {
+      var h = HOURS[d], text = h ? spanText({ start: h[0] * 60, end: h[1] * 60 }) : 'Closed', last = out[out.length - 1];
+      if (last && last.text === text) { last.to = d; }
+      else out.push({ from: d, to: d, text: text });
+    });
+    return out.map(function (g) {
+      return { days: DAY_SHORT[g.from] + (g.to !== g.from ? ' to ' + DAY_SHORT[g.to] : ''), text: g.text };
+    });
+  }
+  var minuteFns = [];
+  function onShopMinute(fn) { minuteFns.push(fn); fn(shopState()); }
+  (function minuteTick() {
+    var st = shopState();
+    minuteFns.forEach(function (fn) { fn(st); });
+    setTimeout(minuteTick, 60000 - (Date.now() % 60000) + 40);   /* re-check at the top of every minute */
+  })();
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) { var st = shopState(); minuteFns.forEach(function (fn) { fn(st); }); }
+  });
+
+  /* The nav's small print. */
+  var navHours = document.querySelector('.nav__hours');
+  if (navHours) onShopMinute(function (st) {
+    navHours.textContent = st.open ? 'Open until ' + st.closeText : 'Closed · opens ' + (st.openText || '');
+  });
+
   /* ------------------------------------------------------- departures
      The menu as a departures board, built from /menu-board.json so the
      menu can be edited without touching code. Each row is an accordion
-     (one open at a time) under its own h3. The status tiles are split-flaps:
-     when the board first scrolls into view they flip and settle row by
-     row, top to bottom, in about 1.2s; after that single rows keep
-     refreshing (see ambient below). None of it under reduced motion. The tiles are aria-hidden; screen
-     readers get the status as text. */
+     (one open at a time) under its own h3.
+
+     The status tiles are split-flaps, and they tell the truth: what they
+     say comes from config/departures.js and the shop clock above.
+       OPEN          every row cycles its own sayings.
+       CLOSING SOON  row 1 locks to FINAL CALL; the rest keep cycling.
+       CLOSED        row 1 shows the real next opening (OPENS 9AM); the
+                     rest cycle the closed sayings. Nothing says NOW
+                     BOARDING while the shop is closed.
+     When the board first scrolls into view the rows settle top to bottom;
+     after that each row flips every CYCLE_MS, staggered by STAGGER_MS, and
+     only while the board is on screen and the tab is visible. Under
+     reduced motion nothing flips: each row shows its first saying. The
+     tiles are aria-hidden; each row carries its status as plain text
+     ("Open now", "Closed, opens 9 AM"), which changes only with the state. */
   var board = document.getElementById('board');
   var boardRows = document.getElementById('boardRows');
   if (board && boardRows) {
-    var CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    var WIDTH = 12;       /* tiles per status, the length of NOW BOARDING */
-    var STEP = 55;        /* ms per flap in a riffle */
-    var STATUS = {
-      'on-time': 'ON TIME', 'now-boarding': 'NOW BOARDING',
-      'seasonal': 'SEASONAL', 'sold-out': 'SOLD OUT'
-    };
-    var SPOKEN = { 'on-time': 'On time', 'now-boarding': 'Now boarding', 'seasonal': 'Seasonal', 'sold-out': 'Sold out' };
+    var DEP = window.DD_DEPARTURES || {};
+    var CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-&./';
+    var STEP = 55;                                /* ms per flap in a riffle */
+    var CYCLE = DEP.CYCLE_MS || 4500, STAGGER = DEP.STAGGER_MS || 600;
+    var MAXW = 14;
+    var WIDTH = 12;                               /* tiles per row: set in build() */
+
+    function clean(p) { return String(p || '').toUpperCase().replace(/[^A-Z0-9 :\-&.\/]/g, '').replace(/\s+/g, ' ').replace(/^ | $/g, '').slice(0, MAXW); }
+    var OPEN_SETS = {};
+    (function () { var o = DEP.OPEN || {}; for (var k in o) if (o.hasOwnProperty(k)) OPEN_SETS[k] = o[k].map(clean).filter(Boolean); })();
+    if (!OPEN_SETS.GENERAL || !OPEN_SETS.GENERAL.length) OPEN_SETS.GENERAL = ['ON TIME'];
+    var CLOSED_SET = (DEP.CLOSED || ['GATE CLOSED']).map(clean).filter(Boolean);
+    var FINAL = clean(DEP.FINAL_CALL || 'FINAL CALL'), OPENS = clean(DEP.OPENS || 'OPENS');
+    var SOLD = clean(DEP.SOLD_OUT || 'SOLD OUT'), SEASON = clean(DEP.SEASONAL || 'SEASONAL');
+    var HIGHLIGHT = (DEP.HIGHLIGHT || ['NOW BOARDING', 'FINAL CALL']).map(clean);
+    function opensWord(st) { return clean(OPENS + ' ' + (st.openText || '').replace(/ (AM|PM)$/, '$1')); }
 
     var jobs = [], flapRaf = 0, audio = null, soundOn = false;
 
@@ -324,6 +455,8 @@
       } catch (e) { soundOn = false; }
     }
 
+    /* One flap: the old letter's top half folds down over the new one.
+       Transform only, so it stays on the compositor. */
     function paint(cell, ch, last) {
       var face = cell.firstElementChild, leaf = cell.lastElementChild;
       leaf.firstElementChild.textContent = face.textContent;
@@ -334,9 +467,11 @@
       }
       if (last) tick();
     }
-    function runJobs(now) {
+    /* One clock for scheduling and running, so a browser whose rAF
+       timestamp trails performance.now() cannot stall a riffle. */
+    function runJobs() {
       flapRaf = 0;
-      var alive = false;
+      var now = performance.now(), alive = false;
       for (var i = 0; i < jobs.length; i++) {
         var j = jobs[i];
         if (j.done) continue;
@@ -354,28 +489,35 @@
     function sequence(to, steps) {
       var b = CHARS.indexOf(to), out = [];
       if (b < 0) b = 0;
-      for (var k = steps; k > 0; k--) out.push(CHARS[(b - k + CHARS.length * 2) % CHARS.length]);
+      for (var k = steps; k > 0; k--) out.push(CHARS.charAt((b - k + CHARS.length * 2) % CHARS.length));
       out.push(to);
       return out;
     }
-    function pad(text) { text = String(text).toUpperCase().slice(0, WIDTH); return text + Array(WIDTH - text.length + 1).join(' '); }
+    /* Centred in the row's tiles, blanks either side. */
+    function pad(text) {
+      text = clean(text);
+      var left = Math.floor((WIDTH - text.length) / 2);
+      return (Array(left + 1).join(' ') + text + Array(WIDTH + 1).join(' ')).slice(0, WIDTH);
+    }
 
-    /* Set a row's tiles: at once, or as a riffle starting after `delay`. */
+    /* Set a row's tiles: at once (delay < 0), or as a riffle starting after
+       `delay`, riffling only the tiles whose letter changes. */
     function flapTo(el, text, delay) {
-      var cells = el.children, want = pad(text), now = performance.now();
+      var cells = el.children, want = pad(text), now = performance.now(), phoneNow = phone.matches;
       for (var i = 0; i < cells.length; i++) {
-        var ch = want.charAt(i);
+        var ch = want.charAt(i), face = cells[i].firstElementChild;
         if (delay < 0) {
           /* set without a riffle: both halves of the tile carry the letter,
              and the top leaf is squared away so nothing hides it */
-          cells[i].firstElementChild.textContent = ch;
+          face.textContent = ch;
           var lf = cells[i].lastElementChild;
           lf.firstElementChild.textContent = ch;
           if (lf.getAnimations) lf.getAnimations().forEach(function (an) { an.cancel(); });
           continue;
         }
-        if (ch === ' ' && cells[i].firstElementChild.textContent === ' ') continue;
-        jobs.push({ cell: cells[i], seq: sequence(ch, phone.matches ? 4 : 6), start: now + delay + i * (phone.matches ? 14 : 18), at: -1, done: false });
+        if (face.textContent === ch) continue;
+        for (var q = jobs.length - 1; q >= 0; q--) if (jobs[q].cell === cells[i]) jobs[q].done = true;
+        jobs.push({ cell: cells[i], seq: sequence(ch, phoneNow ? 4 : 6), start: now + delay + i * (phoneNow ? 14 : 18), at: -1, done: false });
       }
       if (delay >= 0 && !flapRaf && jobs.length) flapRaf = requestAnimationFrame(runJobs);
     }
@@ -384,17 +526,16 @@
       return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
     function price(p) { return typeof p === 'number' && p > 0 ? money(p) : ''; }
-    function tiles(status) {
-      var word = STATUS[status] || STATUS['on-time'], html = '';
-      for (var i = 0; i < WIDTH; i++) {
-        html += '<span class="flap' + (i >= word.length ? ' flap--pad' : '') + '"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span>';
-      }
+    function tiles() {
+      var html = '';
+      for (var i = 0; i < WIDTH; i++) html += '<span class="flap"><span class="flap__ch"> </span><span class="flap__leaf"><span> </span></span></span>';
       return html;
     }
     var TBD = { code: 'HOU', destination: 'Houston' };
+    var STATUSES = { 'on-time': 1, 'now-boarding': 1, 'seasonal': 1, 'sold-out': 1 };
     function rowHtml(r) {
       if (r.code === 'TBD') { var c = {}; for (var k in r) c[k] = r[k]; c.code = TBD.code; c.destination = TBD.destination; r = c; }
-      var slug = esc(r.slug), status = STATUS[r.status] ? r.status : 'on-time';
+      var slug = esc(r.slug), status = STATUSES[r.status] ? r.status : 'on-time';
       var items = r.items || [];
       var names = items.slice(0, 3).map(function (it) { return esc(it.name); }).join(' &middot; ');
       var sub = names || esc(r.description) || 'Full list in the shop';
@@ -407,34 +548,109 @@
       var order = status === 'sold-out'
         ? '<p class="bpanel__soon">Sold out for today.</p>'
         : '<p class="bpanel__order"><a class="btn btn--primary btn--sm" href="#order" data-order="pickup" data-place="category" data-category="' + esc(r.category) + '" aria-label="Order for pickup: ' + esc(r.category) + '">Order</a></p>';
-      return '<li class="brow" data-slug="' + slug + '" data-status="' + status + '">' +
+      return '<li class="brow" data-slug="' + slug + '" data-status="' + status + '" data-code="' + esc(r.code) + '">' +
         '<h3 class="brow__h"><button class="brow__btn" type="button" id="brow-' + slug + '" aria-expanded="false" aria-controls="bpanel-' + slug + '">' +
           '<span class="brow__cell brow__flight">' + esc(r.flight) + '</span>' +
           '<span class="brow__cell brow__dest"><span class="brow__code">' + esc(r.code) + '</span>' + esc(r.destination) + '</span>' +
-          '<span class="brow__cell brow__on"><span class="brow__cat">' + esc(r.category) + '</span><span class="brow__items">' + sub + '</span>' +
-            '<span class="brow__fold" aria-hidden="true"><span><b>' + esc(r.code) + '</b>' + esc(r.destination) + '</span><span><i>Gate</i><b>' + esc(r.gate) + '</b></span></span></span>' +
-          '<span class="brow__cell brow__gate"><span class="vh">Gate </span>' + esc(r.gate) + '</span>' +
-          '<span class="brow__cell brow__status"><span class="flaps" aria-hidden="true">' + tiles(status) + '</span><span class="vh">, ' + SPOKEN[status] + '</span></span>' +
+          '<span class="brow__cell brow__on"><span class="brow__cat">' + esc(r.category) + '</span><span class="brow__items">' + sub + '</span></span>' +
+          '<span class="brow__cell brow__gate"><span class="brow__gatel" aria-hidden="true">Gate </span><span class="vh">Gate </span>' + esc(r.gate) + '</span>' +
+          '<span class="brow__cell brow__status"><span class="flaps" aria-hidden="true" aria-live="off" style="--n:' + WIDTH + '">' + tiles() + '</span><span class="vh brow__sr"></span></span>' +
         '</button></h3>' +
         '<div class="bpanel" id="bpanel-' + slug + '" role="region" aria-labelledby="brow-' + slug + '" hidden><div class="bpanel__in">' +
           (r.description ? '<p class="bpanel__desc">' + esc(r.description) + '</p>' : '') + list + order +
         '</div></div></li>';
     }
 
-    var rows = [], btns = [], openRow = null;
+    var rows = [], btns = [], openRow = null, R = [];
+    var state = shopState(), stateKey = '';
 
-    /* Opening a row calls its flight: the tiles riffle to NOW BOARDING (a
-       sold-out row riffles and lands on SOLD OUT again), and closing it
-       riffles them back to the row's own status. */
-    function callRow(row, on) {
-      var st = row.getAttribute('data-status');
-      var word = on && st !== 'sold-out' ? STATUS['now-boarding'] : STATUS[st];
-      flapTo(row.querySelector('.flaps'), word, reduce ? -1 : 0);
+    /* What a row says right now: a locked word, or its set to cycle. */
+    function plan(r, i) {
+      if (state.open) {
+        if (i === 0 && state.soon) return { lock: FINAL };
+        if (r.status === 'sold-out') return { lock: SOLD };
+        return { set: r.openSet };
+      }
+      if (i === 0) return { lock: opensWord(state) };
+      return { set: CLOSED_SET };
     }
+    function spoken(r, i) {
+      if (!state.open) return 'Closed, opens ' + (state.openSpoken || 'soon');
+      if (r.status === 'sold-out') return 'Open now, sold out today';
+      if (state.soon) return 'Open now, closing at ' + state.closeText;
+      return 'Open now';
+    }
+    function show(r, word, delay) {
+      r.word = word;
+      r.el.classList.toggle('is-hl', HIGHLIGHT.indexOf(word) > -1);
+      r.el.classList.toggle('is-sold', word === SOLD);
+      flapTo(r.flaps, word, delay);
+    }
+    /* Every row back to the first thing it should say in this state. Rows
+       that share a set start at different places in it, so a board full of
+       GENERAL rows does not all say the same thing at once. */
+    function applyState(delayFor) {
+      var used = {};
+      R.forEach(function (r, i) {
+        var p = plan(r, i);
+        r.lock = p.lock || null; r.set = p.set || null;
+        if (r.set) {
+          var key = r.set === CLOSED_SET ? 'closed' : r.setKey;
+          used[key] = used[key] || 0;
+          r.idx = used[key]++ % r.set.length;
+          /* row 1 is the one that starts on NOW BOARDING */
+          if (i > 0 && HIGHLIGHT.indexOf(r.set[r.idx]) > -1) r.idx = (r.idx + 1) % r.set.length;
+        }
+        r.sr.textContent = ', ' + spoken(r, i);
+        show(r, r.lock || r.set[r.idx], delayFor(i));
+      });
+    }
+    function advance(r) {
+      if (r.lock) { if (r.word !== r.lock) show(r, r.lock, 0); return; }
+      r.idx = (r.idx + 1) % r.set.length;
+      show(r, r.set[r.idx], 0);
+    }
+
+    /* The cycle: row i first flips at 1.2s + i * STAGGER, then every CYCLE.
+       Runs only while the board is on screen and the tab is showing. */
+    var seen = false, cycling = false, settled = false;
+    function stopCycle() { cycling = false; R.forEach(function (r) { clearTimeout(r.timer); }); }
+    function startCycle() {
+      if (reduce || cycling || !settled || !seen || document.hidden) return;
+      cycling = true;
+      R.forEach(function (r, i) {
+        (function step(wait) {
+          r.timer = setTimeout(function () { if (!cycling) return; advance(r); step(CYCLE); }, wait);
+        })(1200 + i * STAGGER);
+      });
+    }
+    document.addEventListener('visibilitychange', function () { if (document.hidden) stopCycle(); else startCycle(); });
+
+    /* The settle: every row riffles in, one row after the next. */
+    function settle(animate) {
+      if (settled) return;
+      settled = true;
+      var stagger = phone.matches ? 50 : 60;
+      applyState(function (i) { return animate && !reduce ? i * stagger : -1; });
+      startCycle();
+    }
+
+    /* The shop clock ticks every minute; the board only moves when the
+       state (or row 1's opening time) actually changes. */
+    function onMinute(st) {
+      state = st;
+      var key = st.mode + '|' + (st.open ? '' : opensWord(st));
+      if (key === stateKey) return;
+      stateKey = key;
+      if (!settled) { R.forEach(function (r, i) { r.sr.textContent = ', ' + spoken(r, i); }); return; }
+      stopCycle();
+      applyState(function () { return reduce ? -1 : 0; });
+      startCycle();
+    }
+
     function setRow(row, on) {
       var btn = row.querySelector('.brow__btn'), panel = row.querySelector('.bpanel');
       settle(false);
-      callRow(row, on);
       row.classList.toggle('is-open', on);
       btn.setAttribute('aria-expanded', on ? 'true' : 'false');
       panel.hidden = !on;
@@ -455,55 +671,42 @@
       return null;
     }
 
-    /* The settle: every row's status riffles in, one row after the next. */
-    var settled = false;
-    function settle(animate) {
-      if (settled) return;
-      settled = true;
-      var stagger = phone.matches ? 50 : 60;
-      rows.forEach(function (row, i) {
-        flapTo(row.querySelector('.flaps'), STATUS[row.getAttribute('data-status')], animate ? i * stagger : -1);
-      });
-    }
-
-    /* The live board: while it is on screen, one row at a time re-riffles
-       and lands back on its own status, every few seconds, like a real
-       departures board refreshing. Never under reduced motion, never while
-       the tab or the board is out of view, and never on the open row. */
-    var boardSeen = false, ambientT = 0, lastLive = -1;
-    function ambient() {
-      if (ambientT || reduce) return;
-      ambientT = setTimeout(function () {
-        ambientT = 0;
-        if (!boardSeen) return;
-        if (!document.hidden && settled && rows.length > 2) {
-          var i;
-          do { i = Math.floor(Math.random() * rows.length); } while (i === lastLive || rows[i] === openRow);
-          lastLive = i;
-          flapTo(rows[i].querySelector('.flaps'), STATUS[rows[i].getAttribute('data-status')], 0);
-        }
-        ambient();
-      }, 2200 + Math.random() * 1600);
-    }
-
     function build(data) {
       if (data.tbdShowsAs) TBD = data.tbdShowsAs;
-      boardRows.innerHTML = (data.rows || []).map(rowHtml).join('');
+      var list = data.rows || [];
+      /* The tiles fit the longest thing the board can say: every set in
+         use, the closed set, and the words row 1 locks to. */
+      var words = CLOSED_SET.concat([FINAL, SOLD, SEASON]);
+      list.forEach(function (r) { var code = r.code === 'TBD' ? TBD.code : r.code; words = words.concat(OPEN_SETS[code] || OPEN_SETS.GENERAL); });
+      spans.forEach(function (s) {
+        var wd = Math.floor(s.start / DAY) % 7;
+        words.push(opensWord({ openText: clockText(s.start) }), opensWord({ openText: DAY_SHORT[wd] + ' ' + clockText(s.start) }));
+      });
+      WIDTH = Math.min(MAXW, Math.max.apply(null, words.map(function (w) { return w.length; })));
+
+      boardRows.innerHTML = list.map(rowHtml).join('');
       rows = [].slice.call(boardRows.querySelectorAll('.brow'));
       btns = rows.map(function (r) { return r.querySelector('.brow__btn'); });
+      R = rows.map(function (el) {
+        var code = el.getAttribute('data-code'), status = el.getAttribute('data-status');
+        var key = OPEN_SETS[code] ? code : 'GENERAL', set = OPEN_SETS[key];
+        if (status === 'seasonal') { set = [SEASON].concat(set); key += '+S'; }
+        return { el: el, flaps: el.querySelector('.flaps'), sr: el.querySelector('.brow__sr'), status: status, openSet: set, setKey: key, idx: 0, word: '', timer: 0 };
+      });
       btns.forEach(function (b, i) { b.addEventListener('click', function () { openBoardRow(rows[i], false); }); });
       if (window.DD && window.DD.wireOrder) window.DD.wireOrder(boardRows);
 
-      if (reduce || !('IntersectionObserver' in window)) settle(false);
+      onShopMinute(onMinute);
+      if (reduce || !('IntersectionObserver' in window)) { seen = true; settle(false); }
       else {
         var sio = new IntersectionObserver(function (es) {
           if (es.some(function (e) { return e.isIntersecting; })) { settle(true); sio.disconnect(); }
         }, { threshold: .2 });
         sio.observe(boardRows);
-        /* keep the board live while it is on screen */
+        /* flip only while the board is on screen */
         new IntersectionObserver(function (es) {
-          boardSeen = es[es.length - 1].isIntersecting;
-          if (boardSeen) ambient();
+          seen = es[es.length - 1].isIntersecting;
+          if (seen) startCycle(); else stopCycle();
         }).observe(board);
       }
 
@@ -558,54 +761,6 @@
       });
   }
 
-  /* ---------------------------------------------------------- hours
-     One source for the open/closed state, read in the shop's own
-     timezone rather than the visitor's. These are still the placeholder
-     hours from the markup; change them here and the nav and the footer
-     both follow. Index is day of week, 0 = Sunday, [open, close] in
-     24-hour local time. */
-  var HOURS = CFG.HOURS || [[10, 22], [9, 22], [9, 22], [9, 22], [9, 22], [9, 24], [9, 24]];
-  function shopClock() {
-    try {
-      var parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: (CFG.SHOP && CFG.SHOP.timezone) || 'America/Chicago', hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit'
-      }).formatToParts(new Date());
-      var o = {};
-      parts.forEach(function (x) { o[x.type] = x.value; });
-      var days = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-      var h = parseInt(o.hour, 10) % 24;
-      return { d: days[o.weekday], m: h * 60 + parseInt(o.minute, 10) };
-    } catch (e) {
-      var n = new Date();
-      return { d: n.getDay(), m: n.getHours() * 60 + n.getMinutes() };
-    }
-  }
-  function clockLabel(h) {
-    var ap = (h % 24) >= 12 ? 'pm' : 'am', hh = h % 12;   /* 24 is midnight: 12 am */
-    return (hh || 12) + ' ' + ap;
-  }
-  function hoursState() {
-    var t = shopClock(), today = HOURS[t.d];
-    if (today && t.m >= today[0] * 60 && t.m < today[1] * 60) {
-      return { open: true, text: 'Open until ' + clockLabel(today[1]) };
-    }
-    if (today && t.m < today[0] * 60) {
-      return { open: false, text: 'Closed · opens ' + clockLabel(today[0]) };
-    }
-    for (var i = 1; i <= 7; i++) {
-      var next = HOURS[(t.d + i) % 7];
-      if (next) return { open: false, text: 'Closed · opens ' + (i === 1 ? 'tomorrow ' : '') + clockLabel(next[0]) };
-    }
-    return { open: false, text: 'Closed' };
-  }
-  (function () {
-    var st = hoursState();
-    var navHours = document.querySelector('.nav__hours');
-    if (navHours) navHours.textContent = st.text;
-    var footState = document.getElementById('footState');
-    if (footState) { footState.textContent = st.text; footState.setAttribute('data-open', st.open ? 'yes' : 'no'); }
-  })();
-
   /* ---------------------------------------------------------- ordering
      Toast is the ordering engine. Every element with data-order reads its
      destination from config: pickup, delivery and group each fall back to
@@ -626,9 +781,7 @@
     return url + (url.indexOf('?') > -1 ? '&' : '?') + 'mode=' + mode;
   }
   function hoursRows() {
-    return (CFG.HOURS_LABELS || []).map(function (h) {
-      return '<tr><th>' + h.days + '</th><td>' + clockLabel(h.open).replace(' ', '') + ' to ' + clockLabel(h.close).replace(' ', '') + '</td></tr>';
-    }).join('');
+    return hoursGroups().map(function (g) { return '<tr><th>' + g.days + '</th><td>' + g.text + '</td></tr>'; }).join('');
   }
   (function ordering() {
     var phoneCfg = CFG.PHONE || {};
@@ -644,11 +797,7 @@
       if (tels[t].hasAttribute('data-tel-label') && phoneCfg.display) tels[t].textContent = (COPY.callCta || 'Call') + ' ' + phoneCfg.display;
     }
     var tables = document.querySelectorAll('[data-hours] tbody');
-    for (var h = 0; h < tables.length; h++) if (CFG.HOURS_LABELS) tables[h].innerHTML = hoursRows();
-    var list = document.querySelector('[data-hours-list]');
-    if (list && CFG.HOURS_LABELS) list.innerHTML = CFG.HOURS_LABELS.map(function (x) {
-      return '<li><span>' + x.days + '</span><span>' + clockLabel(x.open).replace(' ', '') + ' to ' + clockLabel(x.close).replace(' ', '') + '</span></li>';
-    }).join('');
+    for (var h = 0; h < tables.length; h++) tables[h].innerHTML = hoursRows();
 
     /* the sheet */
     var sheet = document.getElementById('orderSheet');
@@ -718,6 +867,61 @@
     window.addEventListener('load', function () {
       if (navigator.serviceWorker) navigator.serviceWorker.register('/sw.js').catch(function () {});
     });
+  }
+
+  /* ------------------------------------------------------------ links
+     Every link marked data-link takes its URL from LINKS in
+     config/ordering.js. An empty value hides the link (and its list item)
+     rather than leaving a dead one; the markup's own href is only the
+     no-JavaScript fallback. */
+  var LINKS = CFG.LINKS || {};
+  [].forEach.call(document.querySelectorAll('[data-link]'), function (a) {
+    var key = a.getAttribute('data-link');
+    if (!(key in LINKS)) return;
+    var url = String(LINKS[key] || '').replace(/^\s+|\s+$/g, '');
+    var holder = a.parentNode.tagName === 'LI' ? a.parentNode : a;
+    if (!url) { holder.hidden = true; return; }
+    a.setAttribute('href', url);
+    holder.hidden = false; a.hidden = false;
+    if (/^https?:/i.test(url)) { a.target = '_blank'; a.rel = 'noopener'; }
+  });
+
+  /* ------------------------------------------------------------- gate
+     The footer's live hours, from the shop clock: the state in words with
+     a pulsing dot while open, a countdown, a bar of today's open hours
+     filling in real time, and the week with today marked. The rows fade
+     up one after another when the footer comes into view. */
+  var gate = document.getElementById('gate');
+  if (gate) {
+    var gState = document.getElementById('gateState'), gCount = document.getElementById('gateCount');
+    var gFill = document.getElementById('gateFill'), gWeek = document.getElementById('gateWeek');
+    gWeek.innerHTML = [1, 2, 3, 4, 5, 6, 0].map(function (d, i) {
+      var h = HOURS[d];
+      return '<li style="--i:' + i + '" data-day="' + d + '"><span>' + DAY_LONG[d].slice(0, 3) + '</span><span>' +
+        (h ? clockText(h[0] * 60) + ' \u2013 ' + clockText(h[1] * 60) : 'Closed') + '</span></li>';
+    }).join('');
+    var weekRows = [].slice.call(gWeek.children);
+    onShopMinute(function (st) {
+      gState.setAttribute('data-state', st.mode);
+      gState.lastChild.textContent = st.open
+        ? (st.soon ? 'Final call' : 'Open now') + ' \u00b7 closes ' + st.closeText
+        : 'Closed \u00b7 opens ' + (st.openText || 'soon');
+      gCount.textContent = st.open ? 'Closes in ' + durText(st.closesIn) : st.opensIn != null ? 'Opens in ' + durText(st.opensIn) : '';
+      gFill.style.transform = 'scaleX(' + clamp(st.progress, 0, 1).toFixed(4) + ')';
+      var today = Math.floor(st.t / DAY) % 7;
+      weekRows.forEach(function (li) {
+        var on = +li.getAttribute('data-day') === today;
+        li.classList.toggle('is-today', on);
+        if (on) li.setAttribute('aria-current', 'date'); else li.removeAttribute('aria-current');
+      });
+    });
+    if (reduce || !('IntersectionObserver' in window)) gate.classList.add('is-in');
+    else {
+      var gio = new IntersectionObserver(function (es) {
+        if (es.some(function (e) { return e.isIntersecting; })) { gate.classList.add('is-in'); gio.disconnect(); }
+      }, { threshold: .35 });
+      gio.observe(gate);
+    }
   }
 
   /* ----------------------------------------------------------- footer
@@ -1049,7 +1253,7 @@
   var wall = document.getElementById('socialWall');
   var social = document.getElementById('social');
   if (wall && social) (function () {
-    var PROFILE = { tiktok: 'https://www.tiktok.com/@dubai.dips', instagram: 'https://www.instagram.com/dubaianddips/' };
+    var PROFILE = { tiktok: LINKS.tiktok, instagram: LINKS.instagram };    /* from LINKS in config/ordering.js */
     var NAME = { tiktok: 'TikTok', instagram: 'Instagram' };
     var HANDLE = { tiktok: '@dubai.dips', instagram: '@dubaianddips' };
     var ROUTES = ['DXB', 'FCO', 'NRT', 'CAI'];

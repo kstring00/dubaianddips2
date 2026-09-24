@@ -513,7 +513,6 @@ body.sheet-open{overflow:hidden}
 .boxfoot__stage{position:relative;perspective:1200px;perspective-origin:50% 0}
 /* the interior: a little darker than the lid, lit from the opening */
 .boxfoot__inner{position:relative;z-index:1;background:linear-gradient(180deg,var(--courtyard-deep) 0%,var(--courtyard) 42%);padding:clamp(2.6rem,5vw,4rem) 0 1.9rem;box-shadow:inset 0 14px 28px rgb(var(--black-rgb)/.3)}
-.boxfoot__grid{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:clamp(1.8rem,4vw,3rem)}
 .boxfoot__col{display:flex;flex-direction:column;align-items:flex-start;gap:.55rem}
 /* The stacked logo: the footer column is a vertical space. Its padding is
    the protection area; the negative margin lines the ink up with the text. */
@@ -526,16 +525,68 @@ body.sheet-open{overflow:hidden}
 .boxfoot a:hover{color:var(--mint)}
 .boxfoot a.btn:hover{color:var(--off-white)}
 .boxfoot__tel{display:inline-flex;align-items:center;min-height:44px;font-weight:600;border-bottom:1px solid rgb(var(--mint-rgb)/.6)}
-.boxfoot__dir,.boxfoot__cater{display:inline-flex;align-items:center;min-height:44px;font-size:.94rem;border-bottom:1px solid rgb(var(--mint-rgb)/.6)}
-.boxfoot__state{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-weight:600;font-size:.82rem;color:var(--mint)!important;letter-spacing:.1em;text-transform:uppercase}
-.boxfoot__state::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mint);flex:0 0 auto}
-.boxfoot__state[data-open="no"]{color:rgb(var(--surface-rgb)/.72)}
-.boxfoot__state[data-open="no"]::before{background:rgb(var(--surface-rgb)/.5)}
-.boxfoot__hours{font-family:var(--body);font-weight:400;font-variant-numeric:tabular-nums;font-size:.84rem;color:rgb(var(--surface-rgb)/.82)}
-.boxfoot__hours li{font-size:.84rem;color:inherit;display:flex;justify-content:space-between;gap:1.2rem;padding:.12rem 0}
+.boxfoot__dir{display:inline-flex;align-items:center;min-height:44px;font-size:.94rem;border-bottom:1px solid rgb(var(--mint-rgb)/.6)}
 .boxfoot .btn{margin-top:.5rem}
 .boxfoot__base{display:flex;flex-wrap:wrap;gap:.8rem 1.6rem;justify-content:space-between;align-items:center;margin-top:clamp(2rem,4vw,3rem);padding-top:1.5rem;border-top:1px solid rgb(var(--surface-rgb)/.22);font-family:var(--mono);font-weight:500;font-size:.8rem;letter-spacing:.1em;color:rgb(var(--surface-rgb)/.85)}
 .boxfoot__tm{flex-basis:100%;font-family:var(--body);font-weight:300;font-size:.82rem;letter-spacing:0;color:rgb(var(--surface-rgb)/.85)!important}
+.boxfoot [hidden]{display:none!important}
+.boxfoot__legal{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.4rem 1.4rem}
+.boxfoot__legal a{display:inline-flex;align-items:center;min-height:44px;border-bottom:1px solid rgb(var(--mint-rgb)/.6)}
+
+/* ---- the layout: where | gate | links | the pass. The splash sits under
+   all of it; the content is lifted above it. ---- */
+.boxfoot__grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,.8fr) auto;gap:clamp(1.8rem,3.4vw,3rem);align-items:start}
+.boxfoot__base{position:relative;z-index:1}
+.boxfoot__links h3+ul{margin-bottom:1.1rem}
+
+/* ---- the splash: a soft Mint and Browned Sugar glow drifting over the
+   Courtyard (one 20s loop, transform only), under the brand star pattern
+   at the guide's subtle tone, a shade lighter than the ground. Kept low
+   enough that every line of text stays above 4.5:1. ---- */
+.boxfoot__splash{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.boxfoot__glow{position:absolute;inset:-18% -12%;background:radial-gradient(34% 42% at 46% 44%,rgb(var(--mint-rgb)/.04),transparent 72%),radial-gradient(32% 46% at 84% 60%,rgb(var(--browned-sugar-rgb)/.16),transparent 72%);animation:ddDrift 20s ease-in-out infinite;will-change:transform}
+@keyframes ddDrift{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-5%,4%,0) scale(1.06)}}
+.boxfoot__splash::after{content:"";position:absolute;inset:0;background:url("/public/brand/pattern/pattern-light.svg") 0 0/62.8px 64.61px;opacity:.4}
+
+/* ---- the gate: live hours, one type scale ---- */
+.gate{width:100%;max-width:21rem}
+.gate h3{margin-bottom:.35rem}
+.gate__state{display:flex;align-items:center;gap:.6rem;font-size:1rem!important;font-weight:500;line-height:1.4!important;color:var(--off-white)}
+.gate__dot{position:relative;flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:var(--mint)}
+.gate__dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--mint);opacity:0}
+.gate__state[data-state="open"] .gate__dot::after,.gate__state[data-state="soon"] .gate__dot::after{animation:gatePulse 2.2s cubic-bezier(.2,.6,.3,1) infinite}
+.gate__state[data-state="closed"] .gate__dot{background:var(--bark);box-shadow:0 0 0 1.5px var(--natural)}
+@keyframes gatePulse{0%{transform:scale(1);opacity:.65}100%{transform:scale(2.9);opacity:0}}
+.gate__count{font-size:.9rem!important;line-height:1.5!important;color:var(--natural)!important;font-variant-numeric:tabular-nums}
+.gate__bar{position:relative;width:100%;height:3px;margin:.55rem 0 .7rem;border-radius:3px;background:rgb(var(--mint-rgb)/.2);overflow:hidden}
+.gate__fill{position:absolute;inset:0;border-radius:inherit;background:var(--browned-sugar);transform-origin:0 50%;transform:scaleX(0);transition:transform 1.2s var(--ease-out)}
+.gate__week{width:100%;font-variant-numeric:tabular-nums}
+.gate__week li{position:relative;display:flex;justify-content:space-between;gap:1rem;padding:.28rem 0;font-size:.9rem;line-height:1.5;color:var(--natural)}
+.gate__week li>span:last-child{text-align:right;white-space:nowrap}
+.gate__week li.is-today{color:var(--off-white);font-weight:500}
+.gate__week li.is-today::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;background:var(--browned-sugar);transform-origin:0 50%;transform:scaleX(0);transition:transform .7s var(--ease-out) .7s}
+.gate.is-in .gate__week li.is-today::after{transform:none}
+.js .gate__week li{opacity:0;transform:translate3d(0,10px,0);transition:opacity .5s var(--ease-out),transform .5s var(--ease-out);transition-delay:calc(var(--i,0) * 70ms)}
+.js .gate.is-in .gate__week li{opacity:1;transform:none}
+
+/* ---- Order ahead: the DXB boarding pass is the button ---- */
+.boxfoot__fly{align-items:center;padding-top:.4rem}
+/* the link itself never moves (a moving hit area jitters under the pointer); the card inside it tilts and lifts */
+.flycard{position:relative;display:block;width:clamp(188px,15vw,208px);color:var(--bark);text-decoration:none;-webkit-tap-highlight-color:transparent}
+.flycard__card{display:flex;flex-direction:column;transform:rotate(-6deg);transition:transform .5s var(--ease-out);filter:drop-shadow(0 16px 24px rgb(var(--black-rgb)/.32))}
+.boxfoot a.flycard,.boxfoot a.flycard:hover{color:var(--bark)}
+.flycard:hover .flycard__card,.flycard:focus-visible .flycard__card,.flycard:active .flycard__card{transform:translate3d(0,-8px,0) rotate(-2deg)}
+.flycard:focus-visible{outline:2px solid var(--mint);outline-offset:6px;border-radius:10px}
+.flycard__pass{position:relative;width:100%;height:auto}
+.flycard__cta{position:relative;display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:48px;margin-top:-7px;padding:.75rem .75rem;border-radius:0 0 8px 8px;border-top:1.5px dashed rgb(var(--bark-rgb)/.35);background:var(--off-white);font-family:var(--mono);font-weight:600;font-size:.64rem;line-height:1.3;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.flycard__cta i{flex:0 0 auto}
+.flycard__cta i{font-style:normal;font-size:1rem;letter-spacing:0;transition:transform .35s var(--ease-out)}
+.flycard:hover .flycard__cta i,.flycard:focus-visible .flycard__cta i{transform:translateX(4px)}
+
+@media(max-width:1099px){
+  .boxfoot__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .boxfoot__fly{align-items:flex-start;padding-left:1rem}
+}
 
 /* ---- the lid. Decoration only; it is not in the DOM until JS arms it. ---- */
 .boxfoot__lid{display:none;position:absolute;z-index:2;inset:0;transform-origin:50% 0;backface-visibility:hidden;will-change:transform;background:var(--courtyard);box-shadow:0 18px 40px rgb(var(--black-rgb)/.4)}
@@ -549,7 +600,18 @@ body.sheet-open{overflow:hidden}
 /* ---- the boarding pass on the lid, as it sits on the takeout box ---- */
 .pass{flex:0 0 auto;width:clamp(96px,11vw,132px);height:auto;transform:rotate(-7deg);filter:drop-shadow(0 6px 12px rgb(var(--black-rgb)/.3))}
 @media(max-width:899px){
-  .boxfoot__grid{grid-template-columns:1fr}
+  /* phone order: the pass (Order ahead), the gate, where to find us,
+     social, then the legal line */
+  .boxfoot__grid{display:flex;flex-direction:column;gap:2.6rem}
+  .boxfoot__fly{order:1;align-items:center;align-self:stretch;padding:.6rem 0 0}
+  .gate{order:2;max-width:none}
+  .boxfoot__where{order:3}
+  .boxfoot__links{order:4}
+  .flycard{width:min(64vw,236px)}
+  .flycard__cta{font-size:.74rem;min-height:52px}
+  .boxfoot__tel,.boxfoot__dir{justify-content:center;width:100%;max-width:24rem;min-height:52px;padding:0 1.2rem;border:1.5px solid rgb(var(--mint-rgb)/.6);border-radius:999px;font-size:1rem}
+  .boxfoot__where address{margin-bottom:.4rem}
+  .boxfoot__glow{inset:-10% -40%}
   .boxfoot__lidface{flex-direction:column;justify-content:center;gap:1.2rem;padding-block:1rem}
   .pass{width:96px}
   .boxfoot__wordmark{--logo-h:clamp(1.7rem,8vw,2.2rem)}
@@ -586,7 +648,7 @@ body.sheet-open{overflow:hidden}
 
 /* ---- the board: Courtyard panel, Off-White primary text, Mint secondary ---- */
 .board{background:var(--courtyard);border-radius:14px;overflow:hidden;box-shadow:var(--lift-2);color:var(--off-white)}
-.board__head,.brow__btn{display:grid;grid-template-columns:5.4rem minmax(8.5rem,11rem) minmax(0,1fr) 4.4rem 10.4rem;align-items:center;gap:clamp(.7rem,1.6vw,1.6rem);padding:.85rem clamp(1rem,2.2vw,1.8rem)}
+.board__head,.brow__btn{display:grid;grid-template-columns:5.4rem minmax(8.5rem,11rem) minmax(0,1fr) 4.4rem auto;align-items:center;gap:clamp(.7rem,1.6vw,1.6rem);padding:.85rem clamp(1rem,2.2vw,1.8rem)}
 .board__head{font-family:var(--mono);font-weight:600;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);border-bottom:1px solid rgb(var(--mint-rgb)/.22);padding-left:calc(clamp(1rem,2.2vw,1.8rem) + 3px)}
 .board__head>span:last-child{justify-self:end}
 .board__rows{list-style:none;margin:0;padding:0}
@@ -597,33 +659,31 @@ body.sheet-open{overflow:hidden}
 .brow__btn{width:100%;min-height:64px;text-align:left;background:transparent;border:0;border-left:3px solid transparent;cursor:pointer;color:inherit;font:inherit;padding-block:1rem;transition:background .3s var(--ease),border-color .3s var(--ease)}
 .brow__btn:hover{background:rgb(var(--off-white-rgb)/.06)}
 .brow__btn:focus-visible{outline:2px solid var(--mint);outline-offset:-4px;border-radius:6px}
-.brow[data-status="now-boarding"] .brow__btn{border-left-color:var(--browned-sugar)}
+.brow.is-hl .brow__btn{border-left-color:var(--browned-sugar)}
 .brow.is-open .brow__btn{background:var(--courtyard-deep);border-left-color:var(--mint)}
 .brow__cell{min-width:0}
 .brow__flight{font-family:var(--data);font-size:.88rem;letter-spacing:.04em;color:var(--mint);white-space:nowrap}
 .brow__dest{display:flex;align-items:baseline;gap:.6rem;font-size:1.02rem;font-weight:400;color:var(--off-white);white-space:nowrap}
-.brow__code,.brow__fold b{font-family:var(--data);font-weight:400;font-size:.84rem;letter-spacing:.06em;color:var(--mint)}
+.brow__code{font-family:var(--data);font-weight:400;font-size:.84rem;letter-spacing:.06em;color:var(--mint)}
 .brow__cat{display:block;font-family:var(--display);font-weight:500;font-size:clamp(1.05rem,1.4vw,1.22rem);line-height:1.2;color:var(--off-white)}
 .brow__items{display:block;margin-top:.3rem;font-family:var(--mono);font-weight:500;font-size:.74rem;line-height:1.5;letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
 .brow__gate{font-family:var(--data);font-size:.92rem;color:var(--off-white)}
-.brow__fold{display:none}
-.brow__fold i{font-style:normal;font-family:var(--mono);font-weight:500;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint)}
+.brow__gatel{display:none}
 .brow__status{justify-self:end}
 
 /* ---- split-flap tiles. ON TIME on Courtyard; NOW BOARDING in Browned
    Sugar (the step that carries Off-White letters at AA); SEASONAL in Mint;
    SOLD OUT on Bark. ---- */
 .flaps{display:inline-flex;gap:2px;perspective:340px}
-.flap{position:relative;width:.92em;height:1.72em;overflow:hidden;border-radius:2px;background:var(--courtyard-deep);box-shadow:inset 0 0 0 1px rgb(var(--black-rgb)/.18);font-family:var(--data);font-size:.8rem;font-weight:600;line-height:1.72em;text-align:center;color:var(--off-white)}
+.flap{position:relative;width:.92em;height:1.72em;overflow:hidden;border-radius:2px;background:var(--courtyard-deep);box-shadow:inset 0 0 0 1px rgb(var(--black-rgb)/.18);font-family:var(--data);font-size:.88rem;font-weight:600;line-height:1.72em;text-align:center;color:var(--off-white)}
 .flap::after{content:"";position:absolute;z-index:3;left:0;right:0;top:50%;height:1px;background:rgb(var(--black-rgb)/.35)}
 .flap__ch{position:absolute;inset:0}
 .flap__leaf{position:absolute;z-index:2;left:0;right:0;top:0;height:50%;overflow:hidden;transform-origin:50% 100%;backface-visibility:hidden;background:inherit;will-change:transform}
 .flap__leaf>span{position:absolute;left:0;right:0;top:0;height:200%}
-.brow[data-status="now-boarding"] .flap{background:var(--browned-sugar-deep)}
-/* an opened row is called: its tiles flip to NOW BOARDING in Browned Sugar */
-.brow.is-open:not([data-status="sold-out"]) .flap{background:var(--browned-sugar-deep);color:var(--off-white)}
-.brow[data-status="seasonal"] .flap{color:var(--mint)}
-.brow[data-status="sold-out"] .flap{background:var(--bark);color:var(--natural)}
+/* the word decides the colour: NOW BOARDING / FINAL CALL on Browned Sugar
+   (the deep shade, 4.7:1 with Off-White), SOLD OUT on Bark, the rest green */
+.brow.is-hl .flap{background:var(--browned-sugar-deep)}
+.brow.is-sold .flap{background:var(--bark);color:var(--natural)}
 
 /* ---- the row, opened in place ---- */
 .bpanel{background:var(--courtyard-deep)}
@@ -658,28 +718,33 @@ body.sheet-open{overflow:hidden}
 @media(max-width:880px){.feature{grid-template-columns:1fr}.feature__photo{min-height:0;aspect-ratio:16/10}}
 
 @media(max-width:899px){
-  /* Three columns on a phone: flight, category (with its origin and gate
-     folded under it), status. The status keeps only the tiles its word
-     needs, so the middle column keeps its width. */
-  .board{border-radius:12px}
+  /* On a phone every row is its own ticket: flight and origin on top, the
+     category large, what is on board under it, and the status tiles full
+     width across the bottom stub. The tiles share the stub's width equally
+     (--n of them) and size their letters from it, so a 14-tile word fits
+     a 320px screen with no sideways scroll. */
+  .board{background:transparent;box-shadow:none;border-radius:0;overflow:visible}
   .board__head{display:none}
-  .brow__btn{grid-template-columns:3.5rem minmax(0,1fr) auto;grid-template-areas:"flight cat status" "flight items items" "flight fold fold";gap:0 .7rem;min-height:56px;padding:.95rem .8rem .95rem .7rem}
-  /* the category sits beside the status; its items and the folded origin
-     and gate run full width under both, so nothing wraps into a sliver */
+  .board__rows{display:flex;flex-direction:column;gap:.85rem}
+  .brow,.brow:last-child{border:0;border-radius:14px;overflow:hidden;background:var(--courtyard);box-shadow:var(--lift-2)}
+  .brow__btn{position:relative;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"flight dest gate" "cat cat cat" "items items items" "status status status";gap:0 .75rem;min-height:56px;padding:1rem 1rem 0;border-left:0;border-top:3px solid transparent}
+  .brow.is-hl .brow__btn{border-top-color:var(--browned-sugar)}
+  .brow.is-open .brow__btn{border-top-color:var(--mint)}
   .brow__on{display:contents}
-  .brow__dest,.brow__gate{display:none}
-  .brow__flight{grid-area:flight;align-self:start;padding-top:.15rem;font-size:.8rem}
-  .brow__cat{grid-area:cat;align-self:center}
-  .brow__items{grid-area:items}
-  .brow__status{grid-area:status;align-self:center}
-  .brow__fold{grid-area:fold;display:flex;flex-wrap:wrap;gap:.25rem .9rem;margin-top:.45rem;font-size:.84rem;font-weight:400;color:var(--off-white)}
-  .brow__fold>span{display:inline-flex;align-items:baseline;gap:.35rem}
-  .flap{font-size:.72rem;width:.9em}
-  .flaps{gap:1px}
-  .flap--pad{display:none}
-  .brow.is-open:not([data-status="sold-out"]) .flap--pad{display:block}
-  .bpanel__in{grid-template-columns:1fr;padding:.2rem .8rem 1.3rem calc(.7rem + 3px)}
+  .brow__flight{grid-area:flight;font-size:.82rem}
+  .brow__dest{grid-area:dest;gap:.45rem;font-size:.9rem;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .brow__gate{grid-area:gate;justify-self:end;font-size:.82rem;color:var(--mint)}
+  .brow__gatel{display:inline;font-family:var(--mono);font-weight:500;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+  .brow__cat{grid-area:cat;margin-top:.7rem;font-size:clamp(1.35rem,5.6vw,1.6rem);line-height:1.15}
+  .brow__items{grid-area:items;margin-top:.35rem}
+  .brow__status{grid-area:status;justify-self:stretch;position:relative;margin:1rem -1rem 0;padding:.95rem 1rem 1.05rem;container-type:inline-size}
+  /* the tear line between the ticket and its stub */
+  .brow__status::before{content:"";position:absolute;left:1rem;right:1rem;top:0;height:2px;background:radial-gradient(circle,rgb(var(--mint-rgb)/.45) 1px,transparent 1.4px) 0 50%/8px 2px repeat-x}
+  .flaps{display:grid;grid-template-columns:repeat(var(--n,12),minmax(0,1fr));gap:2px;width:100%;max-width:calc(var(--n,12) * 2.3rem);margin-inline:auto}
+  .flap{width:auto;height:1.8em;line-height:1.8em;font-size:clamp(.7rem,calc((100cqi - (var(--n,12) - 1) * 2px) / var(--n,12) * .9),1.25rem)}
+  .bpanel__in{grid-template-columns:1fr;padding:1.1rem 1rem 1.3rem}
   .bitems{grid-template-columns:1fr}
+  .board__foot{margin-top:.85rem;border:0;border-radius:14px;background:var(--courtyard)}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -720,6 +785,10 @@ body.sheet-open{overflow:hidden}
   .feature,.feature__go i{transition:none}
   .flap__leaf{display:none}
   .flap__ch{transition:opacity .18s linear}
+  .boxfoot__glow,.gate__dot::after{animation:none!important}
+  .js .gate__week li{opacity:1;transform:none;transition:none}
+  .gate__week li.is-today::after{transform:none;transition:none}
+  .gate__fill,.flycard__card,.flycard__cta i{transition:none}
 }
 
 /* ---- social: NOW BOARDING. The TikTok + Instagram wall.
@@ -853,7 +922,7 @@ html.swm-open{overflow:hidden}
   <div class="nav__right">
     <span class="nav__meta">
       <a class="nav__call" href="tel:+12815550147" data-tel>(281) 555-0147</a>
-      <span class="nav__hours">Open until 10 pm</span>
+      <span class="nav__hours" aria-live="off"></span>
     </span>
     <!-- The one piece of the header that never fades: the Order button.
          Its destination and behaviour come from config/ordering.js. -->
@@ -1017,16 +1086,13 @@ html.swm-open{overflow:hidden}
       <div class="visit__facts rise">
         <div class="fact"><h3>Address</h3><address>1234 Bay Area Blvd, Suite 100<br>Houston, TX 77058</address></div>
         <div class="fact"><h3>Hours</h3>
-          <table class="hours-table" data-hours><tbody>
-            <tr><th>Mon to Thu</th><td>9am to 10pm</td></tr>
-            <tr><th>Fri to Sat</th><td>9am to 12am</td></tr>
-            <tr><th>Sun</th><td>10am to 10pm</td></tr>
-          </tbody></table>
+          <!-- filled from HOURS in config/ordering.js -->
+          <table class="hours-table" data-hours><tbody></tbody></table>
         </div>
         <div class="fact"><h3>Parking</h3><p>Free lot right out front, and more spaces around the side of the building.</p></div>
         <div class="fact"><h3>Phone</h3><p><a href="tel:+12815550147" data-tel>(281) 555-0147</a></p></div>
         <div class="visit__cta">
-          <a class="btn btn--line" href="https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX" target="_blank" rel="noopener">Get directions</a>
+          <a class="btn btn--line" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips+Clear+Lake+Houston+TX" data-link="directions" target="_blank" rel="noopener">Get directions</a>
           <a class="tlink" href="#order" data-order="pickup" data-place="visit" data-copy="pickupCta">Order ahead for pickup</a>
         </div>
       </div>
@@ -1199,31 +1265,51 @@ html.swm-open{overflow:hidden}
 <footer class="boxfoot on-green" id="foot">
   <div class="boxfoot__stage">
     <div class="boxfoot__inner">
+      <!-- the splash: a slow Mint and Browned Sugar glow and the brand star
+           pattern, behind everything; decoration only -->
+      <div class="boxfoot__splash" aria-hidden="true"><span class="boxfoot__glow"></span></div>
       <div class="shell boxfoot__grid">
-        <div class="boxfoot__col" data-rise-foot>
+        <div class="boxfoot__col boxfoot__where" data-rise-foot>
           <div class="boxfoot__mark"><svg class="logo logo--stacked" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-stacked"/></svg></div>
           <address>1234 Bay Area Blvd, Suite 100<br>Houston, TX 77058</address>
           <a class="boxfoot__tel" href="tel:+12815550147" data-tel>(281) 555-0147</a>
-          <a class="boxfoot__dir" href="https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX" target="_blank" rel="noopener">Get directions</a>
+          <a class="boxfoot__dir" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips+Clear+Lake+Houston+TX" data-link="directions" target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a>
         </div>
-        <div class="boxfoot__col" data-rise-foot>
+        <!-- The gate: live hours from HOURS in config/ordering.js, in the
+             shop's own timezone. Filled by site.js. -->
+        <div class="boxfoot__col gate" id="gate" data-rise-foot>
           <h3>Hours</h3>
-          <p class="boxfoot__state" id="footState" data-open="yes">Open until 10 pm</p>
-          <ul class="boxfoot__hours" data-hours-list><li><span>Mon to Thu</span><span>9am to 10pm</span></li><li><span>Fri to Sat</span><span>9am to 12am</span></li><li><span>Sun</span><span>10am to 10pm</span></li></ul>
+          <p class="gate__state" id="gateState" data-state="open"><i class="gate__dot" aria-hidden="true"></i><span></span></p>
+          <p class="gate__count" id="gateCount"></p>
+          <div class="gate__bar" aria-hidden="true"><span class="gate__fill" id="gateFill"></span></div>
+          <ul class="gate__week" id="gateWeek" aria-label="Opening hours this week"></ul>
         </div>
-        <div class="boxfoot__col" data-rise-foot>
-          <h3>Follow</h3>
+        <div class="boxfoot__col boxfoot__links" data-rise-foot>
+          <h3>Follow the route</h3>
           <ul>
-            <li><a href="https://www.instagram.com/dubaianddips/" target="_blank" rel="noopener">Instagram</a></li>
-            <li><a href="https://www.tiktok.com/@dubai.dips" target="_blank" rel="noopener">TikTok</a></li>
+            <li><a href="https://www.instagram.com/dubaianddips/" data-link="instagram" target="_blank" rel="noopener">Instagram<span class="vh"> (opens in a new tab)</span></a></li>
+            <li><a href="https://www.tiktok.com/@dubai.dips" data-link="tiktok" target="_blank" rel="noopener">TikTok<span class="vh"> (opens in a new tab)</span></a></li>
           </ul>
-          <a class="btn btn--line" href="#visit" data-order="pickup" data-place="footer" data-copy="pickupCta">Order ahead for pickup</a>
-          <a class="boxfoot__cater" href="#contact">Catering &amp; large orders</a>
+          <h3>Fly with us</h3>
+          <ul>
+            <li><a href="#contact" data-link="catering">Catering &amp; large orders</a></li>
+            <li hidden><a href="" data-link="googleReviews" target="_blank" rel="noopener">Leave us a review<span class="vh"> (opens in a new tab)</span></a></li>
+          </ul>
+        </div>
+        <!-- Order ahead IS the boarding pass: the brand's own DXB pass,
+             tilted, lifting straight on hover. Destination from config. -->
+        <div class="boxfoot__col boxfoot__fly" data-rise-foot>
+          <a class="flycard" href="#visit" data-order="pickup" data-place="footer">
+            <span class="flycard__card">
+              <img class="flycard__pass" src="/public/brand/boarding-pass/bpass-dubai.svg" width="131" height="158" alt="" loading="lazy" decoding="async">
+              <span class="flycard__cta"><span data-copy="pickupCta">Order ahead for pickup</span><i aria-hidden="true">&rarr;</i></span>
+            </span>
+          </a>
         </div>
       </div>
       <div class="shell boxfoot__base" data-rise-foot>
         <span>&copy; <span id="year">2026</span> Dubai &amp; Dips<span class="tm"></span>.</span>
-        <span>Clear Lake, Houston</span>
+        <span class="boxfoot__legal"><span>Clear Lake, Houston</span><a href="" data-link="privacyPolicy" hidden>Privacy policy</a></span>
         <p class="boxfoot__tm">Dubai &amp; Dips<span class="tm"></span> is a <span class="tm-kind"></span>trademark of Dubai &amp; Dips.</p>
       </div>
     </div>
@@ -1270,6 +1356,7 @@ html.swm-open{overflow:hidden}
   </div>
 </div>
 <script src="/config/ordering.js" defer></script>
+<script src="/config/departures.js" defer></script>
 <script src="/track.js" defer></script>
 <script src="/site.js" defer></script>
 </body>

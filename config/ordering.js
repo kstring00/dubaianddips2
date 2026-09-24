@@ -19,6 +19,9 @@
      TOAST_GROUP_URL   optional: a Toast group-ordering link
      PHONE             the shop's real number (the current one is the
                        placeholder that was already on the site)
+     SHOP.address      the real street address (also a placeholder)
+     HOURS             confirm against the door sign
+     LINKS             googleReviews and privacyPolicy are still empty
      REWARDS_LIVE      true once Toast loyalty is switched on
      DEMO_ITEMS prices these are demo prices; no price on the boards was
                        legible, so confirm against the real menu
@@ -45,18 +48,37 @@ window.DD_CONFIG = {
     area: "Clear Lake",
     city: "Houston",
     address: "1234 Bay Area Blvd, Suite 100, Houston, TX 77058",
-    timezone: "America/Chicago",
-    directions: "https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX"
+    timezone: "America/Chicago"
   },
-  /* Index is day of week, 0 = Sunday. [open, close] in 24-hour shop time.
-     The label groups the rows the way the door sign does. */
-  /* A close of 24 is midnight. */
+
+  /* ---- Hours: the ONE source ------------------------------------------
+     Everything that shows or depends on the hours reads this: the nav's
+     "Open until", the departures board (NOW BOARDING / FINAL CALL / OPENS),
+     the footer gate, the Visit table, the ordering sheet and the demo's
+     pickup times. Open or closed is always worked out in SHOP.timezone,
+     never the visitor's own clock.
+     Index is day of week, 0 = Sunday. [open, close] in 24-hour shop time;
+     half hours are fine (9.5 is 9:30). A close of 24 is midnight: open to
+     the end of that day. A close earlier than the open runs past midnight
+     (e.g. [18, 2]). null means closed all day. The "Mon to Thu" style rows
+     are grouped from this automatically. */
   HOURS: [[10, 22], [9, 22], [9, 22], [9, 22], [9, 22], [9, 24], [9, 24]],
-  HOURS_LABELS: [
-    { days: "Mon to Thu", open: 9, close: 22 },
-    { days: "Fri to Sat", open: 9, close: 24 },
-    { days: "Sun", open: 10, close: 22 }
-  ],
+  /* The board's row 1 says FINAL CALL for this many minutes before close. */
+  CLOSING_SOON_MINUTES: 30,
+
+  /* ---- Links: the ONE source ------------------------------------------
+     Every footer link (and the social wall) reads these. The phone comes
+     from PHONE above and Order ahead from TOAST_* above. An empty value
+     hides its link rather than leaving a dead one - fill it in and the
+     link appears. */
+  LINKS: {
+    directions: "https://www.google.com/maps/dir/?api=1&destination=Dubai+and+Dips+Clear+Lake+Houston+TX",
+    instagram: "https://www.instagram.com/dubaianddips/",
+    tiktok: "https://www.tiktok.com/@dubai.dips",
+    catering: "#contact",
+    googleReviews: "",   /* MISSING: the Google Business "Leave a review" link (g.page/r/.../review) */
+    privacyPolicy: ""    /* MISSING: there is no privacy policy page yet */
+  },
 
   /* ---- Delivery ------------------------------------------------------ */
   DELIVERY_MINIMUM: 15,

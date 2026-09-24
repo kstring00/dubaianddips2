@@ -56,7 +56,7 @@ p{margin:0 0 2rem;color:var(--ink-soft);max-width:38ch;margin-inline:auto}
     <a class="btn" id="orderLink" href="/#order" data-order="pickup" data-place="404">Order ahead for pickup</a>
     <a class="link" href="/">Back to the shop</a>
     <a class="link" id="callLink" href="tel:+12815550147">Call (281) 555-0147</a>
-    <a class="link" href="https://maps.google.com/?q=Dubai+and+Dips+Clear+Lake+Houston+TX">Get directions</a>
+    <a class="link" id="dirLink" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips+Clear+Lake+Houston+TX" target="_blank" rel="noopener">Get directions</a>
   </div>
 </main>
 <!-- Same rule as everywhere else: the order button reads config and is
@@ -76,6 +76,8 @@ p{margin:0 0 2rem;color:var(--ink-soft);max-width:38ch;margin-inline:auto}
   if (call && c.PHONE) { call.setAttribute('href', 'tel:' + c.PHONE.tel); call.textContent = 'Call ' + c.PHONE.display; }
   var barCall = document.querySelector('[data-bar-call]');
   if (barCall && c.PHONE) barCall.setAttribute('href', 'tel:' + c.PHONE.tel);
+  var dir = document.getElementById('dirLink');
+  if (dir && c.LINKS && c.LINKS.directions) dir.setAttribute('href', c.LINKS.directions);
 })();
 </script>
 </body>
