@@ -250,6 +250,28 @@
     vcur = vtarget(); vapply(vcur);
   }
 
+  /* ---- /catering: the departures band's film. No source until the band
+     is a screen away; plays while on screen, pauses when it is not. ---- */
+  var sky = document.querySelector('.sky__film');
+  if (sky && !reduce && IO) {
+    var skyOn = false;
+    var sio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting && !skyOn) {
+          skyOn = true;
+          if (!sky.getAttribute('data-live')) {
+            sky.setAttribute('data-live', '1');
+            [].forEach.call(sky.querySelectorAll('source[data-src]'), function (so) { so.src = so.getAttribute('data-src'); });
+            sky.load();
+          }
+          var pr = sky.play(); if (pr && pr.catch) pr.catch(function () {});
+        } else if (!e.isIntersecting && skyOn) { skyOn = false; sky.pause(); }
+      });
+    }, { rootMargin: '40% 0px' });
+    sio.observe(sky);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) sky.pause(); else if (skyOn) { var pr = sky.play(); if (pr && pr.catch) pr.catch(function () {}); } });
+  }
+
   /* ---- /gelato: the tabs ---- */
   var tabbar = document.querySelector('.gtabs__bar');
   var flapsDone = false;

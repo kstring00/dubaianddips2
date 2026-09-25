@@ -23,7 +23,8 @@ const IMG = {
   '/assets/rev-dubai-frappe.webp': [260, 260], '/assets/rev-pistachio-frappe.webp': [260, 260], '/assets/rev-biscoff-frappe.webp': [260, 260],
   '/assets/rev-strawberry-matcha.webp': [260, 260], '/assets/rev-kunafa.webp': [260, 260],
   '/assets/visit-clear-lake.webp': [1360, 765], '/assets/blog-lineup.webp': [1360, 765], '/assets/blog-gelato.webp': [765, 478], '/assets/visit-clear-lake-800.webp': [800, 450],
-  '/assets/hero-poster.webp': [1280, 704], '/assets/craft-poster.webp': [1280, 714],
+  '/assets/hero-poster.webp': [1280, 704], '/assets/craft-poster.webp': [1280, 714], '/assets/flight-poster.webp': [1280, 720],
+  '/assets/inside-room.webp': [1600, 1067], '/assets/inside-room-900.webp': [900, 600],
   '/assets/social/social-01-720.webp': [430, 765], '/assets/social/social-02-720.webp': [430, 765], '/assets/social/social-03-720.webp': [430, 765],
   '/assets/social/social-04-720.webp': [430, 765], '/assets/social/social-05-720.webp': [574, 1020], '/assets/social/social-06-720.webp': [430, 765]
 };
@@ -231,6 +232,23 @@ export function cateringPage() {
       <li class="rv"><span class="itin__n">${ring}<b>02</b></span><h3>Everyone picks</h3><p>${esc(CFG.COPY.groupText)} Group orders start at $${CFG.GROUP_ORDER_MINIMUM}.</p></li>
       <li class="rv"><span class="itin__n">${ring}<b>03</b></span><h3>Pickup or delivery</h3><p>Pick up at <a href="/visit/${READY[0].slug}">${esc(READY[0].name)}</a>, or have it delivered up to ${CFG.DELIVERY_RADIUS_MILES} miles from the shop ($${CFG.DELIVERY_MINIMUM} minimum).</p></li>
     </ol>
+  </div>
+</section>
+<section class="sky" aria-labelledby="sky-title">
+  <video class="sky__film" muted playsinline loop preload="none" poster="/assets/flight-poster.webp" aria-hidden="true" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
+  <div class="sky__wash" aria-hidden="true"></div>
+  <div class="shell sky__grid">
+    <div class="sky__copy">
+      <p class="sky__eyebrow rv"><span class="sky__dot"></span>Now departing &middot; HOU Clear Lake</p>
+      <h2 class="sky__title rv" id="sky-title">Big orders, <em>cleared for takeoff.</em></h2>
+      <p class="sky__lead rv">Kunafa, gelato and drinks for the whole room, boxed the morning of and on their way. One call or one link, and it all lands together.</p>
+      <ul class="sky__chips rv" aria-label="The short version">
+        <li><b>$${CFG.GROUP_ORDER_MINIMUM}</b><span>groups start</span></li>
+        <li><b>${CFG.DELIVERY_RADIUS_MILES} mi</b><span>delivery radius</span></li>
+        <li><b>${C.noticeHours ? C.noticeHours + ' hrs' : 'Same week'}</b><span>${C.noticeHours ? 'notice' : 'turnaround'}</span></li>
+      </ul>
+      <div class="sky__actions rv"><a class="btn btn--primary btn--hero" href="#request" data-cater-cta="sky">Start a catering order</a><a class="sky__tel" href="tel:${PH.tel}" data-call="catering-sky">or call ${esc(PH.display)}</a></div>
+    </div>
   </div>
 </section>
 ${faqBlock(faqs)}

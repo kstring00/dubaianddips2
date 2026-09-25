@@ -81,13 +81,14 @@ window.DD_CONFIG = {
       mapQuery: "Dubai and Dips Clear Lake Houston TX",
       parking: "Free lot right out front, and more spaces around the side of the building.",
       landmark: "",            /* MISSING: a landmark to look for, e.g. the shopping centre name */
-      photo: "/assets/visit-clear-lake.webp",
-      photoAlt: "Inside Dubai & Dips Clear Lake: the deep green wall with the gold DUBAI & DIPS sign over the pastry counter, white chairs and marble tables.",
+      photo: "/assets/inside-room.webp",
+      photoAlt: "Inside Dubai & Dips Clear Lake: marble tables and cream chairs under the light rails, the walnut slat column, and the gold DUBAI & DIPS sign on the green wall above the counter.",
       /* The gallery on /visit/clear-lake. Real photos only; the two of the
          room are all there are so far, the rest are the food photographed
          here. Add more of the space as they are shot: { src, alt, big }. */
       gallery: [
-        { src: "/assets/visit-clear-lake.webp", alt: "The room: the deep green wall with the gold DUBAI & DIPS sign over the pastry counter, white chairs and marble tables.", big: true },
+        { src: "/assets/inside-room.webp", alt: "The room from the door: marble tables, cream chairs, the walnut column and the counter under the gold sign.", big: true },
+        { src: "/assets/visit-clear-lake.webp", alt: "The green wall: the gold DUBAI & DIPS sign over the pastry counter, white chairs and marble tables." },
         { src: "/assets/social/social-05-720.webp", alt: "At the counter: a cup of pistachio gelato beside a layered latte in a Dubai & Dips cup, the paper takeout bag behind them.", tall: true },
         { src: "/assets/menu-dubai-frappe.webp", alt: "The Dubai Chocolate Frappe on marble, pistachio and dark chocolate pulled down the inside of the cup." },
         { src: "/assets/menu-kunafa.webp", alt: "A round golden kunafa topped with crushed pistachio on a gold board." },
