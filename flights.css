@@ -5,8 +5,8 @@
 .fl{position:relative;background:var(--bark-deep);color:var(--off-white);overflow:hidden;padding:clamp(2.8rem,5vw,4rem) 0 clamp(2.4rem,4vw,3.2rem)}
 .fl::before{content:"";position:absolute;inset:0;background:url("/public/brand/pattern/pattern-light.svg") 0 0/62.8px 64.61px;opacity:.28;pointer-events:none}
 .fl__head{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:.6rem 3rem;margin-bottom:clamp(1rem,2vw,1.5rem)}
-.fl .eyebrow{display:inline-flex;align-items:center;gap:.6rem;margin:0 0 .5rem;font-family:var(--mono);font-weight:600;font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mint)}
-.fl .eyebrow .logo--star{--logo-h:.8rem;--logo-accent:var(--browned-sugar)}
+.fl .eyebrow{display:inline-flex;align-items:center;gap:.7rem;margin:0 0 .6rem;font-family:var(--mono);font-weight:600;font-size:clamp(.98rem,1.3vw,1.18rem);letter-spacing:.22em;text-transform:uppercase;color:var(--mint)}
+.fl .eyebrow .logo--star{--logo-h:.95em;--logo-accent:var(--browned-sugar)}
 .fl__title{font-size:clamp(1.9rem,3.4vw,2.8rem);line-height:1.02;letter-spacing:-.03em;color:var(--off-white)}
 .fl__title em{color:var(--mint)}
 .fl__lead{max-width:34ch;font-size:.98rem;line-height:1.55;color:var(--natural)}

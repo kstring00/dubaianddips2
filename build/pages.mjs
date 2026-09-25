@@ -465,8 +465,21 @@ export function teamPage() {
         <dl class="crew__meta"><div><dt>Favorite</dt><dd>${esc(m.favorite)}</dd></div><div><dt>Seat</dt><dd>${esc(m.seat || '')}</dd></div><div><dt>Crew</dt><dd>D&amp;D</dd></div></dl>
       </div>
     </li>`).join('');
-  const body = hero({ trail, eyebrow: 'CAI &middot; Cairo &middot; DD 105', h1: 'Meet *the crew.*',
-    lead: 'The people behind the counter. Names, roles and favorites are placeholders until the owner fills them in.' }) + `
+  /* the arcade behind the title: a run of pointed arches on slender piers
+     under a dentil cornice, drawn once and repeated, in stone tones */
+  const arcade = `<svg class="arcade" viewBox="0 0 1600 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="arch" width="200" height="300" patternUnits="userSpaceOnUse">
+        <path class="arcade__void" d="M22 300V150c0-52 38-92 78-118 40 26 78 66 78 118v150z"/>
+        <path class="arcade__line" d="M22 300V150c0-52 38-92 78-118 40 26 78 66 78 118v150M0 300V120M200 300V120M0 120h200M0 104h200"/>
+        <path class="arcade__dentil" d="M10 106h12v12H10zM40 106h12v12H40zM70 106h12v12H70zM100 106h12v12h-12zM130 106h12v12h-12zM160 106h12v12h-12zM188 106h12v12h-12z"/>
+        <path class="arcade__line" d="M0 86h200M0 62h200"/>
+      </pattern>
+    </defs>
+    <rect width="1600" height="300" fill="url(#arch)"/>
+  </svg>`;
+  const body = hero({ trail, eyebrow: 'CAI &middot; Cairo &middot; DD 105', h1: 'Meet *the crew.*', cls: 'phero--crew',
+    lead: 'The people behind the counter. Names, roles and favorites are placeholders until the owner fills them in.', media: arcade }) + `
 <section class="crewgrid" aria-label="The crew">
   <div class="shell"><ul class="crew__list">${cards}</ul></div>
 </section>
