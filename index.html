@@ -259,9 +259,9 @@ html.navsheet-open .thumbbar{visibility:hidden}
 .js .hero__tag-l:first-child{animation-delay:.7s}
 .js .hero__tag-l:last-child{animation-delay:1.35s}
 @keyframes heroTag{to{opacity:1;transform:none}}
-.hero__lead{max-width:30ch;font-family:var(--display);font-weight:500;font-size:clamp(1.7rem,3.2vw,3rem);line-height:1.1;letter-spacing:-.03em;color:var(--on-dark);text-wrap:balance;text-shadow:0 8px 40px rgb(var(--black-rgb)/.3)}
-.hero__lead em{display:block;margin-top:.25em;font-family:var(--italic);font-style:italic;font-weight:400;font-size:.62em;letter-spacing:0;color:var(--accent-bright)}
 .hero__kicker{font-family:var(--mono);font-weight:600;font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-bright)}
+.hero__land h1{font-weight:500;font-size:clamp(2.6rem,5.4vw,6rem);line-height:.92;letter-spacing:-.04em;color:var(--on-dark);text-wrap:balance;text-shadow:0 8px 40px rgb(var(--black-rgb)/.3)}
+.hero__land h1 em{color:var(--accent-bright);letter-spacing:-.02em}
 .hero__land p{font-weight:300;font-size:clamp(1rem,1.15vw,1.15rem);color:rgb(var(--surface-rgb)/.82)}
 .hero__row{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.4rem;margin-top:.4rem}
 .hero__row .btn{padding:.78rem 1.55rem;min-height:46px}
@@ -279,7 +279,7 @@ html.navsheet-open .thumbbar{visibility:hidden}
   .hero__place{font-size:.7rem;letter-spacing:.2em}
   .hero__hint{bottom:calc(var(--thumb) + 3vh)}
   .hero__land{left:max(5vw,1rem);right:max(5vw,1rem);width:auto;bottom:calc(var(--thumb) + 4vh);gap:.75rem}
-  .hero__lead{font-size:clamp(1.5rem,7.4vw,2.2rem)}.hero__lead em{font-size:.72em}
+  .hero__land h1{font-size:clamp(2.3rem,11vw,3.6rem)}
   .hero__tag{font-size:clamp(1.7rem,7.6vw,2.4rem)}
   .hero__land p{font-size:1rem}
   /* On a phone the CTA sits in the lower third, under the film window,
@@ -842,123 +842,6 @@ body.sheet-open{overflow:hidden}
   .js .boxfoot.is-folded .flycard__card{transform:rotate(-6deg);opacity:1;pointer-events:auto}
 }
 
-/* ---- social: NOW BOARDING. The TikTok + Instagram wall.
-   Each post is a boarding pass: Bark ink card, Browned Sugar hairline,
-   Natural stubs. On a desktop the wall pins for the length of .social__pin
-   and its three columns shear (left .8x up, centre 1.25x down, right 1x
-   up); under 768px it is one swipe row and nothing is pinned. */
-.social{position:relative;background:var(--courtyard-deep);color:var(--off-white);padding-top:clamp(4.5rem,9vw,8rem)}
-.social .label{color:var(--mint)}
-.social :focus-visible{outline-color:var(--mint)}
-.social__head{display:flex;flex-direction:column;align-items:flex-start;gap:1rem;padding-bottom:clamp(2rem,4vw,3.2rem)}
-.social__title{display:flex;flex-direction:column;gap:.55rem;font-family:var(--data);font-weight:600;letter-spacing:0;line-height:1}
-.social__flap{font-size:clamp(1.7rem,4.6vw,3.6rem);letter-spacing:.04em;color:var(--off-white)}
-.social__handles{font-size:clamp(.82rem,1.5vw,1.1rem);font-weight:500;letter-spacing:.02em;color:var(--mint);line-height:1.5}
-.sf-word{display:inline-flex;white-space:nowrap}
-.social__flap .sf-ch{position:relative;display:inline-block;min-width:.74em;margin-right:.07em;padding:.1em .02em .08em;text-align:center;border-radius:3px;background:rgb(var(--black-rgb)/.3);box-shadow:inset 0 0 0 1px rgb(var(--black-rgb)/.2)}
-.social__flap .sf-ch::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgb(var(--black-rgb)/.4)}
-.social__flap .sf-word+.sf-word{margin-left:.3em}
-.social__line{font-family:var(--display);font-size:clamp(1.25rem,2.1vw,1.7rem);font-weight:400;letter-spacing:-.01em;color:var(--off-white)}
-.social__line em{font-family:var(--italic);font-style:italic;color:var(--mint)}
-
-.social__pin{position:relative}
-.social__stage{position:relative}
-.social__wall{--card-w:min(300px,calc((var(--shell) - 2 * var(--col-gap)) / 3),calc((100vh - var(--nav-h) - 10rem) * .5625));--col-gap:clamp(1.2rem,3vw,2.8rem);display:grid;grid-template-columns:repeat(3,var(--card-w));justify-content:center;gap:clamp(1.6rem,3vw,2.6rem) var(--col-gap);margin:0;padding:0 0 clamp(3rem,6vw,5rem);list-style:none}
-.sw-slot{display:flex}
-.social.is-pinned .social__pin{height:250vh}
-.social.is-pinned .social__stage{position:sticky;top:0;height:100vh;overflow:hidden;overflow:clip;padding-top:calc(var(--nav-h) + 1.4rem);-webkit-mask-image:linear-gradient(transparent 0,#000 calc(var(--nav-h) + .6rem),#000 calc(100% - 3rem),transparent);mask-image:linear-gradient(transparent 0,#000 calc(var(--nav-h) + .6rem),#000 calc(100% - 3rem),transparent)}
-.social.is-pinned .social__wall{padding-bottom:0}
-.social.is-pinned .sw-slot{will-change:transform}
-
-.bp{--rot:0deg;position:relative;display:flex;flex-direction:column;width:100%;margin:0;padding:0;border:1px solid var(--browned-sugar);border-radius:14px;overflow:hidden;background:var(--bark-deep);color:var(--bark);font:inherit;text-align:left;text-decoration:none;cursor:pointer;-webkit-appearance:none;appearance:none;transform:rotate(var(--rot));transition:transform .6s var(--ease-out),box-shadow .6s var(--ease-out);box-shadow:0 18px 40px rgb(var(--black-rgb)/.28)}
-.bp:hover,.bp:focus-visible{transform:none;box-shadow:0 22px 50px rgb(var(--black-rgb)/.36)}
-/* brass, with an Off-White ring outside it: Browned Sugar alone is under 3:1 on the green */
-.social .bp:focus-visible{outline:2px solid var(--off-white);outline-offset:4px;border-color:var(--browned-sugar);box-shadow:0 0 0 2px var(--browned-sugar),0 22px 50px rgb(var(--black-rgb)/.36)}
-.bp__stub{position:relative;display:block;background:var(--natural);color:var(--bark);font-family:var(--data);font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-.bp__stub::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .29 0 0 0 0 .24 0 0 0 0 .21 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-.bp__top{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.55rem;padding:.55rem .7rem}
-.bp__badge{display:inline-grid;place-items:center;min-width:1.9rem;height:1.35rem;padding:0 .3rem;border-radius:5px;font-size:.66rem;letter-spacing:.04em;line-height:1}
-.bp__badge--tiktok{background:var(--bark);color:var(--off-white)}
-.bp__badge--instagram{position:relative;color:var(--bark);box-shadow:inset 0 0 0 1.5px var(--bark);border-radius:7px}
-.bp__route{white-space:nowrap;font-size:.74rem;letter-spacing:.1em}
-.bp__route i{font-style:normal;color:var(--browned-sugar-deep)}
-.bp__gate{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;font-size:.8rem}
-.bp__gate i{font-style:normal;font-size:.7rem;letter-spacing:.14em;color:var(--bark-soft)}
-.bp__photo{position:relative;display:block;aspect-ratio:9/16;overflow:hidden;background:var(--courtyard)}
-.bp__photo img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease-out)}
-.bp:hover .bp__photo img,.bp:focus-visible .bp__photo img{transform:scale(1.03)}
-.bp__play{position:absolute;right:.7rem;bottom:.7rem;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:rgb(var(--bark-rgb)/.72);border:1px solid rgb(var(--browned-sugar-rgb)/.9);color:var(--off-white);font-family:var(--data);font-size:.85rem;line-height:1}
-.bp__none{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;background:radial-gradient(120% 80% at 50% 45%,var(--courtyard) 0,var(--courtyard-deep) 100%);color:var(--off-white);text-align:center}
-.bp__none b{font-family:var(--data);font-size:clamp(2rem,4vw,3rem);letter-spacing:.08em;font-weight:600}
-.bp__none svg{--logo-h:22px;--logo-accent:var(--mint)}
-.bp.is-noposter .bp__none{display:flex}
-.bp.is-noposter picture{visibility:hidden}
-.bp__bot{flex:1 0 auto;padding:1.05rem .8rem .75rem}
-/* the tear line: perforation dots, with a notch cut into each edge */
-.bp__bot::before{content:"";position:absolute;left:.9rem;right:.9rem;top:0;height:4px;transform:translateY(-50%);background:radial-gradient(circle,var(--bark-deep) 1.5px,transparent 1.9px) 0 50%/9px 4px repeat-x;opacity:.55}
-.bp__notch{position:absolute;top:0;width:14px;height:14px;border-radius:50%;background:var(--courtyard-deep);transform:translateY(-50%);z-index:1}
-.bp__notch--l{left:-8px}.bp__notch--r{right:-8px}
-.bp__cap{display:block;font-family:var(--display);font-size:1rem;font-weight:500;letter-spacing:-.005em;line-height:1.25;text-transform:none;color:var(--bark)}
-.bp__meta{display:flex;justify-content:space-between;gap:.5rem;margin-top:.55rem;font-size:.7rem;letter-spacing:.16em;color:var(--bark-soft)}
-.bp__code{display:block;height:24px;margin-top:.5rem;background:repeating-linear-gradient(90deg,var(--bark) 0 2px,transparent 2px 3px,var(--bark) 3px 4px,transparent 4px 7px,var(--bark) 7px 10px,transparent 10px 11px,var(--bark) 11px 12px,transparent 12px 15px,var(--bark) 15px 16px,transparent 16px 18px,var(--bark) 18px 21px,transparent 21px 23px);opacity:.85}
-
-/* the follow tickets: outlined, never filled, so the Order button stays the one call to action */
-.bp--follow{justify-content:space-between;background:transparent;border:1.5px solid var(--browned-sugar);box-shadow:none;color:var(--off-white)}
-.bp--follow:hover,.bp--follow:focus-visible{box-shadow:none;background:rgb(var(--off-white-rgb)/.04)}
-.bp__follow{display:flex;flex-direction:column;align-items:center;gap:.7rem;padding:1.5rem 1.2rem;text-align:center}
-.bp__frow{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.7rem .9rem;font-family:var(--data);font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgb(var(--off-white-rgb)/.7)}
-.bp__frow--top{border-bottom:1px dashed rgb(var(--browned-sugar-rgb)/.7)}
-.bp__frow--bot{flex-direction:column;align-items:stretch;border-top:1px dashed rgb(var(--browned-sugar-rgb)/.7)}
-.bp__frow--bot .bp__code{width:100%;margin-top:.1rem;opacity:.5;background-image:repeating-linear-gradient(90deg,var(--natural) 0 2px,transparent 2px 3px,var(--natural) 3px 4px,transparent 4px 7px,var(--natural) 7px 10px,transparent 10px 11px,var(--natural) 11px 12px,transparent 12px 15px,var(--natural) 15px 16px,transparent 16px 18px,var(--natural) 18px 21px,transparent 21px 23px)}
-.bp__follow svg{--logo-h:26px;--logo-accent:var(--mint)}
-.bp__big{font-family:var(--display);font-size:clamp(1.45rem,2.2vw,1.9rem);font-weight:500;line-height:1.1;letter-spacing:-.02em}
-.bp__big em{font-family:var(--italic);font-style:italic;font-weight:400}
-.bp__handle{font-family:var(--data);font-size:.85rem;color:var(--natural)}
-.bp__count{font-size:.9rem;color:rgb(var(--off-white-rgb)/.82)}
-.bp__go{display:inline-flex;align-items:center;min-height:44px;margin-top:.4rem;padding:.55rem 1.3rem;border-radius:999px;box-shadow:inset 0 0 0 1.5px rgb(var(--off-white-rgb)/.75);font-weight:500;font-size:.95rem;transition:background .35s var(--ease),color .35s var(--ease)}
-.bp--follow:hover .bp__go,.bp--follow:focus-visible .bp__go{background:var(--off-white);color:var(--bark)}
-
-.social__hint{display:none}
-.social__noscript{padding-bottom:3rem}
-.social__noscript a{color:var(--off-white)}
-
-@media(max-width:767px){
-  .social__wall{display:flex;justify-content:flex-start;gap:1rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);padding:.4rem var(--gutter) 1.2rem;scrollbar-width:none}
-  .social__wall::-webkit-scrollbar{display:none}
-  .sw-slot{flex:0 0 min(72vw,280px);scroll-snap-align:start}
-  .bp{transform:none}
-  .social__hint{display:block;padding:0 var(--gutter) 3rem;text-align:right;font-family:var(--data);font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mint)}
-}
-
-/* the modal: our poster first, the official embed only once it has rendered */
-.swm{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:max(1rem,env(safe-area-inset-top,0px)) .75rem}
-.swm[hidden]{display:none}
-.swm__backdrop{position:absolute;inset:0;background:rgb(var(--bark-deep-rgb,59 49 43)/.9)}
-.swm__panel{position:relative;display:flex;flex-direction:column;width:min(580px,100%);max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);border:1.5px solid var(--browned-sugar);border-radius:16px;background:var(--bark-deep);color:var(--off-white);box-shadow:0 30px 80px rgb(var(--black-rgb)/.5);overflow:hidden}
-.js .swm:not([hidden]) .swm__panel{animation:swmIn .35s var(--ease-out)}
-@keyframes swmIn{from{opacity:0;transform:translateY(14px) scale(.98)}}
-.swm__bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.4rem .4rem .4rem 1.1rem;border-bottom:1px solid rgb(var(--browned-sugar-rgb)/.5)}
-.swm__title{font-family:var(--data);font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--natural)}
-.swm__close{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--off-white);font-size:1.6rem;line-height:1;cursor:pointer}
-.swm__close:hover{background:rgb(var(--off-white-rgb)/.08)}
-.swm :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
-.swm__body{overflow:auto;padding:1rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
-.swm__embed:empty{display:none}
-.swm__embed{width:100%;display:flex;justify-content:center}
-.swm__embed blockquote{margin:0!important}
-.swm.has-embed .swm__fallback{display:none}
-.swm__fallback{display:flex;flex-direction:column;align-items:center;gap:1rem;margin:0}
-.swm__fallback img{width:auto;max-width:100%;height:min(62vh,640px);aspect-ratio:9/16;object-fit:cover;border-radius:10px;border:1px solid rgb(var(--browned-sugar-rgb)/.7)}
-.swm__open{color:var(--off-white);box-shadow:inset 0 0 0 1.5px rgb(var(--off-white-rgb)/.8)}
-.swm__open:hover{background:var(--off-white);color:var(--bark)}
-html.swm-open{overflow:hidden}
-
-@media(prefers-reduced-motion:reduce){
-  .bp,.bp__photo img,.bp__go{transition:none}
-  .bp,.bp:hover,.bp:focus-visible{transform:none}
-  .bp:hover .bp__photo img,.bp:focus-visible .bp__photo img{transform:none}
-  .js .swm:not([hidden]) .swm__panel{animation:none}
-}
 /* build:flights-css */
 </style>
 </head>
@@ -968,7 +851,7 @@ html.swm-open{overflow:hidden}
 
 <!-- build:header (the build reuses this header, and the menu sheet below, on every inner page) -->
 <header class="nav nav--intro" id="nav">
-  <a class="nav__brand" href="/" aria-label="Dubai &amp; Dips, home"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg><svg class="logo logo--mark" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-mark"/></svg></a>
+  <a class="nav__brand" href="/"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg><svg class="logo logo--mark" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-mark"/></svg></a>
   <nav class="nav__links" aria-label="Primary">
     <a href="/">Home</a><a href="/menu">Menu</a><a href="/visit">Visit</a><a href="/catering">Catering</a><a href="/blog">Journal</a><a href="/feed">The Feed</a>
   </nav>
@@ -1009,7 +892,7 @@ html.swm-open{overflow:hidden}
       <div class="hero__mark"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg></div>
       <!-- The tagline, in the decorative italic (the Editor's Note stand-in),
            one line at a time after the wordmark. It is the page's h1. -->
-      <h1 class="hero__tag"><span class="hero__tag-l">Walk in.</span> <span class="hero__tag-l">Taste Dubai.</span></h1>
+      <p class="hero__tag"><span class="hero__tag-l">Walk in.</span> <span class="hero__tag-l">Taste Dubai.</span></p>
       <p class="hero__place">Dessert shop &middot; Clear Lake, Houston</p>
       <!-- Pickup first. The primary is the most visible thing on the page
            at load; the delivery link is the quiet alternative. -->
@@ -1021,7 +904,8 @@ html.swm-open{overflow:hidden}
     <p class="hero__hint" id="heroHint" aria-hidden="true">Scroll to open <span>&darr;</span></p>
     <div class="hero__land" id="heroLand">
       <span class="hero__kicker">Clear Lake, Houston</span>
-      <p class="hero__lead">Gelato, pastries, coffee and matcha. <em>Made here, every morning.</em></p>
+      <h1>Made here, <em>every morning.</em></h1>
+      <p>Gelato, pastries, coffee and matcha.</p>
       <div class="hero__row">
         <a class="btn btn--primary" href="#visit" data-order="pickup" data-place="hero-landing" data-copy="pickupCta">Order ahead for pickup</a>
         <a class="tlink" href="#visit" data-order="delivery" data-place="hero-landing" data-copy="deliveryCta">Or get it delivered</a>
@@ -1281,26 +1165,6 @@ html.swm-open{overflow:hidden}
   </script>
 </section>
 
-<!-- ============================== SOCIAL ==============================
-     "Now boarding": the TikTok and Instagram wall. The cards are built by
-     site.js from /assets/social/posts.json (how to add a post is at the
-     top of that part of site.js). Nothing from TikTok or Instagram loads
-     until someone opens a card. -->
-<section class="social" id="social" aria-labelledby="social-title">
-  <div class="shell social__head">
-    <span class="label">Follow the route</span>
-    <h2 class="social__title" id="social-title" aria-label="Now boarding: @dubai.dips on TikTok, @dubaianddips on Instagram"><span class="social__flap" data-flap="NOW BOARDING" aria-hidden="true">NOW BOARDING</span><span class="social__handles" data-flap="&mdash; @dubai.dips / @dubaianddips" aria-hidden="true">&mdash; @dubai.dips / @dubaianddips</span></h2>
-    <p class="social__line">10k+ travelers follow <em>the route.</em></p>
-  </div>
-  <div class="social__pin" id="socialPin">
-    <div class="social__stage">
-      <ul class="social__wall" id="socialWall" aria-label="Posts from TikTok and Instagram"></ul>
-    </div>
-  </div>
-  <p class="social__hint" aria-hidden="true">swipe &rarr;</p>
-  <noscript><p class="shell social__noscript"><a href="https://www.tiktok.com/@dubai.dips" target="_blank" rel="noopener">@dubai.dips on TikTok</a> &middot; <a href="https://www.instagram.com/dubaianddips/" target="_blank" rel="noopener">@dubaianddips on Instagram</a></p></noscript>
-</section>
-
 <div class="band band--divider" aria-hidden="true">
   <span class="band__track"><span class="band__set"><span class="band__item">Made here, every morning <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span><span class="band__item">Gelato &middot; Pastries &middot; Coffee &middot; Matcha <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span></span></span>
 </div>
@@ -1417,17 +1281,6 @@ html.swm-open{overflow:hidden}
 </div>
 
 <!-- /build:footer -->
-<!-- the social wall's post viewer (see the SOCIAL section) -->
-<div class="swm" id="swm" hidden>
-  <div class="swm__backdrop" data-swm-close></div>
-  <div class="swm__panel" role="dialog" aria-modal="true" aria-labelledby="swmTitle">
-    <div class="swm__bar">
-      <p class="swm__title" id="swmTitle"></p>
-      <button class="swm__close" type="button" data-swm-close aria-label="Close">&times;</button>
-    </div>
-    <div class="swm__body" id="swmBody"></div>
-  </div>
-</div>
 <script src="/config/ordering.js" defer></script>
 <script src="/config/departures.js" defer></script>
 <script src="/hours.js" defer></script>

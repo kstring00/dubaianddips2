@@ -49,10 +49,10 @@ const pages = {
   'menu/index.html': menuPage(),
   'catering/index.html': cateringPage(),
   'visit/index.html': visitIndex(),
+  'feed/index.html': feedPage(),
   /* ready for content: built, noindex, and kept out of the sitemap */
   'gelato/index.html': gelatoPage(),
   'team/index.html': teamPage(),
-  'feed/index.html': feedPage(),
   '404.html': notFoundPage()
 };
 for (const l of READY) pages[`visit/${l.slug}/index.html`] = locationPage(l);
@@ -67,6 +67,7 @@ const urls = [
   ['/menu', lastmod(['menu-board.json', 'build/pages.mjs'])],
   ['/catering', lastmod(['build/pages.mjs', 'config/ordering.js'])],
   ['/visit', lastmod(['build/pages.mjs', 'config/ordering.js'])],
+  ['/feed', lastmod(['build/pages.mjs', 'config/feed.js'])],
   ...READY.map(l => ['/visit/' + l.slug, lastmod(['build/pages.mjs', 'config/ordering.js'])]),
   ...(blog.posts.some(p => !p.draft) ? [['/blog', blog.posts.filter(p => !p.draft).map(p => p.updated).sort().pop()]] : []),
   ...blog.posts.filter(p => !p.draft).map(p => ['/blog/' + p.slug, p.updated || p.date])

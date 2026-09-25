@@ -1203,24 +1203,8 @@
   }
 
   /* ------------------------------------------------------------- social
-     NOW BOARDING: the TikTok and Instagram wall, built from
-     /assets/social/posts.json.
-
-     To add or swap a post (no code change):
-       1. Drop the photo in assets/social/, e.g. social-09.jpg. A tall photo
-          at least 1080px wide looks best; any size works.
-       2. Add an entry to assets/social/posts.json:
-            "platform": "tiktok" or "instagram"
-            "url":      the post's link (in the app: Share > Copy link)
-            "poster":   "assets/social/social-09.jpg"
-            "focus":    the point of the photo to keep in the crop, "50% 50%"
-            "caption":  under 60 characters
-            "alt":      what the photo shows, for screen readers
-       3. Run `python3 scripts/social-posters.py` to cut the 9:16 WebP crops.
-     A post with an empty url still shows; it opens the profile in a new
-     tab instead of the post. Posts show in the file's order, with the two
-     follow tickets after the 3rd and the 6th.
-
+     NOW BOARDING: the TikTok and Instagram wall on /feed, built from the
+     posts in config/feed.js (how to add a post is at the top of that file).
      Nothing from TikTok or Instagram loads with the page. Opening a post
      shows our poster and an "Open on ..." button at once; the official
      embed script loads only then, and the embed replaces the poster once
@@ -1265,7 +1249,8 @@
           '<span class="bp__route">' + route + ' <i>&rarr;</i> HOU</span>' +
           '<span class="bp__gate"><i>Gate</i>' + (n < 9 ? '0' : '') + (n + 1) + '</span>' +
         '</span>' +
-        '<span class="bp__photo">' + picture(p, true, '(min-width: 768px) 300px, 72vw') +
+        /* the first three posters are above the fold on /feed, so they load at once; the rest wait */
+        '<span class="bp__photo">' + picture(p, n > 2, '(min-width: 768px) 300px, 72vw').replace(' decoding=', n === 0 ? ' fetchpriority="high" decoding=' : ' decoding=') +
           '<span class="bp__none" aria-hidden="true">' + star() + '<b>' + route + '</b></span>' +
           '<span class="bp__play" aria-hidden="true">' + (link ? '&#9654;' : '&nearr;') + '</span>' +
         '</span>' +
@@ -1491,10 +1476,7 @@
       window.addEventListener('resize', measure, { passive: true });
       if (wide.addEventListener) wide.addEventListener('change', measure);
     }
-    fetch('/assets/social/posts.json', { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(build)
-      .catch(function () { build([]); });
+    build(Array.isArray(window.DD_FEED) ? window.DD_FEED : []);
   })();
 
 })();

@@ -51,12 +51,15 @@
     for (var i = 0; i <= n; i++) out.push(ip(i / n));
     return out;
   }
-  /* the frame: the whole world on a desktop, the Houston to Middle East
-     band on a phone */
+  /* the frame: the band the routes fly in, Houston on the left to Tokyo on
+     the right, no southern ocean, no Antarctica. A ring of points along
+     the band's edge (great arcs between far corners would cross the pole).
+     Phones take the Houston to Middle East band and lose the far east. */
   function frame() {
-    return phone.matches
-      ? { type: 'Polygon', coordinates: [[[-108, 8], [-108, 64], [64, 64], [64, 8], [-108, 8]]] }
-      : { type: 'Sphere' };
+    var w = phone.matches ? [-108, 66] : [-112, 150], h = [10, 66], pts = [];
+    for (var x = w[0]; x <= w[1]; x += 2) { pts.push([x, h[0]]); pts.push([x, h[1]]); }
+    for (var y = h[0]; y <= h[1]; y += 2) { pts.push([w[0], y]); pts.push([w[1], y]); }
+    return { type: 'MultiPoint', coordinates: pts };
   }
   function layout() {
     if (!ready) return;
@@ -65,8 +68,14 @@
     canvas.width = W * dpr; canvas.height = H * dpr;
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     proj = window.d3.geoNaturalEarth1().rotate([30, 0]);
-    proj.fitExtent([[phone.matches ? 0 : 8, 8], [W - (phone.matches ? 0 : 8), H - 8]], frame());
+    /* fit the band to the stage's width and centre it on the stage's
+       height: on a wide low stage the far north and south crop away, on
+       a phone the band letterboxes a little */
+    var fr = frame(), pad = phone.matches ? 6 : 10;
+    proj.fitExtent([[pad, -1e5], [W - pad, 1e5]], fr);
     path = window.d3.geoPath(proj);
+    var bb = path.bounds(fr), t = proj.translate();
+    proj.translate([t[0], t[1] + (H / 2 - (bb[0][1] + bb[1][1]) / 2)]);
     gates = F.gates.map(function (g) { var p = proj([g.lon, g.lat]); return { g: g, x: p[0], y: p[1], pts: arcPoints(F.origin, g, 96) }; });
     drawBase();
     positionCards();
@@ -151,6 +160,13 @@
     if (hp) { dot(c, hp[0], hp[1], 9, COL.mint, .16); dot(c, hp[0], hp[1], 4.2, COL.mint, .55); dot(c, hp[0], hp[1], 2, COL.off, 1); }
   }
 
+  /* the readout under the map: the flight that left most recently */
+  var now_ = root.querySelector('.fl__now'), nowText = '';
+  function setNow(i) {
+    var text = i < 0 ? 'Boarding' : 'Now flying \u00b7 ' + gates[i].g.flight + ' \u00b7 HOU \u2192 ' + gates[i].g.code;
+    if (now_ && text !== nowText) { nowText = text; now_.textContent = text; }
+  }
+
   var t0 = 0;
   function frameDraw(now) {
     raf = 0;
@@ -159,10 +175,12 @@
     ctx.drawImage(base, 0, 0, W, H);
     gates.forEach(function (g, i) { drawRoute(ctx, g, i === active ? .55 : .14, i === active ? 1.4 : .9); });
     var T = (now - t0) / 1000, per = F.flight.seconds, gap = F.flight.gapSeconds, cycle = gap * gates.length + per;
+    var flying = -1, latest = 1e9;
     gates.forEach(function (g, i) {
       var local = ((T - i * gap) % cycle + cycle) % cycle;      /* each flight leaves gap seconds after the last */
-      if (T >= i * gap && local < per) drawFlight(ctx, g, easeOut(local / per), i === active);
+      if (T >= i * gap && local < per) { drawFlight(ctx, g, easeOut(local / per), i === active); if (local < latest) { latest = local; flying = i; } }
     });
+    setNow(flying);
     drawGates(ctx);
     if (seen && !document.hidden) raf = requestAnimationFrame(frameDraw);
   }
@@ -175,6 +193,7 @@
     ctx.drawImage(base, 0, 0, W, H);
     gates.forEach(function (g, i) { drawRoute(ctx, g, i === active ? .6 : .3, i === active ? 1.6 : 1.1); });
     drawGates(ctx);
+    if (now_) now_.textContent = gates.length + ' routes \u00b7 all in place';
   }
 
   /* ---- the gates: hover, focus, click ---- */

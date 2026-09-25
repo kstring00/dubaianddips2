@@ -297,27 +297,5 @@
     window.addEventListener('resize', function () { var on = 0; tbs.forEach(function (b, i) { if (b.getAttribute('aria-selected') === 'true') on = i; }); pick(on); }, { passive: true });
   }
 
-  /* ---- /feed: the official embeds, loaded when a tile nears the screen ---- */
-  var ftiles = [].slice.call(document.querySelectorAll('.ftile.has-url'));
-  if (ftiles.length && IO) {
-    var loadedEmbeds = {};
-    var embedScript = function (src) { if (loadedEmbeds[src]) return; loadedEmbeds[src] = 1; var s = document.createElement('script'); s.src = src; s.async = true; document.body.appendChild(s); };
-    var fio = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (!e.isIntersecting) return; fio.unobserve(e.target);
-        var t = e.target, url = t.getAttribute('data-url'), p = t.getAttribute('data-platform'), body = t.querySelector('.ftile__body');
-        var id = /\/video\/(\d+)/.exec(url);
-        if (p === 'tiktok' && id) {
-          body.innerHTML = '<blockquote class="tiktok-embed" cite="' + url + '" data-video-id="' + id[1] + '"><section><a href="' + url + '" target="_blank" rel="noopener">Open on TikTok</a></section></blockquote>';
-          embedScript('https://www.tiktok.com/embed.js');
-        } else if (p === 'instagram') {
-          body.innerHTML = '<blockquote class="instagram-media" data-instgrm-permalink="' + url + '" data-instgrm-version="14"><a href="' + url + '" target="_blank" rel="noopener">Open on Instagram</a></blockquote>';
-          if (window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); else embedScript('https://www.instagram.com/embed.js');
-        } else return;
-        new MutationObserver(function (m, o) { if (body.querySelector('iframe')) { t.classList.add('is-embedded'); o.disconnect(); } }).observe(body, { childList: true, subtree: true });
-      });
-    }, { rootMargin: '300px 0px' });
-    ftiles.forEach(function (t) { fio.observe(t); });
-  }
 
 })();

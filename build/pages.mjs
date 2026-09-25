@@ -458,35 +458,38 @@ ${flightsSection()}`;
 }
 
 export function feedPage() {
+  /* The Feed is the NOW BOARDING wall that used to sit on the homepage:
+     the split-flap title, the pinned shearing wall of boarding-pass cards
+     (site.js builds them from config/feed.js) and the post viewer. */
   const trail = [{ name: 'Home', url: '/' }, { name: 'The Feed', url: '/feed' }];
-  const L = CFG.LINKS || {};
-  const glyph = p => p === 'tiktok'
-    ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v11.2a3.2 3.2 0 1 1-2.6-3.1V8.4a5.9 5.9 0 1 0 5.3 5.8V9.6a6.4 6.4 0 0 0 3.6 1.1V8a3.7 3.7 0 0 1-3.6-3.3V3z"/></svg>`
-    : `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="7" r="1.1"/></svg>`;
-  const name = { tiktok: 'TikTok', instagram: 'Instagram' }, handle = { tiktok: '@dubai.dips', instagram: '@dubaianddips' };
-  const tiles = FEED.map((t, i) => {
-    const p = t.platform === 'instagram' ? 'instagram' : 'tiktok';
-    const ok = /^https:\/\/(www\.|m\.|vm\.)?(tiktok\.com|instagram\.com)\//i.test(t.url || '');
-    return `<li class="ftile rv${ok ? ' has-url' : ''}" data-platform="${p}"${ok ? ` data-url="${esc(t.url)}"` : ''} style="--i:${i}">
-      <div class="ftile__top" aria-hidden="true">${glyph(p)}<span>${name[p]}</span></div>
-      <div class="ftile__body">${ok ? `<a class="ftile__link" href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.caption || 'Open on ' + name[p])}<span class="vh"> (opens in a new tab)</span></a>` : `<p class="ftile__ph">${esc(t.caption || '')}</p>`}</div>
-    </li>`;
-  }).join('');
-  const body = hero({ trail, eyebrow: 'HND &middot; Tokyo &middot; DD 106', h1: 'The *Feed.*',
-    lead: 'Our best TikToks and Reels, hand-picked. The tiles fill as post links are added; follow along in the meantime.',
-    actions: `<a class="btn btn--primary" href="${esc(L.tiktok)}" target="_blank" rel="noopener">${glyph('tiktok')} Follow on TikTok<span class="vh"> (opens in a new tab)</span></a><a class="btn btn--line" href="${esc(L.instagram)}" target="_blank" rel="noopener">${glyph('instagram')} Follow on Instagram<span class="vh"> (opens in a new tab)</span></a>` }) + `
-<section class="feedwall" aria-label="Posts">
-  <div class="shell"><ul class="feedwall__grid">${tiles}</ul></div>
-</section>
-<section class="follow" aria-label="Follow">
-  <div class="shell follow__grid">
-    <a class="follow__card follow__card--tt rv" href="${esc(L.tiktok)}" target="_blank" rel="noopener">${glyph('tiktok')}<span class="follow__k">TikTok</span><span class="follow__h">${handle.tiktok}</span><span class="follow__go">Follow <i aria-hidden="true">&nearr;</i></span><span class="vh"> (opens in a new tab)</span></a>
-    <a class="follow__card follow__card--ig rv" href="${esc(L.instagram)}" target="_blank" rel="noopener">${glyph('instagram')}<span class="follow__k">Instagram</span><span class="follow__h">${handle.instagram}</span><span class="follow__go">Follow <i aria-hidden="true">&nearr;</i></span><span class="vh"> (opens in a new tab)</span></a>
+  const body = `<section class="social" id="social" aria-labelledby="social-title">
+  <div class="shell social__head">
+    ${crumbs(trail)}<span class="label">Follow the route</span>
+    <h1 class="social__title" id="social-title" aria-label="Now boarding: @dubai.dips on TikTok, @dubaianddips on Instagram"><span class="social__flap" data-flap="NOW BOARDING" aria-hidden="true">NOW BOARDING</span><span class="social__handles" data-flap="&mdash; @dubai.dips / @dubaianddips" aria-hidden="true">&mdash; @dubai.dips / @dubaianddips</span></h1>
+    <p class="social__line">10k+ travelers follow <em>the route.</em></p>
   </div>
+  <div class="social__pin" id="socialPin">
+    <div class="social__stage">
+      <ul class="social__wall" id="socialWall" aria-label="Posts from TikTok and Instagram"></ul>
+    </div>
+  </div>
+  <p class="social__hint" aria-hidden="true">swipe &rarr;</p>
+  <noscript><p class="shell social__noscript"><a href="https://www.tiktok.com/@dubai.dips" target="_blank" rel="noopener">@dubai.dips on TikTok</a> &middot; <a href="https://www.instagram.com/dubaianddips/" target="_blank" rel="noopener">@dubaianddips on Instagram</a></p></noscript>
 </section>
-${flightsSection()}`;
-  return page({ path: '/feed', current: '/feed', bodyClass: 'p-feed', noindex: true, title: 'The Feed | Dubai & Dips on TikTok and Instagram',
-    description: 'Hand-picked TikToks and Instagram Reels from Dubai & Dips in Clear Lake, Houston.', jsonld: [breadcrumbs(trail)], body });
+${flightsSection()}
+<div class="swm" id="swm" hidden>
+  <div class="swm__backdrop" data-swm-close></div>
+  <div class="swm__panel" role="dialog" aria-modal="true" aria-labelledby="swmTitle">
+    <div class="swm__bar">
+      <p class="swm__title" id="swmTitle"></p>
+      <button class="swm__close" type="button" data-swm-close aria-label="Close">&times;</button>
+    </div>
+    <div class="swm__body" id="swmBody"></div>
+  </div>
+</div>`;
+  return page({ path: '/feed', current: '/feed', bodyClass: 'p-feed', title: 'The Feed | Dubai & Dips on TikTok and Instagram',
+    description: 'Now boarding: our TikToks and Instagram Reels from Dubai & Dips in Clear Lake, Houston. @dubai.dips on TikTok, @dubaianddips on Instagram.',
+    jsonld: [breadcrumbs(trail)], body });
 }
 
 /* ================================================================= 404 */

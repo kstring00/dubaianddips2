@@ -558,27 +558,8 @@
 
 /* ---- /feed ---- */
 .phero__actions .btn svg{width:1.05em;height:1.05em;fill:currentColor}
-.feedwall{padding:0 0 clamp(3rem,6vw,4rem);background:var(--surface)}
-.feedwall__grid{columns:3;column-gap:1rem;margin:0;padding:0;list-style:none}
-.ftile{break-inside:avoid;margin:0 0 1rem;overflow:hidden;border-radius:16px;background:var(--natural);box-shadow:inset 0 0 0 1px rgb(var(--bark-rgb)/.1)}
-.ftile__top{display:flex;align-items:center;gap:.5rem;padding:.8rem 1rem;font-family:var(--mono);font-weight:600;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--bark)}
-.ftile__top svg{width:1rem;height:1rem;fill:currentColor}
-.ftile__body{position:relative;min-height:22rem;display:grid;place-items:center;padding:1.2rem;background:var(--courtyard) url("/public/brand/pattern/pattern-on-courtyard.svg") 0 0/62.8px 64.61px;color:var(--off-white);text-align:center}
-.ftile:nth-child(3n+2) .ftile__body{min-height:28rem}
-.ftile__ph{max-width:24ch;font-family:var(--italic);font-style:italic;font-size:1.05rem;color:var(--natural)}
-.ftile__link{color:var(--off-white)}
-.ftile__body blockquote{margin:0!important;width:100%!important;min-width:0!important;max-width:none!important}
-.ftile.is-embedded .ftile__body{display:block;padding:0;background:var(--off-white);min-height:0}
-.follow{padding:0 0 clamp(4rem,8vw,7rem);background:var(--surface)}
-.follow__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
-.follow__card{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:1rem;padding:1.6rem 1.6rem;border-radius:18px;background:var(--courtyard);color:var(--off-white);text-decoration:none;transition:transform .6s var(--ease-out)}
-.follow__card:hover,.follow__card:focus-visible{transform:translate3d(0,-4px,0)}
-.follow__card svg{grid-row:1/3;width:2.2rem;height:2.2rem;fill:currentColor}
-.follow__k{font-family:var(--mono);font-weight:600;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mint)}
-.follow__h{font-family:var(--display);font-weight:500;font-size:clamp(1.3rem,2.4vw,1.9rem);letter-spacing:-.02em}
-.follow__go{grid-row:1/3;font-weight:500;color:var(--mint)}
 
-@media(max-width:1099px){.crew__list{grid-template-columns:repeat(2,minmax(0,1fr))}.feedwall__grid{columns:2}}
+@media(max-width:1099px){.crew__list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:899px){
   .vhero{height:130vh}
   .vhero__copy{bottom:calc(var(--thumb) + 6vh)}
@@ -597,9 +578,8 @@
   .gflap__n{display:none}
   .gflap .flaps{display:grid;grid-template-columns:repeat(var(--n,14),minmax(0,1fr));width:100%}
   .gflap .flap{width:auto;font-size:clamp(.7rem,3.2vw,1rem)}
-  .follow__grid{grid-template-columns:1fr}
 }
-@media(max-width:599px){.crew__list,.feedwall__grid{grid-template-columns:1fr;columns:1}.gal__grid{gap:.5rem}}
+@media(max-width:599px){.crew__list{grid-template-columns:1fr}.gal__grid{gap:.5rem}}
 @media(prefers-reduced-motion:reduce){
   .vhero{height:auto}
   .vhero__stage{position:relative;height:auto;min-height:70svh}
@@ -612,6 +592,132 @@
   .itin__ring-a,.itin__ring-b{transition:none;stroke-dashoffset:0}
   .jpour{display:none}
   .js .jhead__eyebrow,.js .jhead__title,.js .jhead__lead{opacity:1;transform:none;animation:none}
-  .gal__item img,.jcard__img img,.jcard__pill,.jcard__pill i,.gtabs__ink,.gtabs__btn,.follow__card{transition:none}
+  .gal__item img,.jcard__img img,.jcard__pill,.jcard__pill i,.gtabs__ink,.gtabs__btn{transition:none}
   .gtab{animation:none}
+}
+
+/* ---- /feed: NOW BOARDING. The TikTok + Instagram wall (moved here from the homepage).
+   Each post is a boarding pass: Bark ink card, Browned Sugar hairline,
+   Natural stubs. On a desktop the wall pins for the length of .social__pin
+   and its three columns shear (left .8x up, centre 1.25x down, right 1x
+   up); under 768px it is one swipe row and nothing is pinned. */
+.social{position:relative;background:var(--courtyard-deep);color:var(--off-white);padding-top:clamp(3.5rem,7vw,6rem)}
+.p-feed .page{background:var(--courtyard-deep)}
+.social .label{color:var(--mint)}
+.social :focus-visible{outline-color:var(--mint)}
+.social__head{display:flex;flex-direction:column;align-items:flex-start;gap:1rem;padding-bottom:clamp(2rem,4vw,3.2rem)}
+.social__title{display:flex;flex-direction:column;gap:.55rem;font-family:var(--data);font-weight:600;letter-spacing:0;line-height:1}
+.social__flap{font-size:clamp(1.7rem,4.6vw,3.6rem);letter-spacing:.04em;color:var(--off-white)}
+.social__handles{font-size:clamp(.82rem,1.5vw,1.1rem);font-weight:500;letter-spacing:.02em;color:var(--mint);line-height:1.5}
+.sf-word{display:inline-flex;white-space:nowrap}
+.social__flap .sf-ch{position:relative;display:inline-block;min-width:.74em;margin-right:.07em;padding:.1em .02em .08em;text-align:center;border-radius:3px;background:rgb(var(--black-rgb)/.3);box-shadow:inset 0 0 0 1px rgb(var(--black-rgb)/.2)}
+.social__flap .sf-ch::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgb(var(--black-rgb)/.4)}
+.social__flap .sf-word+.sf-word{margin-left:.3em}
+.social__line{font-family:var(--display);font-size:clamp(1.25rem,2.1vw,1.7rem);font-weight:400;letter-spacing:-.01em;color:var(--off-white)}
+.social__line em{font-family:var(--italic);font-style:italic;color:var(--mint)}
+
+.social__pin{position:relative}
+.social__stage{position:relative}
+/* the wall is built by site.js after first paint: hold its height until then, so nothing below it jumps */
+.social__wall:empty{min-height:calc(min(72vw,280px) * 1.7778 + 196px)}
+@media(min-width:768px){.social__wall:empty{min-height:100vh}}
+/* the breadcrumb sits on Courtyard here */
+.p-feed .crumbs a{color:rgb(var(--off-white-rgb)/.72)}
+.p-feed .crumbs a:hover,.p-feed .crumbs [aria-current]{color:var(--natural)}
+.p-feed .crumbs li+li::before{color:rgb(var(--off-white-rgb)/.35)}
+.social__wall{--card-w:min(300px,calc((var(--shell) - 2 * var(--col-gap)) / 3),calc((100vh - var(--nav-h) - 10rem) * .5625));--col-gap:clamp(1.2rem,3vw,2.8rem);display:grid;grid-template-columns:repeat(3,var(--card-w));justify-content:center;gap:clamp(1.6rem,3vw,2.6rem) var(--col-gap);margin:0;padding:0 0 clamp(3rem,6vw,5rem);list-style:none}
+.sw-slot{display:flex}
+.social.is-pinned .social__pin{height:250vh}
+.social.is-pinned .social__stage{position:sticky;top:0;height:100vh;overflow:hidden;overflow:clip;padding-top:calc(var(--nav-h) + 1.4rem);-webkit-mask-image:linear-gradient(transparent 0,#000 calc(var(--nav-h) + .6rem),#000 calc(100% - 3rem),transparent);mask-image:linear-gradient(transparent 0,#000 calc(var(--nav-h) + .6rem),#000 calc(100% - 3rem),transparent)}
+.social.is-pinned .social__wall{padding-bottom:0}
+.social.is-pinned .sw-slot{will-change:transform}
+
+.bp{--rot:0deg;position:relative;display:flex;flex-direction:column;width:100%;margin:0;padding:0;border:1px solid var(--browned-sugar);border-radius:14px;overflow:hidden;background:var(--bark-deep);color:var(--bark);font:inherit;text-align:left;text-decoration:none;cursor:pointer;-webkit-appearance:none;appearance:none;transform:rotate(var(--rot));transition:transform .6s var(--ease-out),box-shadow .6s var(--ease-out);box-shadow:0 18px 40px rgb(var(--black-rgb)/.28)}
+.bp:hover,.bp:focus-visible{transform:none;box-shadow:0 22px 50px rgb(var(--black-rgb)/.36)}
+/* brass, with an Off-White ring outside it: Browned Sugar alone is under 3:1 on the green */
+.social .bp:focus-visible{outline:2px solid var(--off-white);outline-offset:4px;border-color:var(--browned-sugar);box-shadow:0 0 0 2px var(--browned-sugar),0 22px 50px rgb(var(--black-rgb)/.36)}
+.bp__stub{position:relative;display:block;background:var(--natural);color:var(--bark);font-family:var(--data);font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.bp__stub::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .29 0 0 0 0 .24 0 0 0 0 .21 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.bp__top{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.55rem;padding:.55rem .7rem}
+.bp__badge{display:inline-grid;place-items:center;min-width:1.9rem;height:1.35rem;padding:0 .3rem;border-radius:5px;font-size:.66rem;letter-spacing:.04em;line-height:1}
+.bp__badge--tiktok{background:var(--bark);color:var(--off-white)}
+.bp__badge--instagram{position:relative;color:var(--bark);box-shadow:inset 0 0 0 1.5px var(--bark);border-radius:7px}
+.bp__route{white-space:nowrap;font-size:.74rem;letter-spacing:.1em}
+.bp__route i{font-style:normal;color:var(--browned-sugar-deep)}
+.bp__gate{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;font-size:.8rem}
+.bp__gate i{font-style:normal;font-size:.7rem;letter-spacing:.14em;color:var(--bark-soft)}
+.bp__photo{position:relative;display:block;aspect-ratio:9/16;overflow:hidden;background:var(--courtyard)}
+.bp__photo img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease-out)}
+.bp:hover .bp__photo img,.bp:focus-visible .bp__photo img{transform:scale(1.03)}
+.bp__play{position:absolute;right:.7rem;bottom:.7rem;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:rgb(var(--bark-rgb)/.72);border:1px solid rgb(var(--browned-sugar-rgb)/.9);color:var(--off-white);font-family:var(--data);font-size:.85rem;line-height:1}
+.bp__none{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;background:radial-gradient(120% 80% at 50% 45%,var(--courtyard) 0,var(--courtyard-deep) 100%);color:var(--off-white);text-align:center}
+.bp__none b{font-family:var(--data);font-size:clamp(2rem,4vw,3rem);letter-spacing:.08em;font-weight:600}
+.bp__none svg{--logo-h:22px;--logo-accent:var(--mint)}
+.bp.is-noposter .bp__none{display:flex}
+.bp.is-noposter picture{visibility:hidden}
+.bp__bot{flex:1 0 auto;padding:1.05rem .8rem .75rem}
+/* the tear line: perforation dots, with a notch cut into each edge */
+.bp__bot::before{content:"";position:absolute;left:.9rem;right:.9rem;top:0;height:4px;transform:translateY(-50%);background:radial-gradient(circle,var(--bark-deep) 1.5px,transparent 1.9px) 0 50%/9px 4px repeat-x;opacity:.55}
+.bp__notch{position:absolute;top:0;width:14px;height:14px;border-radius:50%;background:var(--courtyard-deep);transform:translateY(-50%);z-index:1}
+.bp__notch--l{left:-8px}.bp__notch--r{right:-8px}
+.bp__cap{display:block;font-family:var(--display);font-size:1rem;font-weight:500;letter-spacing:-.005em;line-height:1.25;text-transform:none;color:var(--bark)}
+.bp__meta{display:flex;justify-content:space-between;gap:.5rem;margin-top:.55rem;font-size:.7rem;letter-spacing:.16em;color:var(--bark-soft)}
+.bp__code{display:block;height:24px;margin-top:.5rem;background:repeating-linear-gradient(90deg,var(--bark) 0 2px,transparent 2px 3px,var(--bark) 3px 4px,transparent 4px 7px,var(--bark) 7px 10px,transparent 10px 11px,var(--bark) 11px 12px,transparent 12px 15px,var(--bark) 15px 16px,transparent 16px 18px,var(--bark) 18px 21px,transparent 21px 23px);opacity:.85}
+
+/* the follow tickets: outlined, never filled, so the Order button stays the one call to action */
+.bp--follow{justify-content:space-between;background:transparent;border:1.5px solid var(--browned-sugar);box-shadow:none;color:var(--off-white)}
+.bp--follow:hover,.bp--follow:focus-visible{box-shadow:none;background:rgb(var(--off-white-rgb)/.04)}
+.bp__follow{display:flex;flex-direction:column;align-items:center;gap:.7rem;padding:1.5rem 1.2rem;text-align:center}
+.bp__frow{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.7rem .9rem;font-family:var(--data);font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgb(var(--off-white-rgb)/.7)}
+.bp__frow--top{border-bottom:1px dashed rgb(var(--browned-sugar-rgb)/.7)}
+.bp__frow--bot{flex-direction:column;align-items:stretch;border-top:1px dashed rgb(var(--browned-sugar-rgb)/.7)}
+.bp__frow--bot .bp__code{width:100%;margin-top:.1rem;opacity:.5;background-image:repeating-linear-gradient(90deg,var(--natural) 0 2px,transparent 2px 3px,var(--natural) 3px 4px,transparent 4px 7px,var(--natural) 7px 10px,transparent 10px 11px,var(--natural) 11px 12px,transparent 12px 15px,var(--natural) 15px 16px,transparent 16px 18px,var(--natural) 18px 21px,transparent 21px 23px)}
+.bp__follow svg{--logo-h:26px;--logo-accent:var(--mint)}
+.bp__big{font-family:var(--display);font-size:clamp(1.45rem,2.2vw,1.9rem);font-weight:500;line-height:1.1;letter-spacing:-.02em}
+.bp__big em{font-family:var(--italic);font-style:italic;font-weight:400}
+.bp__handle{font-family:var(--data);font-size:.85rem;color:var(--natural)}
+.bp__count{font-size:.9rem;color:rgb(var(--off-white-rgb)/.82)}
+.bp__go{display:inline-flex;align-items:center;min-height:44px;margin-top:.4rem;padding:.55rem 1.3rem;border-radius:999px;box-shadow:inset 0 0 0 1.5px rgb(var(--off-white-rgb)/.75);font-weight:500;font-size:.95rem;transition:background .35s var(--ease),color .35s var(--ease)}
+.bp--follow:hover .bp__go,.bp--follow:focus-visible .bp__go{background:var(--off-white);color:var(--bark)}
+
+.social__hint{display:none}
+.social__noscript{padding-bottom:3rem}
+.social__noscript a{color:var(--off-white)}
+
+@media(max-width:767px){
+  .social__wall{display:flex;justify-content:flex-start;gap:1rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);padding:.4rem var(--gutter) 1.2rem;scrollbar-width:none}
+  .social__wall::-webkit-scrollbar{display:none}
+  .sw-slot{flex:0 0 min(72vw,280px);scroll-snap-align:start}
+  .bp{transform:none}
+  .social__hint{display:block;padding:0 var(--gutter) 3rem;text-align:right;font-family:var(--data);font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mint)}
+}
+
+/* the modal: our poster first, the official embed only once it has rendered */
+.swm{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:max(1rem,env(safe-area-inset-top,0px)) .75rem}
+.swm[hidden]{display:none}
+.swm__backdrop{position:absolute;inset:0;background:rgb(var(--bark-deep-rgb,59 49 43)/.9)}
+.swm__panel{position:relative;display:flex;flex-direction:column;width:min(580px,100%);max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);border:1.5px solid var(--browned-sugar);border-radius:16px;background:var(--bark-deep);color:var(--off-white);box-shadow:0 30px 80px rgb(var(--black-rgb)/.5);overflow:hidden}
+.js .swm:not([hidden]) .swm__panel{animation:swmIn .35s var(--ease-out)}
+@keyframes swmIn{from{opacity:0;transform:translateY(14px) scale(.98)}}
+.swm__bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.4rem .4rem .4rem 1.1rem;border-bottom:1px solid rgb(var(--browned-sugar-rgb)/.5)}
+.swm__title{font-family:var(--data);font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--natural)}
+.swm__close{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--off-white);font-size:1.6rem;line-height:1;cursor:pointer}
+.swm__close:hover{background:rgb(var(--off-white-rgb)/.08)}
+.swm :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.swm__body{overflow:auto;padding:1rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.swm__embed:empty{display:none}
+.swm__embed{width:100%;display:flex;justify-content:center}
+.swm__embed blockquote{margin:0!important}
+.swm.has-embed .swm__fallback{display:none}
+.swm__fallback{display:flex;flex-direction:column;align-items:center;gap:1rem;margin:0}
+.swm__fallback img{width:auto;max-width:100%;height:min(62vh,640px);aspect-ratio:9/16;object-fit:cover;border-radius:10px;border:1px solid rgb(var(--browned-sugar-rgb)/.7)}
+.swm__open{color:var(--off-white);box-shadow:inset 0 0 0 1.5px rgb(var(--off-white-rgb)/.8)}
+.swm__open:hover{background:var(--off-white);color:var(--bark)}
+html.swm-open{overflow:hidden}
+
+@media(prefers-reduced-motion:reduce){
+  .bp,.bp__photo img,.bp__go{transition:none}
+  .bp,.bp:hover,.bp:focus-visible{transform:none}
+  .bp:hover .bp__photo img,.bp:focus-visible .bp__photo img{transform:none}
+  .js .swm:not([hidden]) .swm__panel{animation:none}
 }

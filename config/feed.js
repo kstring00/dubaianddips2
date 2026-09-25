@@ -1,14 +1,53 @@
 /* Dubai & Dips - The Feed (/feed).
-   Hand-picked TikToks and Instagram Reels, embedded on the page. Paste a
-   post's URL (in the app: Share > Copy link) into `url`; the caption is
-   shown while the embed loads and read by screen readers. Leave `url`
-   empty and the tile stays a placeholder. No API keys, nothing automatic.
-   Plain ES5. */
+   The NOW BOARDING wall: every card is one of our TikToks or Reels, as a
+   boarding pass. Posts show in this order, with the two follow tickets
+   after the 3rd and the 6th.
+
+   To add or swap a post (no code change):
+     1. Drop the photo in assets/social/, e.g. social-09.jpg. A tall photo
+        at least 1080px wide looks best; any size works.
+     2. Add an entry below:
+          platform: "tiktok" or "instagram"
+          url:      the post's link (in the app: Share > Copy link)
+          poster:   "assets/social/social-09.jpg"  (the thumbnail)
+          focus:    the point of the photo to keep in the crop, "50% 50%"
+          caption:  under 60 characters
+          alt:      what the photo shows, for screen readers
+     3. Run `python3 scripts/social-posters.py` to cut the 9:16 WebP crops.
+   A post with an empty url still shows; it opens the profile in a new tab
+   instead of the post. Nothing from TikTok or Instagram loads with the
+   page; the official embed loads only when a card is opened. Plain ES5. */
 window.DD_FEED = [
-  { platform: "tiktok", url: "", caption: "[OWNER TO CONFIRM: paste a TikTok URL]" },
-  { platform: "instagram", url: "", caption: "[OWNER TO CONFIRM: paste an Instagram Reel URL]" },
-  { platform: "tiktok", url: "", caption: "[OWNER TO CONFIRM: paste a TikTok URL]" },
-  { platform: "instagram", url: "", caption: "[OWNER TO CONFIRM: paste an Instagram Reel URL]" },
-  { platform: "tiktok", url: "", caption: "[OWNER TO CONFIRM: paste a TikTok URL]" },
-  { platform: "instagram", url: "", caption: "[OWNER TO CONFIRM: paste an Instagram Reel URL]" }
+  { platform: "tiktok", url: "",
+    poster: "assets/social/social-01.jpg", focus: "49% 50%",
+    caption: "Kunafa, still crisp",
+    alt: "A round golden kunafa topped with a mound of crushed pistachio, on a gold board on white marble" },
+  { platform: "instagram", url: "",
+    poster: "assets/social/social-02.jpg", focus: "48% 50%",
+    caption: "Pistachio and chocolate, drizzled",
+    alt: "A frappe in a clear cup, streaked inside with pistachio and dark chocolate drizzle and topped with whipped cream, on marble" },
+  { platform: "tiktok", url: "",
+    poster: "assets/social/social-03.jpg", focus: "57% 50%",
+    caption: "Six drinks, one strawberry pistachio cup",
+    alt: "Six drinks lined up on marble; in the middle, a cup of fresh strawberries layered with pistachio and crowned with a whole strawberry" },
+  { platform: "instagram", url: "",
+    poster: "assets/social/social-04.jpg", focus: "44% 50%",
+    caption: "The green wall, Clear Lake",
+    alt: "Inside the shop: a deep green wall with the gold DUBAI & DIPS sign above the pastry counter, white chairs and marble tables in front" },
+  { platform: "tiktok", url: "",
+    poster: "assets/social/social-05.jpg", focus: "47% 55%",
+    caption: "Pistachio gelato, latte to go",
+    alt: "A hand holding a cup of pistachio gelato beside a layered latte in a Dubai & Dips cup, with the paper takeout bag behind them" },
+  { platform: "instagram", url: "",
+    poster: "assets/social/social-06.jpg", focus: "47% 50%",
+    caption: "Biscoff frappe, cookie on top",
+    alt: "A Biscoff frappe swirled with cookie butter, topped with whipped cream and a whole Biscoff cookie, on marble" },
+  { platform: "tiktok", url: "",
+    poster: "assets/social/social-07.jpg", focus: "50% 50%",
+    caption: "Pistachio matcha frappe",
+    alt: "A pistachio matcha frappe in a Dubai & Dips cup against a black background" },
+  { platform: "instagram", url: "",
+    poster: "assets/social/social-08.jpg", focus: "50% 50%",
+    caption: "Italy, by way of Houston",
+    alt: "Two drinks wearing FCO / ITALY boarding-pass cup labels, next to two desserts marked Handmade with Love" }
 ];
