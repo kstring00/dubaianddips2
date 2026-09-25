@@ -211,15 +211,21 @@ export function cateringPage() {
       <p>Call and we will take your date, headcount and order by phone. It takes a couple of minutes.</p>
       <p class="bform__callrow"><a class="btn btn--primary" href="tel:${PH.tel}" data-call="catering-form">Call ${esc(PH.display)}</a></p>
     </div>`;
-  const body = `<header class="phero phero--cater">
-  <div class="shell">
-    ${crumbs(trail)}
-    <p class="eyebrow rv">${star()}<span>Group bookings &middot; Offices, parties, events</span></p>
-    <h1 class="phero__title" data-lines>Catering that <em>arrives together.</em></h1>
-    <p class="phero__lead rv">Frappes, espresso, matcha and desserts for the whole room, planned with you.</p>
-    <div class="phero__actions phero__actions--cater rv">
-      <a class="btn btn--primary btn--hero" href="#request" data-scroll>Start a catering order</a>
-      <a class="phero__tel" href="tel:${PH.tel}" data-call="catering-hero">or call ${esc(PH.display)}</a>
+  const body = `<header class="sky sky--hero">
+  <video class="sky__film" muted playsinline loop preload="none" poster="/assets/flight-poster.webp" aria-hidden="true" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
+  <div class="sky__wash" aria-hidden="true"></div>
+  <div class="shell sky__grid">
+    <div class="sky__copy">
+      ${crumbs(trail)}
+      <p class="sky__eyebrow"><span class="sky__dot"></span>Catering &middot; Offices &amp; events</p>
+      <h1 class="sky__title">Big orders, <em>cleared for takeoff.</em></h1>
+      <p class="sky__lead">Kunafa, gelato and drinks for the whole room, boxed the morning of and on their way. One call or one link, and it all lands together.</p>
+      <ul class="sky__chips" aria-label="The short version">
+        <li><b>$${CFG.GROUP_ORDER_MINIMUM}</b><span>groups start</span></li>
+        <li><b>${CFG.DELIVERY_RADIUS_MILES} mi</b><span>delivery radius</span></li>
+        <li><b>${C.noticeHours ? C.noticeHours + ' hrs' : 'Same week'}</b><span>${C.noticeHours ? 'notice' : 'turnaround'}</span></li>
+      </ul>
+      <div class="sky__actions"><a class="btn btn--primary btn--hero" href="#request" data-scroll>Start a catering order</a><a class="sky__tel" href="tel:${PH.tel}" data-call="catering-hero">or call ${esc(PH.display)}</a></div>
     </div>
   </div>
 </header>
@@ -232,23 +238,6 @@ export function cateringPage() {
       <li class="rv"><span class="itin__n">${ring}<b>02</b></span><h3>Everyone picks</h3><p>${esc(CFG.COPY.groupText)} Group orders start at $${CFG.GROUP_ORDER_MINIMUM}.</p></li>
       <li class="rv"><span class="itin__n">${ring}<b>03</b></span><h3>Pickup or delivery</h3><p>Pick up at <a href="/visit/${READY[0].slug}">${esc(READY[0].name)}</a>, or have it delivered up to ${CFG.DELIVERY_RADIUS_MILES} miles from the shop ($${CFG.DELIVERY_MINIMUM} minimum).</p></li>
     </ol>
-  </div>
-</section>
-<section class="sky" aria-labelledby="sky-title">
-  <video class="sky__film" muted playsinline loop preload="none" poster="/assets/flight-poster.webp" aria-hidden="true" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
-  <div class="sky__wash" aria-hidden="true"></div>
-  <div class="shell sky__grid">
-    <div class="sky__copy">
-      <p class="sky__eyebrow rv"><span class="sky__dot"></span>Now departing &middot; HOU Clear Lake</p>
-      <h2 class="sky__title rv" id="sky-title">Big orders, <em>cleared for takeoff.</em></h2>
-      <p class="sky__lead rv">Kunafa, gelato and drinks for the whole room, boxed the morning of and on their way. One call or one link, and it all lands together.</p>
-      <ul class="sky__chips rv" aria-label="The short version">
-        <li><b>$${CFG.GROUP_ORDER_MINIMUM}</b><span>groups start</span></li>
-        <li><b>${CFG.DELIVERY_RADIUS_MILES} mi</b><span>delivery radius</span></li>
-        <li><b>${C.noticeHours ? C.noticeHours + ' hrs' : 'Same week'}</b><span>${C.noticeHours ? 'notice' : 'turnaround'}</span></li>
-      </ul>
-      <div class="sky__actions rv"><a class="btn btn--primary btn--hero" href="#request" data-cater-cta="sky">Start a catering order</a><a class="sky__tel" href="tel:${PH.tel}" data-call="catering-sky">or call ${esc(PH.display)}</a></div>
-    </div>
   </div>
 </section>
 ${faqBlock(faqs)}

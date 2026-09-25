@@ -776,3 +776,28 @@ html.swm-open{overflow:hidden}
 /* the arcade stands on a floor line, and the crew start a step below it */
 .phero--crew::before{content:"";position:absolute;left:8%;right:8%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgb(var(--browned-sugar-rgb)/.5) 20%,rgb(var(--browned-sugar-rgb)/.5) 80%,transparent);z-index:1}
 .p-team .crewgrid{padding-top:clamp(2.5rem,5vw,4rem)}
+
+/* the flight band as the catering hero: right under the nav, full height of
+   the first screen on a desktop, the breadcrumb in light type */
+.sky--hero{min-height:calc(100svh - var(--nav-h));padding:clamp(2rem,5vw,4rem) 0}
+.sky--hero .crumbs{margin-bottom:.4rem}
+.sky--hero .crumbs a{color:rgb(var(--off-white-rgb)/.75)}
+.sky--hero .crumbs a:hover,.sky--hero .crumbs [aria-current]{color:var(--natural)}
+.sky--hero .crumbs li+li::before{color:rgb(var(--off-white-rgb)/.4)}
+.sky--hero .sky__copy>*{animation:ddRise .9s var(--ease-out) both}
+.sky--hero .sky__copy>:nth-child(3){animation-delay:.08s}.sky--hero .sky__copy>:nth-child(4){animation-delay:.16s}.sky--hero .sky__copy>:nth-child(5){animation-delay:.24s}.sky--hero .sky__copy>:nth-child(6){animation-delay:.32s}
+@media(max-width:899px){.sky--hero{min-height:0;padding-top:1.4rem}.sky--hero .sky__copy{padding-top:16vw}}
+@media(prefers-reduced-motion:reduce){.sky--hero .sky__copy>*{animation:none}}
+
+/* 01 02 03: one clean disc each, Courtyard with an Off-White numeral, a
+   Browned Sugar ring drawn once around it, centred on the first line of the
+   heading and on the dashed route line */
+.itin__list{padding-left:4.2rem}
+.itin__list::before{left:calc(1.4rem - 1px);top:1.2rem;bottom:1.2rem}
+.itin .itin__n{left:-4.2rem;top:-.55rem;width:2.8rem;height:2.8rem;background:var(--courtyard);color:var(--off-white);box-shadow:0 0 0 6px var(--surface)}
+.itin .itin__n::after{display:none}
+.itin .itin__n b{position:relative;z-index:2;font-family:var(--data);font-weight:600;font-size:.9rem;letter-spacing:.02em;color:var(--off-white)}
+.itin .itin__ring{display:none}
+.itin .itin__n::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--browned-sugar);opacity:0;transform:scale(.7);transition:opacity .8s var(--ease),transform 1s cubic-bezier(.3,.7,.2,1)}
+.itin__list li.is-in .itin__n::before{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.itin .itin__n::before{opacity:1;transform:none;transition:none}}

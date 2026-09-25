@@ -224,8 +224,9 @@ export function flightsSection({ heading = 'Connecting *flights*', lead = 'Six r
       <div class="fl__label" hidden><span class="fl__lcode"></span><span class="fl__lcity"></span><span class="fl__lpage"></span><span class="fl__lflight"></span></div>
       <p class="fl__legend"><i class="mint"></i><span class="fl__now">Boarding</span></p>
     </div>
+    <p class="fl__pick">Pick a gate <span aria-hidden="true">&darr;</span></p>
     <ul class="fl__cards" aria-label="Destinations">${gates.map((g, i) => `
-      <li><a class="fl__card rv" href="${g.href}" data-gate="${i}" style="--i:${i}"><span class="fl__ccode" aria-hidden="true">${esc(g.code)}</span><span class="fl__ccity">${esc(g.city)} &middot; ${esc(g.flight)}</span><span class="fl__cpage"><span>${esc(g.page)}</span><i aria-hidden="true">&rarr;</i></span></a></li>`).join('')}
+      <li><a class="fl__card rv" href="${g.href}" data-gate="${i}" style="--i:${i}"><span class="fl__cmeta" aria-hidden="true"><b>${esc(g.code)}</b> ${esc(g.city)}</span><span class="fl__cpage">${esc(g.page)}</span><span class="fl__cgo" aria-hidden="true">&rarr;</span></a></li>`).join('')}
     </ul>
   </div>
 </section>`;

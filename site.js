@@ -210,8 +210,32 @@
       }
     }
     /* If the film never arrives the poster stays and the copy still lands. */
-    film.addEventListener('error', function () { film.removeAttribute('poster'); film.style.backgroundImage = 'url(/assets/hero-poster.webp)'; film.style.backgroundSize = 'cover'; }, true);
+    film.addEventListener('error', function () { film.removeAttribute('poster'); film.style.backgroundImage = 'url(/assets/hero-poster.webp)'; film.style.backgroundRepeat = 'no-repeat'; film.style.backgroundPosition = '50% 50%'; film.style.backgroundSize = getComputedStyle(film).objectFit === 'contain' ? 'contain' : 'cover'; }, true);
 
+    /* The opening never sits on the chocolate. The bar's top edge (with its
+       glow) is 27% of the way down the film's frame; work out where that
+       lands on this screen, whatever the crop, and shrink the wordmark and
+       tagline until the place line clears it. */
+    var BAR_TOP = .27, FRAME = [1280, 704];
+    var place = open.querySelector('.hero__place');
+    function fitOpening() {
+      if (!place) return;
+      var r = film.getBoundingClientRect(), st = open.getBoundingClientRect();
+      var fw = film.videoWidth || FRAME[0], fh = film.videoHeight || FRAME[1];
+      var fitMode = getComputedStyle(film).objectFit;
+      var k = fitMode === 'contain' ? Math.min(r.width / fw, r.height / fh) : Math.max(r.width / fw, r.height / fh);
+      var barTop = r.top + (r.height - fh * k) / 2 + fh * k * BAR_TOP - st.top;
+      var room = barTop - 14;
+      var fit = 1;
+      open.style.setProperty('--fit', '1');
+      for (var i = 0; i < 4; i++) {
+        var bottom = place.getBoundingClientRect().bottom - st.top;
+        if (bottom <= room) break;
+        var top = open.firstElementChild.getBoundingClientRect().top - st.top;
+        fit = Math.max(.55, fit * Math.max(.5, (room - top) / Math.max(1, bottom - top)));
+        open.style.setProperty('--fit', fit.toFixed(3));
+      }
+    }
     var travel = 1;
     function layoutHero() { travel = Math.max(1, hero.offsetHeight - window.innerHeight); }
 
@@ -262,9 +286,11 @@
       deferFilm();
       film.addEventListener('seeked', heroLoop.wake);
       film.addEventListener('loadedmetadata', heroLoop.wake);
-      layoutHero(); heroLoop.reset(); navStuck();
+      layoutHero(); fitOpening(); heroLoop.reset(); navStuck();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitOpening);
+      film.addEventListener('loadedmetadata', fitOpening);
       window.addEventListener('scroll', function () { heroLoop.wake(); navStuck(); }, { passive: true });
-      window.addEventListener('resize', function () { layoutHero(); heroLoop.wake(); navStuck(); }, { passive: true });
+      window.addEventListener('resize', function () { layoutHero(); fitOpening(); heroLoop.wake(); navStuck(); }, { passive: true });
     }
   }
 

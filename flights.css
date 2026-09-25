@@ -38,17 +38,19 @@
 .fl__legend i.mint{background:var(--mint)}
 /* the destinations as real links: one row of slim tickets, the code on
    the stub, a perforation, then the city and the page it flies to */
-.fl__cards{position:relative;z-index:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.55rem;margin:.7rem 0 0;padding:0;list-style:none}
+.fl__cards{position:relative;z-index:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.6rem;margin:.6rem 0 0;padding:0;list-style:none}
 .fl__cards>li{display:grid;min-width:0}
-.fl__card{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;align-items:center;column-gap:.9rem;row-gap:.15rem;min-height:6.4rem;padding:.9rem .95rem .9rem 1rem;border-radius:10px;background:rgb(var(--off-white-rgb)/.045);box-shadow:inset 0 0 0 1px rgb(var(--off-white-rgb)/.1);color:var(--off-white);text-decoration:none;transition:background .5s var(--ease),transform .6s var(--ease-out),box-shadow .5s var(--ease)}
-.fl__card::before{content:"";position:absolute;left:3.85rem;top:.7rem;bottom:.7rem;border-left:1px dashed rgb(var(--off-white-rgb)/.22)}
-.fl__card:hover,.fl__card:focus-visible,.fl__card.is-on{background:rgb(var(--off-white-rgb)/.09);box-shadow:inset 0 0 0 1px rgb(var(--mint-rgb)/.45);transform:translate3d(0,-3px,0)}
+/* each ticket is a button: a light card on the dark ground, the page it goes
+   to in large type, a filled arrow disc, and a lift on hover */
+.fl__card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;column-gap:.7rem;row-gap:.3rem;min-height:5.6rem;padding:.9rem .9rem .9rem 1.05rem;border-radius:14px;background:var(--natural);box-shadow:0 1px 0 rgb(var(--off-white-rgb)/.35) inset,0 10px 26px rgb(var(--black-rgb)/.28);color:var(--bark);text-decoration:none;cursor:pointer;transition:transform .5s var(--ease-out),box-shadow .5s var(--ease),background .4s var(--ease)}
+.fl__card:hover,.fl__card:focus-visible,.fl__card.is-on{background:var(--off-white);transform:translate3d(0,-4px,0);box-shadow:0 0 0 2px var(--mint),0 16px 34px rgb(var(--black-rgb)/.34)}
 .fl__card:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
-.fl__ccode{grid-row:1/3;width:2.35rem;font-family:var(--display);font-weight:500;font-size:1.35rem;letter-spacing:-.02em;line-height:1}
-.fl__ccity{font-family:var(--mono);font-weight:600;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fl__cpage{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-weight:500;font-size:.95rem;line-height:1.2}
-.fl__cpage i{font-style:normal;color:var(--mint);transition:transform .4s var(--ease-out)}
-.fl__card:hover .fl__cpage i{transform:translateX(4px)}
+.fl__cmeta{grid-column:1;font-family:var(--mono);font-weight:600;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--courtyard);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl__cmeta b{color:var(--browned-sugar-deep);letter-spacing:.12em}
+.fl__cpage{grid-column:1;font-family:var(--display);font-weight:600;font-size:clamp(1.05rem,1.3vw,1.25rem);letter-spacing:-.01em;line-height:1.15;color:var(--bark)}
+.fl__cgo{grid-column:2;grid-row:1/3;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:var(--courtyard);color:var(--off-white);font-size:1.05rem;transition:transform .45s var(--ease-out),background .4s var(--ease)}
+.fl__card:hover .fl__cgo,.fl__card:focus-visible .fl__cgo,.fl__card.is-on .fl__cgo{transform:translateX(3px);background:var(--browned-sugar-deep)}
+.fl__pick{position:relative;z-index:1;display:flex;align-items:center;gap:.5rem;margin:clamp(1rem,2vw,1.4rem) 0 0;font-family:var(--mono);font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mint)}
 @media(max-width:1199px){.fl__cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:899px){
   .fl__stage{height:220px;border-radius:12px}
@@ -58,10 +60,10 @@
      edges inside the section, which clips it, so the page never scrolls sideways */
   .fl__cards{display:flex;gap:.5rem;margin:.7rem calc(-1 * var(--gutter)) 0;padding:0 var(--gutter) .3rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .fl__cards::-webkit-scrollbar{display:none}
-  .fl__cards>li{flex:0 0 min(66vw,15.5rem);scroll-snap-align:start}
+  .fl__cards>li{flex:0 0 min(62vw,14rem);scroll-snap-align:start}
 }
 @media(prefers-reduced-motion:reduce){
-  .fl__canvas,.fl__video,.fl__gates,.fl__legend,.fl__card,.fl__cpage i,.fl__gate b{transition:none}
+  .fl__canvas,.fl__video,.fl__gates,.fl__legend,.fl__card,.fl__cgo,.fl__gate b{transition:none}
   .fl__label{animation:none}
   .fl__video{display:none!important}
   .fl .fl__canvas,.fl .fl__gates,.fl .fl__legend{opacity:1}
