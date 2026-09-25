@@ -6,8 +6,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { marked } from 'marked';
-import { ROOT, CFG, SITE, PROD, READY, esc, abs, page, crumbs, star, breadcrumbs, faqPage, organization, ORG_ID } from './lib.mjs';
-import { orderBtn, connections, imgSize, img } from './pages.mjs';
+import { ROOT, CFG, SITE, PROD, READY, esc, abs, page, crumbs, star, breadcrumbs, faqPage, organization, ORG_ID, flightsSection } from './lib.mjs';
+import { orderBtn, imgSize, img } from './pages.mjs';
 
 const DIR = path.join(ROOT, 'content', 'blog');
 const REQUIRED = ['title', 'description', 'slug', 'date', 'targetKeyword', 'heroImage', 'heroAlt'];
@@ -87,6 +87,26 @@ const ctaBlock = where => `<aside class="pcta" aria-label="Order ahead">
 </aside>`;
 const fmtDate = d => new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
+/* the title with one italic word: the frontmatter's `italic`, else the last word */
+function italicised(p) {
+  const t = String(p.title);
+  if (p.italic && t.includes(p.italic)) return esc(t).replace(esc(p.italic), '<em>' + esc(p.italic) + '</em>');
+  const m = /^(.*\s)(\S+?)([.?!:]*)$/.exec(t);
+  return m ? esc(m[1]) + '<em>' + esc(m[2]) + '</em>' + esc(m[3]) : esc(t);
+}
+/* the Journal's square: image, the Read pill riding its bottom-right
+   corner, a tiny category label, a centred serif title with one italic word */
+function square(p, i = 0) {
+  const [w, h] = imgSize(p.heroImage);
+  return `<li class="jcard rv" data-cat="${esc(p.category)}" style="--i:${i}">
+  <a class="jcard__link" href="/blog/${p.slug}">
+    <figure class="jcard__img">${img(p.heroImage, p.heroAlt, w, h, { lazy: i > 1, sizes: '(min-width: 900px) 50vw, 100vw' })}<span class="jcard__pill" aria-hidden="true">Read <i>&rarr;</i></span></figure>
+    <p class="jcard__cat">${esc(p.category)}${p.draft ? ' &middot; Draft' : ''} &middot; ${p.readMin} min</p>
+    <h2 class="jcard__title">${italicised(p)}</h2>
+  </a>
+</li>`;
+}
+
 function card(p, { big = false, i = 0 } = {}) {
   const [w, h] = imgSize(p.heroImage);
   return `<article class="pcard${big ? ' pcard--big' : ''} rv" data-cat="${esc(p.category)}" style="--i:${i}">
@@ -108,35 +128,46 @@ export function buildBlog() {
   const out = {};
 
   /* /blog */
-  const trail = [{ name: 'Home', url: '/' }, { name: 'Blog', url: '/blog' }];
+  const trail = [{ name: 'Home', url: '/' }, { name: 'The Journal', url: '/blog' }];
   const cats = [...new Set(posts.map(p => p.category))];
   const [feat, ...rest] = posts;
-  const indexBody = `<header class="phero phero--blog">
-  <div class="shell phero__grid">
-    <div class="phero__copy">
-      ${crumbs(trail)}
-      <p class="eyebrow rv">${star()}<span>The flight log</span></p>
-      <h1 class="phero__title" data-lines>Dessert guides from <em>Clear Lake.</em></h1>
-      <p class="phero__lead rv">Notes from our dessert shop in Clear Lake, Houston: what Dubai chocolate is, which frappe to order, and how to feed a whole office.</p>
-    </div>
+  /* the opening moment: an espresso pour that settles into the title
+     (CSS animation, once, 2.6s); reduced motion shows the title alone */
+  const pour = `<div class="jpour" aria-hidden="true">
+    <svg class="jpour__svg" viewBox="0 0 320 210">
+      <rect class="jpour__spout" x="146" y="14" width="28" height="9" rx="2"/>
+      <path class="jpour__stream" d="M160 23 V132" pathLength="100"/>
+      <clipPath id="jpourCup"><path d="M118 124 h92 l-9 58 q-1 8 -9 8 h-56 q-8 0 -9 -8 z"/></clipPath>
+      <rect class="jpour__crema" x="110" y="124" width="108" height="72" clip-path="url(#jpourCup)"/>
+      <path class="jpour__cup" d="M118 124 h92 l-9 58 q-1 8 -9 8 h-56 q-8 0 -9 -8 z" pathLength="100"/>
+      <path class="jpour__handle" d="M210 136 q22 2 20 20 q-2 16 -22 16" pathLength="100"/>
+      <path class="jpour__saucer" d="M96 200 h128" pathLength="100"/>
+    </svg>
+  </div>`;
+  const indexBody = `<header class="jhead">
+  <div class="shell jhead__in">
+    ${crumbs(trail)}
+    ${pour}
+    <p class="eyebrow jhead__eyebrow">${star()}<span>CDG &middot; Paris &middot; DD 104</span></p>
+    <h1 class="jhead__title"><span>The</span> <em>Journal.</em></h1>
+    <p class="jhead__lead">Notes from our dessert shop in Clear Lake, Houston: what Dubai chocolate is, which frappe to order, and how to feed a whole office.</p>
   </div>
 </header>
-${posts.length ? `<section class="blogidx" aria-label="Posts">
+${posts.length ? `<section class="jidx" aria-label="Posts">
   <div class="shell">
     ${cats.length > 1 ? `<div class="bfilter rv" role="group" aria-label="Filter by category"><button type="button" aria-pressed="true" data-filter="*">All</button>${cats.map(c => `<button type="button" aria-pressed="false" data-filter="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}
-    ${card(feat, { big: true })}
-    ${rest.length ? `<div class="pgrid">${rest.map((p, i) => card(p, { i })).join('')}</div>` : ''}
+    <ul class="jgrid">${posts.map((p, i) => square(p, i)).join('')}</ul>
     <p class="bfilter__none" hidden>No posts in that category yet.</p>
   </div>
 </section>` : `<section class="blogidx blogidx--empty">
   <div class="shell"><div class="bempty rv"><p class="eyebrow">${star()}<span>Boarding soon</span></p><h2>The first guides are being written.</h2><p>Until they land, the <a href="/menu">menu</a> and the <a href="/visit">shop</a> are open.</p></div></div>
 </section>`}
-${connections([['/menu', 'MENU', 'The whole menu', 'Ten routes, from Dubai chocolate to kunafa.'], ['/visit', 'HOU', 'Visit the shop', 'Hours, parking and directions.'], ['/catering', 'GRP', 'Catering', 'Frappes and desserts for a group.']])}`;
+${flightsSection()}`;
   out['blog/index.html'] = page({
     path: '/blog', current: '/blog', bodyClass: 'p-blog', noindex: !posts.some(p => !p.draft),
-    title: 'Dessert Guides from Clear Lake, Houston | Dubai & Dips Blog',
+    title: 'The Journal: Dessert Guides in Houston | Dubai & Dips',
     description: 'Guides from Dubai & Dips in Clear Lake, Houston: Dubai chocolate explained, which frappe to order, late-night dessert and ordering for the office.',
-    jsonld: [breadcrumbs(trail), { '@type': 'Blog', '@id': SITE + '/blog#blog', name: 'Dubai & Dips blog', url: SITE + '/blog', publisher: { '@id': ORG_ID },
+    jsonld: [breadcrumbs(trail), { '@type': 'Blog', '@id': SITE + '/blog#blog', name: 'The Journal, by Dubai & Dips', url: SITE + '/blog', publisher: { '@id': ORG_ID },
       blogPost: posts.filter(p => !p.draft).map(p => ({ '@type': 'BlogPosting', headline: p.title, url: SITE + '/blog/' + p.slug, datePublished: p.date })) }, organization()],
     body: indexBody
   });

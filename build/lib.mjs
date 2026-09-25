@@ -59,7 +59,8 @@ export const HOME_CSS_FILE = { path: `/assets/css/home.${CSS_HASH}.css`, body: H
    blocks the first paint: brand tokens + the homepage's own styles +
    pages.css, comments and extra whitespace removed. */
 const minCss = c => c.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s*\n\s*/g, '\n').replace(/\n+/g, '\n').trim();
-const INLINE_CSS = [read('brand.css'), HOME_CSS, read('pages.css')].map(minCss).join('\n');
+export const FLIGHTS_CSS = minCss(read('flights.css'));
+const INLINE_CSS = [minCss(read('brand.css')), minCss(HOME_CSS), minCss(read('pages.css')), FLIGHTS_CSS].join('\n');
 const SPRITE = /<svg class="vh" aria-hidden="true" focusable="false"><defs>[\s\S]*?<\/defs><\/svg>/.exec(HOME)[0];
 const HEADER = HOME.slice(HOME.indexOf('<header class="nav'), HOME.indexOf('<!-- /build:header -->'));
 if (!HEADER || HOME.indexOf('<!-- /build:footer -->') < 0) throw new Error('index.html is missing the build:header / build:footer markers');
@@ -191,9 +192,42 @@ ${footer()}
 <script src="/track.js" defer></script>
 <script src="/site.js" defer></script>
 <script src="/pages.js" defer></script>
+<script src="/config/flights.js" defer></script>
+<script src="/flights.js" defer></script>
 </body>
 </html>
 `;
+}
+
+/* ---- Connecting Flights: the route map section, one source for the
+   homepage and every inner page. The map itself is drawn by flights.js from
+   config/flights.js; this is the markup around it, the film for the opening
+   and the destinations as real links. ---- */
+const FLIGHTS = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(read('config/flights.js'), sb); return sb.window.DD_FLIGHTS; })();
+export function flightsSection({ heading = 'Connecting *flights*', lead = 'Six routes out of Houston. Every one lands somewhere on this site.' } = {}) {
+  const gates = FLIGHTS.gates;
+  return `<section class="fl" id="flights" aria-labelledby="fl-title">
+  <div class="shell">
+    <div class="fl__head">
+      <div><p class="eyebrow rv">${star()}<span>Departures &middot; HOU Clear Lake</span></p><h2 class="fl__title rv" id="fl-title">${accent(heading)}</h2></div>
+      <p class="fl__lead rv">${lead}</p>
+    </div>
+    <div class="fl__stage" aria-hidden="true">
+      <canvas class="fl__canvas"></canvas>
+      <video class="fl__video" muted playsinline preload="none" poster="/assets/flight-poster.webp" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
+      <video class="fl__video fl__video--v" muted playsinline preload="none" poster="/assets/flight-poster-9x16.webp" tabindex="-1"><source data-src="/assets/flight-9x16.webm" type="video/webm"><source data-src="/assets/flight-9x16.mp4" type="video/mp4"></video>
+      <ul class="fl__gates">
+        <li><span class="fl__origin"></span></li>${gates.map((g, i) => `
+        <li><a class="fl__gate" href="${g.href}" data-gate="${i}" tabindex="-1"><span></span><b>${esc(g.code)}</b></a></li>`).join('')}
+      </ul>
+      <div class="fl__label" hidden><span class="fl__lcode"></span><span class="fl__lcity"></span><span class="fl__lpage"></span><span class="fl__lflight"></span></div>
+      <p class="fl__legend"><span><i class="mint"></i>Now flying</span><span><i class="sugar"></i>Contrail</span></p>
+    </div>
+    <ul class="fl__cards" aria-label="Destinations">${gates.map((g, i) => `
+      <li><a class="fl__card rv" href="${g.href}" data-gate="${i}" style="--i:${i}"><span class="fl__ccode" aria-hidden="true">${esc(g.code)}</span><span class="fl__ccity">${esc(g.city)} &middot; ${esc(g.flight)}</span><span class="fl__cpage"><span>${esc(g.page)}</span><i aria-hidden="true">&rarr;</i></span></a></li>`).join('')}
+    </ul>
+  </div>
+</section>`;
 }
 
 /* The small print under a page title, as a boarding-pass strip. */

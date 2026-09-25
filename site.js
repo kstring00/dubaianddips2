@@ -127,6 +127,9 @@
     sheetList.innerHTML = [].map.call(document.querySelectorAll('.nav__links a'), function (a, i) {
       var cur = a.getAttribute('aria-current');
       return '<li style="--i:' + i + '"><a href="' + a.getAttribute('href') + '"' + (cur ? ' aria-current="' + cur + '"' : '') + '><b aria-hidden="true">' + (i < 9 ? '0' : '') + (i + 1) + '</b><span>' + a.textContent + '</span><i aria-hidden="true">&rarr;</i></a></li>';
+    }).join('') + (sheetList.getAttribute('data-more') || '').split('|').filter(Boolean).map(function (x, k) {
+      var pair = x.split('='), n = document.querySelectorAll('.nav__links a').length + k;
+      return '<li class="navsheet__more" style="--i:' + n + '"><a href="' + pair[1] + '"><b aria-hidden="true">' + (n < 9 ? '0' : '') + (n + 1) + '</b><span>' + pair[0] + '</span><i aria-hidden="true">&rarr;</i></a></li>';
     }).join('');
     var ord = document.querySelector('.nav__order'), tel = (CFG.PHONE || {}).tel;
     sheetFoot.innerHTML = '<a class="btn btn--primary" href="' + (ord ? ord.getAttribute('href') : '/#order') + '" data-order="pickup" data-place="menu-sheet">' + (COPY.pickupShort || 'Order pickup') + '</a>' +
@@ -876,6 +879,24 @@
       }, { threshold: .35 });
       gio.observe(gate);
     }
+  }
+
+  /* ------------------------------------------------- the keepsake pass
+     The footer's boarding pass unfolds once the footer is 35% into view and
+     folds again when it has dropped below 10%, two different points so it
+     never flickers at the edge. Visibility is measured against the smaller
+     of the footer and the viewport, so a tall phone footer can reach 35%.
+     Reduced motion: always open. */
+  var footEl = document.getElementById('foot');
+  if (footEl && !reduce && 'IntersectionObserver' in window) {
+    footEl.classList.add('is-folded');
+    var steps = []; for (var q = 0; q <= 20; q++) steps.push(q / 20);
+    new IntersectionObserver(function (es) {
+      var r = footEl.getBoundingClientRect();
+      var vis = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0)) / Math.max(1, Math.min(r.height, window.innerHeight));
+      if (vis >= .35) footEl.classList.remove('is-folded');
+      else if (vis <= .10) footEl.classList.add('is-folded');
+    }, { threshold: steps }).observe(footEl);
   }
 
   /* ----------------------------------------------------------- footer

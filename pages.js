@@ -157,19 +157,26 @@
         return;
       }
       errBox.hidden = true;
-      var endpoint = (form.getAttribute('data-endpoint') || '').trim();
+      /* robots fill the hidden field; people never see it. Say nothing, send nothing. */
+      var hp = form.elements.botcheck;
+      if (hp && hp.value) { status.textContent = ''; return; }
+      var key = (form.getAttribute('data-key') || '').trim();
+      var endpoint = (form.getAttribute('data-endpoint') || '').trim() || (key ? 'https://api.web3forms.com/submit' : '');
       if (!endpoint) {
         status.innerHTML = 'Online requests are not switched on yet, so nothing was sent. Please call <a class="u" href="tel:' + (phone.tel || '') + '">' + (phone.display || 'the shop') + '</a> and we will take it by phone.';
         emit('catering_request', { sent: false, reason: 'no-endpoint' });
         return;
       }
       var d = data();
+      /* Web3Forms wants access_key, and reads subject/from_name for the email */
+      if (key) { d.access_key = key; d.subject = 'Catering request: ' + d.date + ' for ' + d.headcount; d.from_name = 'Dubai & Dips website'; d.botcheck = ''; }
       send.setAttribute('aria-busy', 'true');
       status.textContent = 'Sending your request…';
       fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(d) })
-        .then(function (r) {
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok && j.success !== false, j: j }; }); })
+        .then(function (res) {
           send.removeAttribute('aria-busy');
-          if (!r.ok) throw new Error(r.status);
+          if (!res.ok) throw new Error('send');
           emit('catering_request', { sent: true, headcount: +d.headcount });
           done(d);
         })
@@ -184,7 +191,7 @@
   /* ---- /blog: the category filter ---- */
   var filter = document.querySelector('.bfilter');
   if (filter) {
-    var cards = [].slice.call(document.querySelectorAll('.blogidx .pcard')), none = document.querySelector('.bfilter__none');
+    var cards = [].slice.call(document.querySelectorAll('.blogidx .pcard, .jgrid .jcard')), none = document.querySelector('.bfilter__none');
     filter.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-filter]'); if (!b) return;
       var f = b.getAttribute('data-filter'), shown = 0;
@@ -213,4 +220,104 @@
     window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(frame); }, { passive: true });
     frame();
   }
+
+  /* ---- the location page: walking in. The photo settles from a slight
+     zoom while the copy rises, then the frame washes to Off-White and the
+     gate pass takes over. Same shape as the homepage hero: a normalised
+     progress value, transforms and opacity only, eased in a rAF loop. ---- */
+  var vhero = document.getElementById('vhero');
+  if (vhero && !reduce) {
+    var vPhoto = vhero.querySelector('.vhero__photo'), vScrim = vhero.querySelector('.vhero__scrim'), vExit = vhero.querySelector('.vhero__exit'), vCopy = vhero.querySelector('.vhero__copy'), vHint = vhero.querySelector('.vhero__hint');
+    var vcur = 0, vraf = 0;
+    var vclamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+    var vease = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var vrng = function (p, a, b) { return vclamp((p - a) / (b - a), 0, 1); };
+    function vtarget() { var travel = Math.max(1, vhero.offsetHeight - window.innerHeight); return vclamp(-vhero.getBoundingClientRect().top / travel, 0, 1); }
+    function vapply(p) {
+      var zoom = 1.14 - .14 * vease(vrng(p, 0, .7));
+      vPhoto.style.transform = 'scale(' + zoom.toFixed(4) + ') translate3d(0,' + (-4 * vease(vrng(p, 0, 1))).toFixed(2) + '%,0)';
+      vScrim.style.opacity = (.55 + .3 * vease(vrng(p, 0, .5))).toFixed(3);
+      var out = vease(vrng(p, .72, .96));
+      vCopy.style.transform = 'translate3d(0,' + (-28 * out).toFixed(1) + 'px,0)';
+      vCopy.style.opacity = (1 - out).toFixed(3);
+      vExit.style.opacity = (.82 * vease(vrng(p, .74, 1))).toFixed(3);
+      if (vHint) vHint.style.opacity = (1 - vease(vrng(p, .02, .12))).toFixed(3);
+    }
+    function vtick() { vraf = 0; var t = vtarget(); vcur += (t - vcur) * .16; if (Math.abs(t - vcur) < .0005) vcur = t; vapply(vcur); if (vcur !== t) vraf = requestAnimationFrame(vtick); }
+    function vwake() { if (!vraf) vraf = requestAnimationFrame(vtick); }
+    window.addEventListener('scroll', vwake, { passive: true });
+    window.addEventListener('resize', vwake, { passive: true });
+    vcur = vtarget(); vapply(vcur);
+  }
+
+  /* ---- /gelato: the tabs ---- */
+  var tabbar = document.querySelector('.gtabs__bar');
+  var flapsDone = false;
+  /* the flavor board: each row riffles in once, the first time it is shown */
+  function settleFlaps() {
+    if (flapsDone || reduce) return; flapsDone = true;
+    var CH = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-&./';
+    [].forEach.call(document.querySelectorAll('.gflap'), function (row, r) {
+      [].forEach.call(row.querySelectorAll('.flap'), function (cell, i) {
+        var face = cell.firstElementChild, leaf = cell.lastElementChild, to = face.textContent.replace(' ', ' ');
+        if (to === ' ') return;
+        var b = CH.indexOf(to); if (b < 0) return;
+        var seq = []; for (var k = 5; k > 0; k--) seq.push(CH.charAt((b - k + CH.length * 2) % CH.length)); seq.push(to);
+        seq.forEach(function (ch, n) {
+          setTimeout(function () {
+            leaf.firstElementChild.textContent = face.textContent; face.textContent = ch;
+            if (leaf.animate) leaf.animate([{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(-90deg)' }], { duration: n === seq.length - 1 ? 150 : 80, easing: 'ease-in', fill: 'forwards' });
+          }, 120 + r * 140 + i * 22 + n * 55);
+        });
+      });
+    });
+  }
+  if (tabbar) {
+    var tbs = [].slice.call(tabbar.querySelectorAll('[role=tab]')), tink = tabbar.querySelector('.gtabs__ink');
+    var pick = function (i, focus) {
+      tbs.forEach(function (b, k) {
+        var on = k === i; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(b.getAttribute('aria-controls')); if (panel) panel.hidden = !on;
+      });
+      var b = tbs[i];
+      if (tink) tink.style.transform = 'translate3d(' + b.offsetLeft + 'px,0,0) scaleX(' + (b.offsetWidth / 100) + ')';
+      if (focus) b.focus();
+      if (b.id === 'tabbtn-flavors') settleFlaps();
+    };
+    tbs.forEach(function (b, i) {
+      b.addEventListener('click', function () { pick(i); });
+      b.addEventListener('keydown', function (e) {
+        var n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tbs.length - 1 : -1;
+        if (n < 0) return; e.preventDefault(); pick((n + tbs.length) % tbs.length, true);
+      });
+    });
+    var hashTab = -1;
+    tbs.forEach(function (b, i) { if ('#' + b.getAttribute('aria-controls') === location.hash) hashTab = i; });
+    pick(hashTab > -1 ? hashTab : 0);
+    window.addEventListener('resize', function () { var on = 0; tbs.forEach(function (b, i) { if (b.getAttribute('aria-selected') === 'true') on = i; }); pick(on); }, { passive: true });
+  }
+
+  /* ---- /feed: the official embeds, loaded when a tile nears the screen ---- */
+  var ftiles = [].slice.call(document.querySelectorAll('.ftile.has-url'));
+  if (ftiles.length && IO) {
+    var loadedEmbeds = {};
+    var embedScript = function (src) { if (loadedEmbeds[src]) return; loadedEmbeds[src] = 1; var s = document.createElement('script'); s.src = src; s.async = true; document.body.appendChild(s); };
+    var fio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return; fio.unobserve(e.target);
+        var t = e.target, url = t.getAttribute('data-url'), p = t.getAttribute('data-platform'), body = t.querySelector('.ftile__body');
+        var id = /\/video\/(\d+)/.exec(url);
+        if (p === 'tiktok' && id) {
+          body.innerHTML = '<blockquote class="tiktok-embed" cite="' + url + '" data-video-id="' + id[1] + '"><section><a href="' + url + '" target="_blank" rel="noopener">Open on TikTok</a></section></blockquote>';
+          embedScript('https://www.tiktok.com/embed.js');
+        } else if (p === 'instagram') {
+          body.innerHTML = '<blockquote class="instagram-media" data-instgrm-permalink="' + url + '" data-instgrm-version="14"><a href="' + url + '" target="_blank" rel="noopener">Open on Instagram</a></blockquote>';
+          if (window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); else embedScript('https://www.instagram.com/embed.js');
+        } else return;
+        new MutationObserver(function (m, o) { if (body.querySelector('iframe')) { t.classList.add('is-embedded'); o.disconnect(); } }).observe(body, { childList: true, subtree: true });
+      });
+    }, { rootMargin: '300px 0px' });
+    ftiles.forEach(function (t) { fio.observe(t); });
+  }
+
 })();

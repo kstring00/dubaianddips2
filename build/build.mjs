@@ -11,8 +11,8 @@
    VERCEL_ENV=production leaves draft posts out entirely. */
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, DIST, PROD, CFG, SITE, READY, MISSING_LOCATIONS, HOME_CSS_FILE, read, write, jsonldTag, restaurant, organization, website, lastmod } from './lib.mjs';
-import { menuPage, cateringPage, visitIndex, locationPage, notFoundPage } from './pages.mjs';
+import { ROOT, DIST, PROD, CFG, SITE, READY, MISSING_LOCATIONS, HOME_CSS_FILE, FLIGHTS_CSS, flightsSection, read, write, jsonldTag, restaurant, organization, website, lastmod } from './lib.mjs';
+import { menuPage, cateringPage, visitIndex, locationPage, notFoundPage, gelatoPage, teamPage, feedPage } from './pages.mjs';
 import { buildBlog } from './blog.mjs';
 
 const t0 = Date.now();
@@ -37,7 +37,11 @@ fs.mkdirSync(DIST, { recursive: true });
 const home = read('index.html');
 const MARK = '<!-- build:jsonld (structured data is generated from config at build time) -->';
 if (!home.includes(MARK)) throw new Error('index.html is missing the build:jsonld marker');
-write('index.html', home.replace(MARK, jsonldTag([organization(), website(), ...READY.map(restaurant)])));
+const FL = '<!-- build:flights (the Connecting Flights map, generated from config/flights.js) -->';
+if (!home.includes(FL) || !home.includes('/* build:flights-css */')) throw new Error('index.html is missing the build:flights markers');
+write('index.html', home.replace(MARK, jsonldTag([organization(), website(), ...READY.map(restaurant)]))
+  .replace(FL, flightsSection({ heading: 'Connecting *flights*', lead: 'Six routes out of Houston. Every one lands somewhere on this site.' }))
+  .replace('/* build:flights-css */', FLIGHTS_CSS));
 write(HOME_CSS_FILE.path.slice(1), HOME_CSS_FILE.body);
 
 /* 2. pages */
@@ -45,6 +49,10 @@ const pages = {
   'menu/index.html': menuPage(),
   'catering/index.html': cateringPage(),
   'visit/index.html': visitIndex(),
+  /* ready for content: built, noindex, and kept out of the sitemap */
+  'gelato/index.html': gelatoPage(),
+  'team/index.html': teamPage(),
+  'feed/index.html': feedPage(),
   '404.html': notFoundPage()
 };
 for (const l of READY) pages[`visit/${l.slug}/index.html`] = locationPage(l);
