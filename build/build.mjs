@@ -11,8 +11,8 @@
    VERCEL_ENV=production leaves draft posts out entirely. */
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, DIST, PROD, CFG, SITE, READY, MISSING_LOCATIONS, HOME_CSS_FILE, read, write, jsonldTag, restaurant, organization, website, lastmod } from './lib.mjs';
-import { menuPage, cateringPage, visitIndex, locationPage, notFoundPage } from './pages.mjs';
+import { ROOT, DIST, PROD, CFG, SITE, READY, MISSING_LOCATIONS, HOME_CSS_FILE, FLIGHTS_CSS, flightsSection, read, write, jsonldTag, restaurant, organization, website, lastmod } from './lib.mjs';
+import { menuPage, cateringPage, visitIndex, locationPage, notFoundPage, gelatoPage, teamPage, feedPage } from './pages.mjs';
 import { buildBlog } from './blog.mjs';
 
 const t0 = Date.now();
@@ -33,11 +33,23 @@ fs.mkdirSync(DIST, { recursive: true });
   }
 })('');
 
+/* the night sky on /team: tsParticles (engine + slim), bundled into one
+   file of ours so nothing loads from a CDN */
+{
+  const { buildSync } = await import('esbuild');
+  buildSync({ entryPoints: [path.join(ROOT, 'build/stars.entry.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2019',
+    legalComments: 'none', outfile: path.join(DIST, 'vendor/stars.js'), logLevel: 'warning' });
+}
+
 /* the homepage: structured data into <head>, nothing else */
 const home = read('index.html');
 const MARK = '<!-- build:jsonld (structured data is generated from config at build time) -->';
 if (!home.includes(MARK)) throw new Error('index.html is missing the build:jsonld marker');
-write('index.html', home.replace(MARK, jsonldTag([organization(), website(), ...READY.map(restaurant)])));
+const FL = '<!-- build:flights (the Connecting Flights map, generated from config/flights.js) -->';
+if (!home.includes(FL) || !home.includes('/* build:flights-css */')) throw new Error('index.html is missing the build:flights markers');
+write('index.html', home.replace(MARK, jsonldTag([organization(), website(), ...READY.map(restaurant)]))
+  .replace(FL, flightsSection())
+  .replace('/* build:flights-css */', FLIGHTS_CSS));
 write(HOME_CSS_FILE.path.slice(1), HOME_CSS_FILE.body);
 
 /* 2. pages */
@@ -45,6 +57,10 @@ const pages = {
   'menu/index.html': menuPage(),
   'catering/index.html': cateringPage(),
   'visit/index.html': visitIndex(),
+  'feed/index.html': feedPage(),
+  /* ready for content: built, noindex, and kept out of the sitemap */
+  'gelato/index.html': gelatoPage(),
+  'team/index.html': teamPage(),
   '404.html': notFoundPage()
 };
 for (const l of READY) pages[`visit/${l.slug}/index.html`] = locationPage(l);
@@ -59,6 +75,7 @@ const urls = [
   ['/menu', lastmod(['menu-board.json', 'build/pages.mjs'])],
   ['/catering', lastmod(['build/pages.mjs', 'config/ordering.js'])],
   ['/visit', lastmod(['build/pages.mjs', 'config/ordering.js'])],
+  ['/feed', lastmod(['build/pages.mjs', 'config/feed.js'])],
   ...READY.map(l => ['/visit/' + l.slug, lastmod(['build/pages.mjs', 'config/ordering.js'])]),
   ...(blog.posts.some(p => !p.draft) ? [['/blog', blog.posts.filter(p => !p.draft).map(p => p.updated).sort().pop()]] : []),
   ...blog.posts.filter(p => !p.draft).map(p => ['/blog/' + p.slug, p.updated || p.date])

@@ -21,6 +21,7 @@ export const server = http.createServer((req, res) => {
   let p = decodeURIComponent(u.pathname);
   const slug = /^\/menu\/([a-z0-9-]+)\/?$/.exec(p);
   if (slug) { res.writeHead(308, { Location: '/menu#' + slug[1] }); return res.end(); }
+  if (/^\/journal(\/|$)/.test(p)) { res.writeHead(308, { Location: p.replace(/^\/journal/, '/blog') }); return res.end(); }
   if (p.length > 1 && p.endsWith('/')) { res.writeHead(308, { Location: p.slice(0, -1) + u.search }); return res.end(); }
   if (p === '/') p = '/index.html';
   else if (p === '/order-demo') p = '/order-demo.html';

@@ -157,19 +157,26 @@
         return;
       }
       errBox.hidden = true;
-      var endpoint = (form.getAttribute('data-endpoint') || '').trim();
+      /* robots fill the hidden field; people never see it. Say nothing, send nothing. */
+      var hp = form.elements.botcheck;
+      if (hp && hp.value) { status.textContent = ''; return; }
+      var key = (form.getAttribute('data-key') || '').trim();
+      var endpoint = (form.getAttribute('data-endpoint') || '').trim() || (key ? 'https://api.web3forms.com/submit' : '');
       if (!endpoint) {
         status.innerHTML = 'Online requests are not switched on yet, so nothing was sent. Please call <a class="u" href="tel:' + (phone.tel || '') + '">' + (phone.display || 'the shop') + '</a> and we will take it by phone.';
         emit('catering_request', { sent: false, reason: 'no-endpoint' });
         return;
       }
       var d = data();
+      /* Web3Forms wants access_key, and reads subject/from_name for the email */
+      if (key) { d.access_key = key; d.subject = 'Catering request: ' + d.date + ' for ' + d.headcount; d.from_name = 'Dubai & Dips website'; d.botcheck = ''; }
       send.setAttribute('aria-busy', 'true');
       status.textContent = 'Sending your request…';
       fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(d) })
-        .then(function (r) {
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok && j.success !== false, j: j }; }); })
+        .then(function (res) {
           send.removeAttribute('aria-busy');
-          if (!r.ok) throw new Error(r.status);
+          if (!res.ok) throw new Error('send');
           emit('catering_request', { sent: true, headcount: +d.headcount });
           done(d);
         })
@@ -184,7 +191,7 @@
   /* ---- /blog: the category filter ---- */
   var filter = document.querySelector('.bfilter');
   if (filter) {
-    var cards = [].slice.call(document.querySelectorAll('.blogidx .pcard')), none = document.querySelector('.bfilter__none');
+    var cards = [].slice.call(document.querySelectorAll('.blogidx .pcard, .jgrid .jcard')), none = document.querySelector('.bfilter__none');
     filter.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-filter]'); if (!b) return;
       var f = b.getAttribute('data-filter'), shown = 0;
@@ -213,4 +220,169 @@
     window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(frame); }, { passive: true });
     frame();
   }
+
+  /* ---- the location page: walking in. The photo settles from a slight
+     zoom while the copy rises, then the frame washes to Off-White and the
+     gate pass takes over. Same shape as the homepage hero: a normalised
+     progress value, transforms and opacity only, eased in a rAF loop. ---- */
+  var vhero = document.getElementById('vhero');
+  if (vhero && !reduce) {
+    var vPhoto = vhero.querySelector('.vhero__photo'), vScrim = vhero.querySelector('.vhero__scrim'), vExit = vhero.querySelector('.vhero__exit'), vCopy = vhero.querySelector('.vhero__copy'), vHint = vhero.querySelector('.vhero__hint');
+    var vcur = 0, vraf = 0;
+    var vclamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+    var vease = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var vrng = function (p, a, b) { return vclamp((p - a) / (b - a), 0, 1); };
+    function vtarget() { var travel = Math.max(1, vhero.offsetHeight - window.innerHeight); return vclamp(-vhero.getBoundingClientRect().top / travel, 0, 1); }
+    function vapply(p) {
+      var zoom = 1.14 - .14 * vease(vrng(p, 0, .7));
+      vPhoto.style.transform = 'scale(' + zoom.toFixed(4) + ') translate3d(0,' + (-4 * vease(vrng(p, 0, 1))).toFixed(2) + '%,0)';
+      vScrim.style.opacity = (.55 + .3 * vease(vrng(p, 0, .5))).toFixed(3);
+      var out = vease(vrng(p, .72, .96));
+      vCopy.style.transform = 'translate3d(0,' + (-28 * out).toFixed(1) + 'px,0)';
+      vCopy.style.opacity = (1 - out).toFixed(3);
+      vExit.style.opacity = (.82 * vease(vrng(p, .74, 1))).toFixed(3);
+      if (vHint) vHint.style.opacity = (1 - vease(vrng(p, .02, .12))).toFixed(3);
+    }
+    function vtick() { vraf = 0; var t = vtarget(); vcur += (t - vcur) * .16; if (Math.abs(t - vcur) < .0005) vcur = t; vapply(vcur); if (vcur !== t) vraf = requestAnimationFrame(vtick); }
+    function vwake() { if (!vraf) vraf = requestAnimationFrame(vtick); }
+    window.addEventListener('scroll', vwake, { passive: true });
+    window.addEventListener('resize', vwake, { passive: true });
+    vcur = vtarget(); vapply(vcur);
+  }
+
+  /* ---- /catering: the departures band's film. No source until the band
+     is a screen away; plays while on screen, pauses when it is not. ---- */
+  var sky = document.querySelector('.sky__film');
+  if (sky && !reduce && IO) {
+    var skyOn = false;
+    var sio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting && !skyOn) {
+          skyOn = true;
+          if (!sky.getAttribute('data-live')) {
+            sky.setAttribute('data-live', '1');
+            [].forEach.call(sky.querySelectorAll('source[data-src]'), function (so) { so.src = so.getAttribute('data-src'); });
+            sky.load();
+          }
+          var pr = sky.play(); if (pr && pr.catch) pr.catch(function () {});
+        } else if (!e.isIntersecting && skyOn) { skyOn = false; sky.pause(); }
+      });
+    }, { rootMargin: '40% 0px' });
+    sio.observe(sky);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) sky.pause(); else if (skyOn) { var pr = sky.play(); if (pr && pr.catch) pr.catch(function () {}); } });
+  }
+
+  /* ---- /team: the night sky. /vendor/stars.js (tsParticles, bundled by the
+     build) loads only once the header is on screen; the stars pause when it
+     scrolls away and play again on return. The text rises once the stars
+     are up (or after a moment if they never come). ---- */
+  var night = document.getElementById('night');
+  if (night) {
+    var skyEl = document.getElementById('nightStars'), sparkEl = document.getElementById('nightSpark');
+    var skies = [], lit = false, seen = false, asked = false;
+    var light = function () { if (!lit) { lit = true; night.classList.add('is-lit'); } };
+    var phoneQ = window.matchMedia('(max-width: 899px)').matches;
+    /* the stars wait for the page to finish loading and the browser to be
+       idle, so the photo and the headline paint first */
+    var whenCalm = function (fn) {
+      var go = function () { if ('requestIdleCallback' in window) requestIdleCallback(fn, { timeout: 1200 }); else setTimeout(fn, 200); };
+      if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
+    };
+    var loadStars = function () {
+      if (asked) return; asked = true;
+      whenCalm(function () {
+      var s = document.createElement('script'); s.src = '/vendor/stars.js'; s.async = true;
+      s.onload = function () {
+        if (!window.DDStars) { light(); return; }
+        Promise.all([
+          window.DDStars.start(skyEl, { kind: 'sky', reduce: reduce, phone: phoneQ }),
+          sparkEl ? window.DDStars.start(sparkEl, { kind: 'spark', reduce: reduce, phone: phoneQ }) : null
+        ]).then(function (cs) {
+          skies = cs.filter(Boolean);
+          skyEl.classList.add('is-on'); if (sparkEl) sparkEl.classList.add('is-on');
+          setTimeout(light, reduce ? 0 : 350);
+          if (!seen && !reduce) skies.forEach(function (c) { c.pause(); });
+        }).catch(light);
+      };
+      s.onerror = light;
+      document.head.appendChild(s);
+      });
+    };
+    setTimeout(light, 2200);
+    if (IO) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          seen = e.isIntersecting;
+          if (seen) loadStars();
+          if (reduce) return;
+          skies.forEach(function (c) { if (seen) c.play(); else c.pause(); });
+        });
+      }, { threshold: 0 }).observe(night);
+    } else { loadStars(); }
+  }
+
+  /* ---- /gelato: the hero. One glint across the glass a second after the
+     photo settles; the photo drifts up a little slower than the page. ---- */
+  var ghero = document.getElementById('ghero');
+  if (ghero && !reduce) {
+    var gmedia = ghero.querySelector('.ghero__media');
+    setTimeout(function () { ghero.classList.add('is-glint'); }, 2600);
+    var graf = 0, gcur = 0;
+    var gtick = function () {
+      graf = 0;
+      var top = ghero.getBoundingClientRect().top, h = ghero.offsetHeight || 1;
+      var p = Math.min(1, Math.max(0, -top / h)), y = -40 * p;
+      if (Math.abs(y - gcur) > .1) { gcur = y; gmedia.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0)'; }
+    };
+    window.addEventListener('scroll', function () { if (!graf) graf = requestAnimationFrame(gtick); }, { passive: true });
+  }
+
+  /* ---- /gelato: the tabs ---- */
+  var tabbar = document.querySelector('.gtabs__bar');
+  var flapsDone = false;
+  /* the flavor board: each row riffles in once, the first time it is shown */
+  function settleFlaps() {
+    if (flapsDone || reduce) return; flapsDone = true;
+    var CH = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-&./';
+    [].forEach.call(document.querySelectorAll('.gflap'), function (row, r) {
+      [].forEach.call(row.querySelectorAll('.flap'), function (cell, i) {
+        var face = cell.firstElementChild, leaf = cell.lastElementChild, to = face.textContent.replace(' ', ' ');
+        if (to === ' ') return;
+        var b = CH.indexOf(to); if (b < 0) return;
+        var seq = []; for (var k = 5; k > 0; k--) seq.push(CH.charAt((b - k + CH.length * 2) % CH.length)); seq.push(to);
+        seq.forEach(function (ch, n) {
+          setTimeout(function () {
+            leaf.firstElementChild.textContent = face.textContent; face.textContent = ch;
+            if (leaf.animate) leaf.animate([{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(-90deg)' }], { duration: n === seq.length - 1 ? 150 : 80, easing: 'ease-in', fill: 'forwards' });
+          }, 120 + r * 140 + i * 22 + n * 55);
+        });
+      });
+    });
+  }
+  if (tabbar) {
+    var tbs = [].slice.call(tabbar.querySelectorAll('[role=tab]')), tink = tabbar.querySelector('.gtabs__ink');
+    var pick = function (i, focus) {
+      tbs.forEach(function (b, k) {
+        var on = k === i; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(b.getAttribute('aria-controls')); if (panel) panel.hidden = !on;
+      });
+      var b = tbs[i];
+      if (tink) tink.style.transform = 'translate3d(' + b.offsetLeft + 'px,0,0) scaleX(' + (b.offsetWidth / 100) + ')';
+      if (focus) b.focus();
+      if (b.id === 'tabbtn-flavors') settleFlaps();
+    };
+    tbs.forEach(function (b, i) {
+      b.addEventListener('click', function () { pick(i); });
+      b.addEventListener('keydown', function (e) {
+        var n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tbs.length - 1 : -1;
+        if (n < 0) return; e.preventDefault(); pick((n + tbs.length) % tbs.length, true);
+      });
+    });
+    var hashTab = -1;
+    tbs.forEach(function (b, i) { if ('#' + b.getAttribute('aria-controls') === location.hash) hashTab = i; });
+    pick(hashTab > -1 ? hashTab : 0);
+    window.addEventListener('resize', function () { var on = 0; tbs.forEach(function (b, i) { if (b.getAttribute('aria-selected') === 'true') on = i; }); pick(on); }, { passive: true });
+  }
+
+
 })();

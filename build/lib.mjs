@@ -59,7 +59,8 @@ export const HOME_CSS_FILE = { path: `/assets/css/home.${CSS_HASH}.css`, body: H
    blocks the first paint: brand tokens + the homepage's own styles +
    pages.css, comments and extra whitespace removed. */
 const minCss = c => c.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s*\n\s*/g, '\n').replace(/\n+/g, '\n').trim();
-const INLINE_CSS = [read('brand.css'), HOME_CSS, read('pages.css')].map(minCss).join('\n');
+export const FLIGHTS_CSS = minCss(read('flights.css'));
+const INLINE_CSS = [minCss(read('brand.css')), minCss(HOME_CSS), minCss(read('pages.css')), FLIGHTS_CSS].join('\n');
 const SPRITE = /<svg class="vh" aria-hidden="true" focusable="false"><defs>[\s\S]*?<\/defs><\/svg>/.exec(HOME)[0];
 const HEADER = HOME.slice(HOME.indexOf('<header class="nav'), HOME.indexOf('<!-- /build:header -->'));
 if (!HEADER || HOME.indexOf('<!-- /build:footer -->') < 0) throw new Error('index.html is missing the build:header / build:footer markers');
@@ -172,7 +173,7 @@ ${o.image ? '' : '<meta property="og:image:width" content="1200">\n<meta propert
 <meta name="twitter:description" content="${esc(o.description)}">
 <meta name="twitter:image" content="${img}">
 <meta name="twitter:image:alt" content="${esc(imgAlt)}">
-${o.preloadImage ? `<link rel="preload" as="image" href="${o.preloadImage}" fetchpriority="high">\n` : ''}<link rel="preload" as="font" type="font/woff2" href="/public/fonts/albert-sans.woff2" crossorigin>
+${o.preloadImage ? `<link rel="preload" as="image" href="${o.preloadImage}" fetchpriority="high">\n` : ''}${(o.preloads || []).map(p => `<link rel="preload" as="image" href="${p.href}"${p.media ? ` media="${p.media}"` : ''} fetchpriority="high">\n`).join('')}<link rel="preload" as="font" type="font/woff2" href="/public/fonts/albert-sans.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/public/fonts/encode-sans.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/public/fonts/playfair-display-italic.woff2" crossorigin>
 <style>${INLINE_CSS}</style>
@@ -189,11 +190,46 @@ ${footer()}
 <script src="/config/ordering.js" defer></script>
 <script src="/hours.js" defer></script>
 <script src="/track.js" defer></script>
+<script src="/config/feed.js" defer></script>
 <script src="/site.js" defer></script>
 <script src="/pages.js" defer></script>
+<script src="/config/flights.js" defer></script>
+<script src="/flights.js" defer></script>
 </body>
 </html>
 `;
+}
+
+/* ---- Connecting Flights: the route map section, one source for the
+   homepage and every inner page. The map itself is drawn by flights.js from
+   config/flights.js; this is the markup around it, the film for the opening
+   and the destinations as real links. ---- */
+const FLIGHTS = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(read('config/flights.js'), sb); return sb.window.DD_FLIGHTS; })();
+export function flightsSection({ heading = 'Where to *next?*', lead = 'Explore the rest of Dubai &amp; Dips: the menu, gelato, catering, our journal, the crew and the feed. Pick a destination below.' } = {}) {
+  const gates = FLIGHTS.gates;
+  return `<section class="fl" id="flights" aria-labelledby="fl-title">
+  <div class="shell">
+    <div class="fl__head">
+      <div><p class="eyebrow rv">${star()}<span>Explore the site</span></p><h2 class="fl__title rv" id="fl-title">${accent(heading)}</h2></div>
+      <p class="fl__lead rv">${lead}</p>
+    </div>
+    <div class="fl__stage" aria-hidden="true">
+      <canvas class="fl__canvas"></canvas>
+      <video class="fl__video" muted playsinline preload="none" data-poster="/assets/flight-poster.webp" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
+      <video class="fl__video fl__video--v" muted playsinline preload="none" data-poster="/assets/flight-poster-9x16.webp" tabindex="-1"><source data-src="/assets/flight-9x16.webm" type="video/webm"><source data-src="/assets/flight-9x16.mp4" type="video/mp4"></video>
+      <ul class="fl__gates">
+        <li><span class="fl__origin"></span></li>${gates.map((g, i) => `
+        <li><a class="fl__gate" href="${g.href}" data-gate="${i}" tabindex="-1"><span></span><b>${esc(g.code)}</b></a></li>`).join('')}
+      </ul>
+      <div class="fl__label" hidden><span class="fl__lcode"></span><span class="fl__lcity"></span><span class="fl__lpage"></span><span class="fl__lflight"></span></div>
+      <p class="fl__legend"><i class="mint"></i><span class="fl__now">Boarding</span></p>
+    </div>
+    <p class="fl__pick">Choose a page <span aria-hidden="true">&darr;</span></p>
+    <ul class="fl__cards" aria-label="Explore the site">${gates.map((g, i) => `
+      <li><a class="fl__card rv" href="${g.href}" data-gate="${i}" style="--i:${i}"><span class="fl__cmeta" aria-hidden="true"><b>${esc(g.code)}</b> ${esc(g.city)}</span><span class="fl__cpage">${esc(g.page)}</span><span class="fl__cgo" aria-hidden="true">&rarr;</span></a></li>`).join('')}
+    </ul>
+  </div>
+</section>`;
 }
 
 /* The small print under a page title, as a boarding-pass strip. */

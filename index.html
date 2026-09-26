@@ -121,7 +121,8 @@ h1 em,h2 em,h3 em{font-family:var(--italic);font-style:italic;font-weight:400;le
 strong,b{font-weight:600}
 p{margin:0}
 .shell{width:var(--shell);margin-inline:auto}
-.label{font-family:var(--mono);font-weight:600;font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-ink)}
+/* section names: big enough to say what the section is at a glance */
+.label{font-family:var(--mono);font-weight:600;font-size:clamp(.98rem,1.3vw,1.18rem);letter-spacing:.22em;text-transform:uppercase;color:var(--accent-ink)}
 .craft .label,.foot .label{color:var(--accent-bright)}
 .vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 .skip{position:absolute;left:-9999px;top:0;z-index:200}
@@ -165,6 +166,10 @@ p{margin:0}
 .nav__links{display:flex;gap:1.5rem;align-items:center}
 .nav__links a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;font-size:.95rem;font-weight:400;text-decoration:none;color:var(--bark);transition:color .3s var(--ease)}
 .nav__links a:hover{color:var(--courtyard)}
+/* eight links: they tighten on laptop widths and never wrap */
+.nav__links a{white-space:nowrap}
+@media(max-width:1279px){.nav__links{gap:1.05rem}.nav__links a{font-size:.9rem}}
+@media(min-width:900px) and (max-width:1149px){.nav__links{gap:.7rem}.nav__links a{min-width:0;font-size:.86rem}.nav__right{gap:.9rem}}
 .nav__right{display:flex;align-items:center;gap:1.4rem}
 .nav__call{display:inline-flex;align-items:center;min-height:44px;font-size:.95rem;font-weight:500;text-decoration:none;color:var(--bark);border-bottom:1px solid rgb(var(--bark-rgb)/.35)}
 .nav__hours{font-family:var(--mono);font-weight:600;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--courtyard)}
@@ -232,14 +237,20 @@ html.navsheet-open .thumbbar{visibility:hidden}
 .hero__stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--film);isolation:isolate}
 .hero__film{position:absolute;inset:0;z-index:1;background:var(--film)}
 .hero__film video{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 50%;background:var(--film)}
+/* wider than the film (about 1.82:1): cover would crop the top and bottom, so
+   the bar would swell under the copy and the buttons. Show the full height
+   instead, the edges faded into the ground. */
+@media(min-width:900px) and (min-aspect-ratio:20/11){.hero__film video{object-fit:contain;--fw:calc(100svh * 1280 / 704);-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);-webkit-mask-size:var(--fw) 100%;mask-size:var(--fw) 100%;-webkit-mask-position:50% 0;mask-position:50% 0;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}}
 .hero__scrim{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;background:linear-gradient(to top,rgb(var(--film-rgb)/.95) 0%,rgb(var(--film-rgb)/.9) 20%,rgb(var(--film-rgb)/.76) 34%,rgb(var(--film-rgb)/.42) 50%,rgb(var(--film-rgb)/0) 68%),linear-gradient(to right,rgb(var(--film-rgb)/.62) 0%,rgb(var(--film-rgb)/.26) 36%,rgb(var(--film-rgb)/0) 62%);will-change:opacity}
 .hero__exit{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;background:linear-gradient(to top,var(--surface) 0%,rgb(var(--surface-rgb)/.72) 26%,rgb(var(--surface-rgb)/0) 62%);will-change:opacity}
-.hero__open{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:1.5vh;will-change:opacity,transform}
-.hero__place{order:2;font-family:var(--mono);font-weight:500;font-size:.8rem;letter-spacing:.26em;text-transform:uppercase;color:var(--accent-bright);margin-top:0}
+/* --fit is set by site.js so the wordmark, tagline and place line always sit
+   in the dark space above the bar, never over the chocolate */
+.hero__open{--fit:1;position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:1.5vh;will-change:opacity,transform}
+.hero__place{order:3;font-family:var(--mono);font-weight:500;font-size:.8rem;letter-spacing:.26em;text-transform:uppercase;color:var(--accent-bright);margin-top:0}
 /* The primary logo, Off-White with the Mint Burj, as the opening frame.
    It lifts away before the room comes in, so it is never over the sign.
    Its padding is the protection area; the line under it sits outside. */
-.hero__mark{order:1;--logo-h:clamp(2.4rem,4.2vw,3.8rem);--logo-ink:var(--off-white);--logo-accent:var(--mint);padding:calc(var(--logo-h) * var(--clear-primary))}
+.hero__mark{order:1;--logo-h:calc(clamp(2.4rem,4.2vw,3.8rem) * var(--fit));--logo-ink:var(--off-white);--logo-accent:var(--mint);padding:calc(var(--logo-h) * var(--clear-primary))}
 /* The order CTA in the opening state. Visible at first paint, before any
    film has loaded, and it is the largest single element on the page. */
 .hero__cta{position:absolute;left:50%;bottom:max(9vh,64px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.75rem;pointer-events:auto}
@@ -252,6 +263,16 @@ html.navsheet-open .thumbbar{visibility:hidden}
 @keyframes heroArrow{0%,100%{transform:translateY(0);opacity:.65}50%{transform:translateY(5px);opacity:1}}
 .hero__land{position:absolute;z-index:4;left:var(--gutter);bottom:max(5.5vh,42px);width:min(640px,52vw);display:flex;flex-direction:column;align-items:flex-start;gap:1rem;will-change:opacity,transform}
 .js .hero__land{opacity:0}
+/* the tagline: Editor's Note stand-in, one line under the wordmark. "Walk in."
+   comes in from the left and "Taste Dubai." from the right; they meet in the
+   middle a beat after the wordmark. */
+.hero__tag{order:2;display:flex;justify-content:center;flex-wrap:nowrap;gap:.32em;margin:0 0 calc(.9rem * var(--fit));font-family:var(--italic);font-style:italic;font-weight:400;font-size:calc(clamp(1.45rem,2.6vw,2.3rem) * var(--fit));line-height:1.15;letter-spacing:-.005em;color:var(--off-white);text-shadow:0 6px 30px rgb(var(--black-rgb)/.35);white-space:nowrap}
+.hero__tag-l{display:block}
+.js .hero__tag-l{opacity:0;animation:heroTagL 1.1s .75s var(--ease-out) forwards}
+.js .hero__tag-l:first-child{transform:translate3d(-38vw,0,0)}
+.js .hero__tag-l:last-child{transform:translate3d(38vw,0,0);animation-name:heroTagR}
+@keyframes heroTagL{0%{opacity:0;transform:translate3d(-38vw,0,0)}35%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes heroTagR{0%{opacity:0;transform:translate3d(38vw,0,0)}35%{opacity:1}100%{opacity:1;transform:none}}
 .hero__kicker{font-family:var(--mono);font-weight:600;font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-bright)}
 .hero__land h1{font-weight:500;font-size:clamp(2.6rem,5.4vw,6rem);line-height:.92;letter-spacing:-.04em;color:var(--on-dark);text-wrap:balance;text-shadow:0 8px 40px rgb(var(--black-rgb)/.3)}
 .hero__land h1 em{color:var(--accent-bright);letter-spacing:-.02em}
@@ -268,11 +289,12 @@ html.navsheet-open .thumbbar{visibility:hidden}
   .hero{height:360vh}
   .hero__film video{top:22svh;height:56.25vw;object-fit:contain;-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgb(var(--black-rgb)) 6%,rgb(var(--black-rgb)) 94%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,rgb(var(--black-rgb)) 6%,rgb(var(--black-rgb)) 94%,transparent 100%)}
   .hero__open{padding-top:12vh}
-  .hero__mark{--logo-h:clamp(2rem,8.6vw,2.8rem)}
+  .hero__mark{--logo-h:calc(clamp(2rem,8.6vw,2.8rem) * var(--fit))}
   .hero__place{font-size:.7rem;letter-spacing:.2em}
   .hero__hint{bottom:calc(var(--thumb) + 3vh)}
   .hero__land{left:max(5vw,1rem);right:max(5vw,1rem);width:auto;bottom:calc(var(--thumb) + 4vh);gap:.75rem}
   .hero__land h1{font-size:clamp(2.3rem,11vw,3.6rem)}
+  .hero__tag{font-size:calc(clamp(1.25rem,5.6vw,1.6rem) * var(--fit));margin-bottom:calc(.7rem * var(--fit))}
   .hero__land p{font-size:1rem}
   /* On a phone the CTA sits in the lower third, under the film window,
      clear of the wordmark above and the thumb bar below. */
@@ -308,6 +330,28 @@ html.navsheet-open .thumbbar{visibility:hidden}
 .direct .why li{align-items:center;text-align:center;padding-left:0}
 .direct .why li>svg{position:static;margin-bottom:.3rem}
 @media(max-width:699px){.why{grid-template-columns:1fr}.direct__ctas .btn{flex:1 1 100%}}
+/* Order Direct, dressed: warm Natural ground (a photo can go under it:
+   drop assets/order-direct-bg.webp in and uncomment the url), a starred
+   rule over the name, two raised cards with icon discs, arrowed buttons. */
+.direct{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,var(--off-white) 0%,var(--natural) 70%);/* background:url("/assets/order-direct-bg.webp") 50% 50%/cover; */}
+.direct::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(40% 55% at 0% 100%,rgb(var(--mint-rgb)/.35),transparent 70%),radial-gradient(35% 50% at 100% 0%,rgb(var(--browned-sugar-rgb)/.14),transparent 70%);pointer-events:none}
+.direct__rule{display:flex;align-items:center;gap:.9rem;margin-bottom:.2rem}
+.direct__rule i{width:clamp(3.5rem,8vw,7rem);border-top:1.5px dotted rgb(var(--browned-sugar-rgb)/.6)}
+.direct__rule svg{--logo-h:1.1rem;--logo-accent:var(--browned-sugar)}
+.direct .sec__head h2{font-size:clamp(2.3rem,5.2vw,4.2rem);letter-spacing:-.03em}
+.direct .why{grid-template-columns:repeat(2,minmax(0,26rem));gap:clamp(1.2rem,3vw,2rem);margin-top:clamp(2.2rem,4vw,3rem)}
+.direct .why li{position:relative;padding:3rem 1.6rem 1.8rem;border-radius:18px;background:rgb(var(--off-white-rgb)/.78);box-shadow:inset 0 0 0 1px rgb(var(--browned-sugar-rgb)/.22),0 18px 40px rgb(var(--bark-rgb)/.08);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.why__icon{position:absolute;left:50%;top:0;display:grid;place-items:center;width:4rem;height:4rem;border-radius:50%;background:var(--off-white);box-shadow:inset 0 0 0 1px rgb(var(--browned-sugar-rgb)/.25),0 8px 20px rgb(var(--bark-rgb)/.1);transform:translate(-50%,-50%)}
+.why__icon svg{width:2rem;height:2rem;fill:none;stroke:var(--browned-sugar-deep);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.direct .why strong{font-size:clamp(1.3rem,1.8vw,1.55rem);letter-spacing:-.01em}
+.direct .why span{font-size:1.02rem;line-height:1.55}
+.direct__ctas{margin-top:clamp(2.2rem,4vw,3rem)}
+.direct__ctas .btn{gap:.8rem;padding-inline:1.8rem;min-height:56px;font-size:1.05rem}
+.direct__ctas .btn--line{border-color:rgb(var(--browned-sugar-rgb)/.7)}
+.direct__go{font-style:normal;transition:transform .4s var(--ease-out)}
+.direct__ctas .btn:hover .direct__go,.direct__ctas .btn:focus-visible .direct__go{transform:translateX(4px)}
+@media(max-width:699px){.direct .why{grid-template-columns:1fr;gap:2.6rem}.direct__rule i{width:3rem}}
+@media(prefers-reduced-motion:reduce){.direct__go{transition:none}}
 
 /* ============================== SHEET ==============================
    "Ordering goes live soon". A bottom sheet on a phone, a centred card on
@@ -413,8 +457,8 @@ body.sheet-open{overflow:hidden}
 .revs__ctrl{display:flex;align-items:center;gap:.85rem;background:var(--surface);padding-left:.75rem}
 .revs__count{font-family:var(--mono);font-weight:600;font-size:.7rem;letter-spacing:.18em;color:var(--accent-ink);white-space:nowrap}
 .revs__arrows{display:flex;gap:.5rem}
-.revs__arrows button{position:relative;appearance:none;width:38px;height:38px;display:grid;place-items:center;border:1px solid rgb(var(--accent-rgb)/.6);border-radius:999px;background:var(--surface);color:var(--accent-ink);font-size:1.1rem;line-height:1;cursor:pointer;transition:background .3s var(--ease),border-color .3s var(--ease)}
-.revs__arrows button::after{content:"";position:absolute;inset:-4px}
+.revs__arrows button{position:relative;appearance:none;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgb(var(--accent-rgb)/.6);border-radius:999px;background:var(--surface);color:var(--accent-ink);font-size:1.1rem;line-height:1;cursor:pointer;transition:background .3s var(--ease),border-color .3s var(--ease)}
+.revs__arrows button::after{content:"";position:absolute;inset:0}
 .revs__arrows button:hover{background:rgb(var(--accent-rgb)/.14);border-color:var(--accent)}
 .revs__arrows button[disabled]{opacity:.35;cursor:default}
 
@@ -576,6 +620,11 @@ body.sheet-open{overflow:hidden}
 .boxfoot__grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,.8fr) auto;gap:clamp(1.8rem,3.4vw,3rem);align-items:start}
 .boxfoot__base{position:relative;z-index:1}
 .boxfoot__links h3+ul{margin-bottom:1.1rem}
+/* each link carries a small line glyph, so the list reads as places to go */
+.boxfoot__links a{display:inline-flex;align-items:center;gap:.85rem}
+.boxfoot__ico{flex:0 0 auto;width:1.35rem;height:1.35rem;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.92;transition:transform .4s var(--ease-out)}
+.boxfoot__links a:hover .boxfoot__ico,.boxfoot__links a:focus-visible .boxfoot__ico{transform:translateX(2px)}
+@media(prefers-reduced-motion:reduce){.boxfoot__ico{transition:none}}
 
 /* ---- the splash: a soft Mint and Browned Sugar glow drifting over the
    Courtyard (one 20s loop, transform only), under the brand star pattern
@@ -610,13 +659,15 @@ body.sheet-open{overflow:hidden}
 /* ---- Order ahead: the DXB boarding pass is the button ---- */
 .boxfoot__fly{align-items:center;padding-top:.4rem}
 /* the link itself never moves (a moving hit area jitters under the pointer); the card inside it tilts and lifts */
-.flycard{position:relative;display:block;width:clamp(188px,15vw,208px);color:var(--bark);text-decoration:none;-webkit-tap-highlight-color:transparent}
-.flycard__card{display:flex;flex-direction:column;transform:rotate(-6deg);transition:transform .5s var(--ease-out);filter:drop-shadow(0 16px 24px rgb(var(--black-rgb)/.32))}
+.flycard{position:relative;display:block;width:clamp(112px,9vw,126px);color:var(--bark);text-decoration:none;-webkit-tap-highlight-color:transparent;perspective:900px}
+/* a keepsake, not a billboard: it unfolds when the footer is a third of the way in and folds again when it has all but left (site.js) */
+.flycard__card{display:flex;flex-direction:column;transform-origin:50% 0;transform:rotate(-6deg);transition:transform .7s var(--ease-out),opacity .7s var(--ease);filter:drop-shadow(0 12px 20px rgb(var(--black-rgb)/.32))}
+.js .boxfoot.is-folded .flycard__card{transform:rotateX(-88deg) rotate(-6deg);opacity:0;pointer-events:none}
 .boxfoot a.flycard,.boxfoot a.flycard:hover{color:var(--bark)}
-.flycard:hover .flycard__card,.flycard:focus-visible .flycard__card,.flycard:active .flycard__card{transform:translate3d(0,-8px,0) rotate(-2deg)}
+.flycard:hover .flycard__card,.flycard:focus-visible .flycard__card,.flycard:active .flycard__card{transform:translate3d(0,-6px,0) rotate(-2deg)}
 .flycard:focus-visible{outline:2px solid var(--mint);outline-offset:6px;border-radius:10px}
 .flycard__pass{position:relative;width:100%;height:auto}
-.flycard__cta{position:relative;display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:48px;margin-top:-7px;padding:.75rem .75rem;border-radius:0 0 8px 8px;border-top:1.5px dashed rgb(var(--bark-rgb)/.35);background:var(--off-white);font-family:var(--mono);font-weight:600;font-size:.64rem;line-height:1.3;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.flycard__cta{position:relative;display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:44px;margin-top:-5px;padding:.55rem .6rem;border-radius:0 0 6px 6px;border-top:1.5px dashed rgb(var(--bark-rgb)/.35);background:var(--off-white);font-family:var(--mono);font-weight:600;font-size:.64rem;line-height:1.3;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
 .flycard__cta i{flex:0 0 auto}
 .flycard__cta i{font-style:normal;font-size:1rem;letter-spacing:0;transition:transform .35s var(--ease-out)}
 .flycard:hover .flycard__cta i,.flycard:focus-visible .flycard__cta i{transform:translateX(4px)}
@@ -645,8 +696,8 @@ body.sheet-open{overflow:hidden}
   .gate{order:2;max-width:none}
   .boxfoot__where{order:3}
   .boxfoot__links{order:4}
-  .flycard{width:min(64vw,236px)}
-  .flycard__cta{font-size:.74rem;min-height:52px}
+  .flycard{width:min(38vw,142px)}
+  .flycard__cta{font-size:.62rem;min-height:44px}
   .boxfoot__tel,.boxfoot__dir{justify-content:center;width:100%;max-width:24rem;min-height:52px;padding:0 1.2rem;border:1.5px solid rgb(var(--mint-rgb)/.6);border-radius:999px;font-size:1rem}
   .boxfoot__where address{margin-bottom:.4rem}
   .boxfoot__glow{inset:-10% -40%}
@@ -678,6 +729,8 @@ body.sheet-open{overflow:hidden}
 .menu::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:url(/public/brand/pattern/pattern-sugar.svg) 50% 0/62.8px 64.61px repeat;
   -webkit-mask-image:linear-gradient(to bottom,rgb(var(--black-rgb)) 0,rgb(var(--black-rgb)) calc(100% - 180px),transparent 100%);mask-image:linear-gradient(to bottom,rgb(var(--black-rgb)) 0,rgb(var(--black-rgb)) calc(100% - 180px),transparent 100%)}
 .menu .sec__head{position:relative}
+/* the section's name, big enough to read as "this is the menu" at a glance */
+.menu .sec__head .label{font-size:clamp(1.2rem,2.2vw,1.85rem);letter-spacing:.28em}
 .menu .sec__head::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:calc(100% + 14rem);height:calc(100% + 8rem);transform:translate(-50%,-50%);pointer-events:none;background:radial-gradient(closest-side,rgb(var(--surface-rgb)/.96) 60%,rgb(var(--surface-rgb)/0) 100%)}
 
 /* "Departures · Updated daily", the board's own small print */
@@ -727,8 +780,18 @@ body.sheet-open{overflow:hidden}
 .bpanel{background:var(--courtyard-deep)}
 .bpanel__in{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:1.1rem 2rem;padding:.2rem clamp(1rem,2.2vw,1.8rem) 1.6rem calc(clamp(1rem,2.2vw,1.8rem) + 3px)}
 .bpanel__desc{grid-column:1/-1;max-width:62ch;font-size:1.02rem;color:var(--off-white)}
-.bitems{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:0 2rem}
-.bitem{display:flex;align-items:baseline;gap:.8rem;padding:.5rem 0;border-bottom:1px dashed rgb(var(--off-white-rgb)/.2);font-size:1rem;font-weight:400;color:var(--off-white)}
+/* the open row: every item a small card, its photo on top (or a placeholder
+   tile drawn for the kind of item), the name and price under it */
+.bitems{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:1rem 1rem}
+.bitem{display:flex;flex-direction:column;gap:.6rem;min-width:0;font-size:1rem;font-weight:400;color:var(--off-white)}
+.bitem__pic{position:relative;display:block;aspect-ratio:1;border-radius:14px;overflow:hidden;background:var(--courtyard-deep);box-shadow:inset 0 0 0 1px rgb(var(--off-white-rgb)/.1),0 8px 20px rgb(var(--black-rgb)/.18)}
+.bitem__pic img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease-out)}
+.bitem:hover .bitem__pic img{transform:scale(1.04)}
+.bitem__ph{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:.5rem;background:radial-gradient(80% 80% at 50% 40%,rgb(var(--mint-rgb)/.14),transparent 70%),url("/public/brand/pattern/pattern-light.svg") 0 0/31.4px 32.3px;background-color:var(--courtyard-deep)}
+.bitem__ph svg{width:44%;height:auto;fill:none;stroke:var(--mint);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.bitem__ph i{font-style:normal;font-family:var(--mono);font-weight:600;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgb(var(--off-white-rgb)/.6)}
+.bitem__txt{display:flex;align-items:baseline;gap:.6rem;padding-bottom:.45rem;border-bottom:1px dashed rgb(var(--off-white-rgb)/.2)}
+.bitem__name{min-width:0;font-size:.98rem;line-height:1.3}
 .bitem__price{margin-left:auto;font-family:var(--data);font-size:.88rem;color:var(--mint)}
 .bpanel__soon{font-size:.98rem;color:var(--off-white)}
 .bpanel__order{margin:0}
@@ -781,7 +844,8 @@ body.sheet-open{overflow:hidden}
   .flaps{display:grid;grid-template-columns:repeat(var(--n,12),minmax(0,1fr));gap:2px;width:100%;max-width:calc(var(--n,12) * 2.3rem);margin-inline:auto}
   .flap{width:auto;height:1.8em;line-height:1.8em;font-size:clamp(.7rem,calc((100cqi - (var(--n,12) - 1) * 2px) / var(--n,12) * .9),1.25rem)}
   .bpanel__in{grid-template-columns:1fr;padding:1.1rem 1rem 1.3rem}
-  .bitems{grid-template-columns:1fr}
+  .bitems{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem .75rem}
+  .bitem__name{font-size:.92rem}
   .board__foot{margin-top:.85rem;border:0;border-radius:14px;background:var(--courtyard)}
 }
 
@@ -790,7 +854,9 @@ body.sheet-open{overflow:hidden}
   .js .rise{opacity:1;transform:none;transition:none}
   .hero{height:auto}
   .hero__stage{position:relative;height:100svh}
-  .hero__open,.hero__hint,.hero__rule{display:none}
+  .hero__hint,.hero__rule,.hero__open .hero__cta,.hero__open .hero__place{display:none}
+  .hero__open{position:absolute;padding-top:calc(var(--nav-h) + 2vh)}
+  .js .hero__tag-l{opacity:1;transform:none;animation:none}
   .js .hero__land{opacity:1}
   .hero__scrim{opacity:1}
   .craft{height:auto}
@@ -819,7 +885,7 @@ body.sheet-open{overflow:hidden}
   .ticket__paper:hover,.ticket:focus-within .ticket__paper{transform:none}
   .rail__end{align-self:flex-start;padding:.6rem var(--gutter) 0}
   .js .sheet.is-open .sheet__card{animation:none}
-  .bitem__order,.hero__alt{transition:none}
+  .bitem__order,.hero__alt,.bitem__pic img{transition:none}
   .feature,.feature__go i{transition:none}
   .flap__leaf{display:none}
   .flap__ch{transition:opacity .18s linear}
@@ -827,125 +893,10 @@ body.sheet-open{overflow:hidden}
   .js .gate__week li{opacity:1;transform:none;transition:none}
   .gate__week li.is-today::after{transform:none;transition:none}
   .gate__fill,.flycard__card,.flycard__cta i{transition:none}
+  .js .boxfoot.is-folded .flycard__card{transform:rotate(-6deg);opacity:1;pointer-events:auto}
 }
 
-/* ---- social: NOW BOARDING. The TikTok + Instagram wall.
-   Each post is a boarding pass: Bark ink card, Browned Sugar hairline,
-   Natural stubs. On a desktop the wall pins for the length of .social__pin
-   and its three columns shear (left .8x up, centre 1.25x down, right 1x
-   up); under 768px it is one swipe row and nothing is pinned. */
-.social{position:relative;background:var(--courtyard-deep);color:var(--off-white);padding-top:clamp(4.5rem,9vw,8rem)}
-.social .label{color:var(--mint)}
-.social :focus-visible{outline-color:var(--mint)}
-.social__head{display:flex;flex-direction:column;align-items:flex-start;gap:1rem;padding-bottom:clamp(2rem,4vw,3.2rem)}
-.social__title{display:flex;flex-direction:column;gap:.55rem;font-family:var(--data);font-weight:600;letter-spacing:0;line-height:1}
-.social__flap{font-size:clamp(1.7rem,4.6vw,3.6rem);letter-spacing:.04em;color:var(--off-white)}
-.social__handles{font-size:clamp(.82rem,1.5vw,1.1rem);font-weight:500;letter-spacing:.02em;color:var(--mint);line-height:1.5}
-.sf-word{display:inline-flex;white-space:nowrap}
-.social__flap .sf-ch{position:relative;display:inline-block;min-width:.74em;margin-right:.07em;padding:.1em .02em .08em;text-align:center;border-radius:3px;background:rgb(var(--black-rgb)/.3);box-shadow:inset 0 0 0 1px rgb(var(--black-rgb)/.2)}
-.social__flap .sf-ch::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgb(var(--black-rgb)/.4)}
-.social__flap .sf-word+.sf-word{margin-left:.3em}
-.social__line{font-family:var(--display);font-size:clamp(1.25rem,2.1vw,1.7rem);font-weight:400;letter-spacing:-.01em;color:var(--off-white)}
-.social__line em{font-family:var(--italic);font-style:italic;color:var(--mint)}
-
-.social__pin{position:relative}
-.social__stage{position:relative}
-.social__wall{--card-w:min(300px,calc((var(--shell) - 2 * var(--col-gap)) / 3),calc((100vh - var(--nav-h) - 10rem) * .5625));--col-gap:clamp(1.2rem,3vw,2.8rem);display:grid;grid-template-columns:repeat(3,var(--card-w));justify-content:center;gap:clamp(1.6rem,3vw,2.6rem) var(--col-gap);margin:0;padding:0 0 clamp(3rem,6vw,5rem);list-style:none}
-.sw-slot{display:flex}
-.social.is-pinned .social__pin{height:250vh}
-.social.is-pinned .social__stage{position:sticky;top:0;height:100vh;overflow:hidden;overflow:clip;padding-top:calc(var(--nav-h) + 1.4rem);-webkit-mask-image:linear-gradient(transparent 0,#000 calc(var(--nav-h) + .6rem),#000 calc(100% - 3rem),transparent);mask-image:linear-gradient(transparent 0,#000 calc(var(--nav-h) + .6rem),#000 calc(100% - 3rem),transparent)}
-.social.is-pinned .social__wall{padding-bottom:0}
-.social.is-pinned .sw-slot{will-change:transform}
-
-.bp{--rot:0deg;position:relative;display:flex;flex-direction:column;width:100%;margin:0;padding:0;border:1px solid var(--browned-sugar);border-radius:14px;overflow:hidden;background:var(--bark-deep);color:var(--bark);font:inherit;text-align:left;text-decoration:none;cursor:pointer;-webkit-appearance:none;appearance:none;transform:rotate(var(--rot));transition:transform .6s var(--ease-out),box-shadow .6s var(--ease-out);box-shadow:0 18px 40px rgb(var(--black-rgb)/.28)}
-.bp:hover,.bp:focus-visible{transform:none;box-shadow:0 22px 50px rgb(var(--black-rgb)/.36)}
-/* brass, with an Off-White ring outside it: Browned Sugar alone is under 3:1 on the green */
-.social .bp:focus-visible{outline:2px solid var(--off-white);outline-offset:4px;border-color:var(--browned-sugar);box-shadow:0 0 0 2px var(--browned-sugar),0 22px 50px rgb(var(--black-rgb)/.36)}
-.bp__stub{position:relative;display:block;background:var(--natural);color:var(--bark);font-family:var(--data);font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-.bp__stub::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .29 0 0 0 0 .24 0 0 0 0 .21 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-.bp__top{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.55rem;padding:.55rem .7rem}
-.bp__badge{display:inline-grid;place-items:center;min-width:1.9rem;height:1.35rem;padding:0 .3rem;border-radius:5px;font-size:.66rem;letter-spacing:.04em;line-height:1}
-.bp__badge--tiktok{background:var(--bark);color:var(--off-white)}
-.bp__badge--instagram{position:relative;color:var(--bark);box-shadow:inset 0 0 0 1.5px var(--bark);border-radius:7px}
-.bp__route{white-space:nowrap;font-size:.74rem;letter-spacing:.1em}
-.bp__route i{font-style:normal;color:var(--browned-sugar-deep)}
-.bp__gate{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;font-size:.8rem}
-.bp__gate i{font-style:normal;font-size:.56rem;letter-spacing:.14em;color:var(--bark-soft)}
-.bp__photo{position:relative;display:block;aspect-ratio:9/16;overflow:hidden;background:var(--courtyard)}
-.bp__photo img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease-out)}
-.bp:hover .bp__photo img,.bp:focus-visible .bp__photo img{transform:scale(1.03)}
-.bp__play{position:absolute;right:.7rem;bottom:.7rem;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:rgb(var(--bark-rgb)/.72);border:1px solid rgb(var(--browned-sugar-rgb)/.9);color:var(--off-white);font-family:var(--data);font-size:.85rem;line-height:1}
-.bp__none{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;background:radial-gradient(120% 80% at 50% 45%,var(--courtyard) 0,var(--courtyard-deep) 100%);color:var(--off-white);text-align:center}
-.bp__none b{font-family:var(--data);font-size:clamp(2rem,4vw,3rem);letter-spacing:.08em;font-weight:600}
-.bp__none svg{--logo-h:22px;--logo-accent:var(--mint)}
-.bp.is-noposter .bp__none{display:flex}
-.bp.is-noposter picture{visibility:hidden}
-.bp__bot{flex:1 0 auto;padding:1.05rem .8rem .75rem}
-/* the tear line: perforation dots, with a notch cut into each edge */
-.bp__bot::before{content:"";position:absolute;left:.9rem;right:.9rem;top:0;height:4px;transform:translateY(-50%);background:radial-gradient(circle,var(--bark-deep) 1.5px,transparent 1.9px) 0 50%/9px 4px repeat-x;opacity:.55}
-.bp__notch{position:absolute;top:0;width:14px;height:14px;border-radius:50%;background:var(--courtyard-deep);transform:translateY(-50%);z-index:1}
-.bp__notch--l{left:-8px}.bp__notch--r{right:-8px}
-.bp__cap{display:block;font-family:var(--display);font-size:1rem;font-weight:500;letter-spacing:-.005em;line-height:1.25;text-transform:none;color:var(--bark)}
-.bp__meta{display:flex;justify-content:space-between;gap:.5rem;margin-top:.55rem;font-size:.56rem;letter-spacing:.16em;color:var(--bark-soft)}
-.bp__code{display:block;height:24px;margin-top:.5rem;background:repeating-linear-gradient(90deg,var(--bark) 0 2px,transparent 2px 3px,var(--bark) 3px 4px,transparent 4px 7px,var(--bark) 7px 10px,transparent 10px 11px,var(--bark) 11px 12px,transparent 12px 15px,var(--bark) 15px 16px,transparent 16px 18px,var(--bark) 18px 21px,transparent 21px 23px);opacity:.85}
-
-/* the follow tickets: outlined, never filled, so the Order button stays the one call to action */
-.bp--follow{justify-content:space-between;background:transparent;border:1.5px solid var(--browned-sugar);box-shadow:none;color:var(--off-white)}
-.bp--follow:hover,.bp--follow:focus-visible{box-shadow:none;background:rgb(var(--off-white-rgb)/.04)}
-.bp__follow{display:flex;flex-direction:column;align-items:center;gap:.7rem;padding:1.5rem 1.2rem;text-align:center}
-.bp__frow{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.7rem .9rem;font-family:var(--data);font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgb(var(--off-white-rgb)/.7)}
-.bp__frow--top{border-bottom:1px dashed rgb(var(--browned-sugar-rgb)/.7)}
-.bp__frow--bot{flex-direction:column;align-items:stretch;border-top:1px dashed rgb(var(--browned-sugar-rgb)/.7)}
-.bp__frow--bot .bp__code{width:100%;margin-top:.1rem;opacity:.5;background-image:repeating-linear-gradient(90deg,var(--natural) 0 2px,transparent 2px 3px,var(--natural) 3px 4px,transparent 4px 7px,var(--natural) 7px 10px,transparent 10px 11px,var(--natural) 11px 12px,transparent 12px 15px,var(--natural) 15px 16px,transparent 16px 18px,var(--natural) 18px 21px,transparent 21px 23px)}
-.bp__follow svg{--logo-h:26px;--logo-accent:var(--mint)}
-.bp__big{font-family:var(--display);font-size:clamp(1.45rem,2.2vw,1.9rem);font-weight:500;line-height:1.1;letter-spacing:-.02em}
-.bp__big em{font-family:var(--italic);font-style:italic;font-weight:400}
-.bp__handle{font-family:var(--data);font-size:.85rem;color:var(--natural)}
-.bp__count{font-size:.9rem;color:rgb(var(--off-white-rgb)/.82)}
-.bp__go{display:inline-flex;align-items:center;min-height:44px;margin-top:.4rem;padding:.55rem 1.3rem;border-radius:999px;box-shadow:inset 0 0 0 1.5px rgb(var(--off-white-rgb)/.75);font-weight:500;font-size:.95rem;transition:background .35s var(--ease),color .35s var(--ease)}
-.bp--follow:hover .bp__go,.bp--follow:focus-visible .bp__go{background:var(--off-white);color:var(--bark)}
-
-.social__hint{display:none}
-.social__noscript{padding-bottom:3rem}
-.social__noscript a{color:var(--off-white)}
-
-@media(max-width:767px){
-  .social__wall{display:flex;justify-content:flex-start;gap:1rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);padding:.4rem var(--gutter) 1.2rem;scrollbar-width:none}
-  .social__wall::-webkit-scrollbar{display:none}
-  .sw-slot{flex:0 0 min(72vw,280px);scroll-snap-align:start}
-  .bp{transform:none}
-  .social__hint{display:block;padding:0 var(--gutter) 3rem;text-align:right;font-family:var(--data);font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mint)}
-}
-
-/* the modal: our poster first, the official embed only once it has rendered */
-.swm{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:max(1rem,env(safe-area-inset-top,0px)) .75rem}
-.swm[hidden]{display:none}
-.swm__backdrop{position:absolute;inset:0;background:rgb(var(--bark-deep-rgb,59 49 43)/.9)}
-.swm__panel{position:relative;display:flex;flex-direction:column;width:min(580px,100%);max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);border:1.5px solid var(--browned-sugar);border-radius:16px;background:var(--bark-deep);color:var(--off-white);box-shadow:0 30px 80px rgb(var(--black-rgb)/.5);overflow:hidden}
-.js .swm:not([hidden]) .swm__panel{animation:swmIn .35s var(--ease-out)}
-@keyframes swmIn{from{opacity:0;transform:translateY(14px) scale(.98)}}
-.swm__bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.4rem .4rem .4rem 1.1rem;border-bottom:1px solid rgb(var(--browned-sugar-rgb)/.5)}
-.swm__title{font-family:var(--data);font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--natural)}
-.swm__close{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--off-white);font-size:1.6rem;line-height:1;cursor:pointer}
-.swm__close:hover{background:rgb(var(--off-white-rgb)/.08)}
-.swm :focus-visible{outline:2px solid var(--mint);outline-offset:2px}
-.swm__body{overflow:auto;padding:1rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
-.swm__embed:empty{display:none}
-.swm__embed{width:100%;display:flex;justify-content:center}
-.swm__embed blockquote{margin:0!important}
-.swm.has-embed .swm__fallback{display:none}
-.swm__fallback{display:flex;flex-direction:column;align-items:center;gap:1rem;margin:0}
-.swm__fallback img{width:auto;max-width:100%;height:min(62vh,640px);aspect-ratio:9/16;object-fit:cover;border-radius:10px;border:1px solid rgb(var(--browned-sugar-rgb)/.7)}
-.swm__open{color:var(--off-white);box-shadow:inset 0 0 0 1.5px rgb(var(--off-white-rgb)/.8)}
-.swm__open:hover{background:var(--off-white);color:var(--bark)}
-html.swm-open{overflow:hidden}
-
-@media(prefers-reduced-motion:reduce){
-  .bp,.bp__photo img,.bp__go{transition:none}
-  .bp,.bp:hover,.bp:focus-visible{transform:none}
-  .bp:hover .bp__photo img,.bp:focus-visible .bp__photo img{transform:none}
-  .js .swm:not([hidden]) .swm__panel{animation:none}
-}
+/* build:flights-css */
 </style>
 </head>
 <body>
@@ -954,9 +905,9 @@ html.swm-open{overflow:hidden}
 
 <!-- build:header (the build reuses this header, and the menu sheet below, on every inner page) -->
 <header class="nav nav--intro" id="nav">
-  <a class="nav__brand" href="#top"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg><svg class="logo logo--mark" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-mark"/></svg></a>
+  <a class="nav__brand" href="/"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg><svg class="logo logo--mark" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-mark"/></svg></a>
   <nav class="nav__links" aria-label="Primary">
-    <a href="/menu">The menu</a><a href="/visit">Visit</a><a href="/catering">Catering</a><a href="/blog">Blog</a><a href="/visit">Contact</a>
+    <a href="/">Home</a><a href="/menu">Menu</a><a href="/gelato">Gelato</a><a href="/visit">Visit</a><a href="/catering">Catering</a><a href="/blog">Journal</a><a href="/team">The Crew</a><a href="/feed">The Feed</a>
   </nav>
   <div class="nav__right">
     <span class="nav__meta">
@@ -993,6 +944,9 @@ html.swm-open{overflow:hidden}
     <div class="hero__exit" id="heroExit" aria-hidden="true"></div>
     <div class="hero__open" id="heroOpen">
       <div class="hero__mark"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg></div>
+      <!-- The tagline, in the decorative italic (the Editor's Note stand-in),
+           one line at a time after the wordmark. It is the page's h1. -->
+      <p class="hero__tag"><span class="hero__tag-l">Walk in.</span> <span class="hero__tag-l">Taste Dubai.</span></p>
       <p class="hero__place">Dessert shop &middot; Clear Lake, Houston</p>
       <!-- Pickup first. The primary is the most visible thing on the page
            at load; the delivery link is the quiet alternative. -->
@@ -1079,17 +1033,18 @@ html.swm-open{overflow:hidden}
 <section class="sec direct" id="order" aria-labelledby="direct-title">
   <div class="shell">
     <div class="sec__head rise">
+      <span class="direct__rule" aria-hidden="true"><i></i><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg><i></i></span>
       <span class="label">Order direct</span>
       <h2 id="direct-title">Straight from us, <em>to you.</em></h2>
     </div>
     <ul class="why rise">
-      <li><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg><strong>Cheaper than the apps</strong><span>No third-party markup on the menu.</span></li>
-      <li><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg><strong>Straight to our kitchen</strong><span>Your order prints on our ticket rail the second you place it.</span></li>
+      <li><span class="why__icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="19" cy="9" r="5.2"/><path d="M19 6.4v5.2M17.4 7.6c0-.7.7-1.2 1.6-1.2s1.6.5 1.6 1.1c0 1.4-3.2.9-3.2 2.4 0 .6.7 1.1 1.6 1.1s1.6-.5 1.6-1.2"/><path d="M4 21.5h4.2l4.6-2.2c1-.5 2.2-.4 3 .3l1.2 1H21c1 0 1.6.7 1.6 1.4 0 .8-.7 1.4-1.6 1.4h-5.2"/><path d="M15.6 23.4H21l5-3c.9-.5 2-.2 2.4.6.4.7.2 1.5-.4 2L22 27.3c-.7.5-1.5.7-2.3.7H8.2H4"/></svg></span><strong>Cheaper than the apps</strong><span>No third-party markup on the menu.</span></li>
+      <li><span class="why__icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9.5 18.5c-2.8-.4-4.8-2.6-4.8-5.3 0-3 2.4-5.3 5.4-5.3.6 0 1.1.1 1.6.2C12.6 5.9 14.2 5 16 5s3.4.9 4.3 3.1c.5-.1 1-.2 1.6-.2 3 0 5.4 2.3 5.4 5.3 0 2.7-2 4.9-4.8 5.3V26H9.5z"/><path d="M9.5 22.4h13M13.2 18.5v3.9M18.8 18.5v3.9"/></svg></span><strong>Straight to our kitchen</strong><span>Your order prints on our ticket rail the second you place it.</span></li>
     </ul>
     <div class="direct__ctas rise">
-      <a class="btn btn--primary" href="#visit" data-order="pickup" data-place="direct">Order online (pickup)</a>
-      <a class="btn btn--line" href="#visit" data-order="delivery" data-place="direct">Get it delivered</a>
-      <a class="btn btn--line" href="#visit" data-order="group" data-place="direct">Start a group order</a>
+      <a class="btn btn--primary" href="#visit" data-order="pickup" data-place="direct">Order online (pickup) <i class="direct__go" aria-hidden="true">&rarr;</i></a>
+      <a class="btn btn--line" href="#visit" data-order="delivery" data-place="direct">Get it delivered <i class="direct__go" aria-hidden="true">&rarr;</i></a>
+      <a class="btn btn--line" href="#visit" data-order="group" data-place="direct">Start a group order <i class="direct__go" aria-hidden="true">&rarr;</i></a>
     </div>
   </div>
 </section>
@@ -1265,29 +1220,11 @@ html.swm-open{overflow:hidden}
   </script>
 </section>
 
-<!-- ============================== SOCIAL ==============================
-     "Now boarding": the TikTok and Instagram wall. The cards are built by
-     site.js from /assets/social/posts.json (how to add a post is at the
-     top of that part of site.js). Nothing from TikTok or Instagram loads
-     until someone opens a card. -->
-<section class="social" id="social" aria-labelledby="social-title">
-  <div class="shell social__head">
-    <span class="label">Follow the route</span>
-    <h2 class="social__title" id="social-title" aria-label="Now boarding: @dubai.dips on TikTok, @dubaianddips on Instagram"><span class="social__flap" data-flap="NOW BOARDING" aria-hidden="true">NOW BOARDING</span><span class="social__handles" data-flap="&mdash; @dubai.dips / @dubaianddips" aria-hidden="true">&mdash; @dubai.dips / @dubaianddips</span></h2>
-    <p class="social__line">10k+ travelers follow <em>the route.</em></p>
-  </div>
-  <div class="social__pin" id="socialPin">
-    <div class="social__stage">
-      <ul class="social__wall" id="socialWall" aria-label="Posts from TikTok and Instagram"></ul>
-    </div>
-  </div>
-  <p class="social__hint" aria-hidden="true">swipe &rarr;</p>
-  <noscript><p class="shell social__noscript"><a href="https://www.tiktok.com/@dubai.dips" target="_blank" rel="noopener">@dubai.dips on TikTok</a> &middot; <a href="https://www.instagram.com/dubaianddips/" target="_blank" rel="noopener">@dubaianddips on Instagram</a></p></noscript>
-</section>
-
 <div class="band band--divider" aria-hidden="true">
   <span class="band__track"><span class="band__set"><span class="band__item">Made here, every morning <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span><span class="band__item">Gelato &middot; Pastries &middot; Coffee &middot; Matcha <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span></span></span>
 </div>
+
+<!-- build:flights (the Connecting Flights map, generated from config/flights.js) -->
 
 <!-- ============================== CONTACT ============================== -->
 <section class="sec" id="contact">
@@ -1338,13 +1275,16 @@ html.swm-open{overflow:hidden}
         <div class="boxfoot__col boxfoot__links" data-rise-foot>
           <h3>Follow the route</h3>
           <ul>
-            <li><a href="https://www.instagram.com/dubaianddips/" data-link="instagram" target="_blank" rel="noopener">Instagram<span class="vh"> (opens in a new tab)</span></a></li>
-            <li><a href="https://www.tiktok.com/@dubai.dips" data-link="tiktok" target="_blank" rel="noopener">TikTok<span class="vh"> (opens in a new tab)</span></a></li>
+            <li><a href="https://www.instagram.com/dubaianddips/" data-link="instagram" target="_blank" rel="noopener"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg>Instagram<span class="vh"> (opens in a new tab)</span></a></li>
+            <li><a href="https://www.tiktok.com/@dubai.dips" data-link="tiktok" target="_blank" rel="noopener"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 3v11.4a3.4 3.4 0 1 1-2.9-3.4" /><path d="M14.5 3c.4 2.4 2.1 4.1 4.6 4.4"/></svg>TikTok<span class="vh"> (opens in a new tab)</span></a></li>
           </ul>
           <h3>Fly with us</h3>
           <ul>
-            <li><a href="#contact" data-link="catering">Catering &amp; large orders</a></li>
-            <li hidden><a href="" data-link="googleReviews" target="_blank" rel="noopener">Leave us a review<span class="vh"> (opens in a new tab)</span></a></li>
+            <li><a href="/catering" data-link="catering"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18h18M4.5 18a7.5 7.5 0 0 1 15 0"/><path d="M12 8.5V7M10.5 7h3"/><path d="M3.5 20.5h17"/></svg>Catering &amp; large orders</a></li>
+            <li><a href="/gelato" data-link="gelato"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7.2 11.5 12 21l4.8-9.5"/><path d="M6.8 11.5h10.4a3.2 3.2 0 0 0 .3-6.3A5.5 5.5 0 0 0 6.5 5.2a3.2 3.2 0 0 0 .3 6.3z"/><path d="M9.3 11.5l3.8 5M14.2 11.5l-2.5 4"/></svg>Gelato</a></li>
+            <li><a href="/team" data-link="team"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="7.5" r="2.8"/><path d="M7 19.5v-1.2a5 5 0 0 1 10 0v1.2"/><circle cx="5.2" cy="9.8" r="2"/><path d="M2 18.5v-.6a3.6 3.6 0 0 1 4.2-3.6"/><circle cx="18.8" cy="9.8" r="2"/><path d="M22 18.5v-.6a3.6 3.6 0 0 0-4.2-3.6"/></svg>Meet the Crew</a></li>
+            <li><a href="/blog" data-link="journal"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6.5C10.2 5 7.6 4.5 3.5 4.7v13.6c4.1-.2 6.7.3 8.5 1.8 1.8-1.5 4.4-2 8.5-1.8V4.7C16.4 4.5 13.8 5 12 6.5z"/><path d="M12 6.5v13.6"/></svg>The Journal</a></li>
+            <li hidden><a href="" data-link="googleReviews" target="_blank" rel="noopener"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>Leave us a review<span class="vh"> (opens in a new tab)</span></a></li>
           </ul>
         </div>
         <!-- Order ahead IS the boarding pass: the brand's own DXB pass,
@@ -1353,7 +1293,7 @@ html.swm-open{overflow:hidden}
           <a class="flycard" href="#visit" data-order="pickup" data-place="footer">
             <span class="flycard__card">
               <img class="flycard__pass" src="/public/brand/boarding-pass/bpass-dubai.svg" width="131" height="158" alt="" loading="lazy" decoding="async">
-              <span class="flycard__cta"><span data-copy="pickupCta">Order ahead for pickup</span><i aria-hidden="true">&rarr;</i></span>
+              <span class="flycard__cta"><span>Order ahead</span><i aria-hidden="true">&rarr;</i></span>
             </span>
           </a>
         </div>
@@ -1396,21 +1336,12 @@ html.swm-open{overflow:hidden}
 </div>
 
 <!-- /build:footer -->
-<!-- the social wall's post viewer (see the SOCIAL section) -->
-<div class="swm" id="swm" hidden>
-  <div class="swm__backdrop" data-swm-close></div>
-  <div class="swm__panel" role="dialog" aria-modal="true" aria-labelledby="swmTitle">
-    <div class="swm__bar">
-      <p class="swm__title" id="swmTitle"></p>
-      <button class="swm__close" type="button" data-swm-close aria-label="Close">&times;</button>
-    </div>
-    <div class="swm__body" id="swmBody"></div>
-  </div>
-</div>
 <script src="/config/ordering.js" defer></script>
 <script src="/config/departures.js" defer></script>
 <script src="/hours.js" defer></script>
 <script src="/track.js" defer></script>
 <script src="/site.js" defer></script>
+<script src="/config/flights.js" defer></script>
+<script src="/flights.js" defer></script>
 </body>
 </html>

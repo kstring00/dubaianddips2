@@ -1,8 +1,11 @@
 /* The inner pages. Every fact on them is read from config/ordering.js,
    hours.js and menu-board.json at build time - the same sources the
    homepage reads - so nothing here can drift from the rest of the site. */
+import vm from 'node:vm';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
-  CFG, MENU, H, SITE, READY, REVIEWS, esc, abs, page, ticketStrip, crumbs, star, accent, plain,
+  ROOT as ROOT_DIR, CFG, MENU, H, SITE, READY, REVIEWS, esc, abs, page, ticketStrip, crumbs, star, accent, plain, flightsSection, read as readRoot,
   restaurant, breadcrumbs, faqPage, organization, website, oneLine, mapsSearch, mapsDirections, orderUrl, restaurantId, isHttp
 } from './lib.mjs';
 
@@ -22,7 +25,8 @@ const IMG = {
   '/assets/rev-dubai-frappe.webp': [260, 260], '/assets/rev-pistachio-frappe.webp': [260, 260], '/assets/rev-biscoff-frappe.webp': [260, 260],
   '/assets/rev-strawberry-matcha.webp': [260, 260], '/assets/rev-kunafa.webp': [260, 260],
   '/assets/visit-clear-lake.webp': [1360, 765], '/assets/blog-lineup.webp': [1360, 765], '/assets/blog-gelato.webp': [765, 478], '/assets/visit-clear-lake-800.webp': [800, 450],
-  '/assets/hero-poster.webp': [1280, 704], '/assets/craft-poster.webp': [1280, 714],
+  '/assets/hero-poster.webp': [1280, 704], '/assets/craft-poster.webp': [1280, 714], '/assets/flight-poster.webp': [1280, 720],
+  '/assets/inside-room.webp': [1600, 1067], '/assets/inside-room-900.webp': [900, 600],
   '/assets/social/social-01-720.webp': [430, 765], '/assets/social/social-02-720.webp': [430, 765], '/assets/social/social-03-720.webp': [430, 765],
   '/assets/social/social-04-720.webp': [430, 765], '/assets/social/social-05-720.webp': [574, 1020], '/assets/social/social-06-720.webp': [430, 765]
 };
@@ -76,6 +80,9 @@ function pass(r, i, { photo = true } = {}) {
 }
 
 /* ================================================================ /menu */
+/* line drawings for the placeholder photo tiles, by the kind of item (same set as the homepage board in site.js) */
+const GLYPH = {"frappe": "<path d=\"M16 20h16l-2 22H18z\"/><path d=\"M14.5 20h19M17 20c0-4 3.2-7 7-7s7 3 7 7\"/><path d=\"M27 13l3-7\"/><path d=\"M19.5 28h9\"/>", "coffee": "<path d=\"M12 22h20v7a10 10 0 0 1-10 10 10 10 0 0 1-10-10z\"/><path d=\"M32 24h2.5a4 4 0 0 1 0 8H31\"/><path d=\"M10 42h24\"/><path d=\"M18 17c0-2 2-2 2-4M24 17c0-2 2-2 2-4\"/>", "matcha": "<path d=\"M13 20h22l-2.5 20.5a3 3 0 0 1-3 2.5h-11a3 3 0 0 1-3-2.5z\"/><path d=\"M14 27h20\"/><path d=\"M29 12c-5 0-8 3-8 7 5 0 8-3 8-7z\"/><path d=\"M21 19l4-4\"/>", "latte": "<path d=\"M14 14h20l-2 27a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2z\"/><path d=\"M15 24h18\"/><path d=\"M20 30c2-2 6-2 8 0M20 34c2-2 6-2 8 0\"/>", "smoothie": "<path d=\"M15 19h18l-2.5 23h-13z\"/><path d=\"M13.5 19h21\"/><path d=\"M26 19l3-12h3\"/><circle cx=\"20\" cy=\"14.5\" r=\"3\"/>", "dessert": "<ellipse cx=\"24\" cy=\"33\" rx=\"16\" ry=\"5\"/><path d=\"M12 30c0-5 5.5-9 12-9s12 4 12 9\"/><path d=\"M18 24c1.5-2 3.5-3 6-3s4.5 1 6 3\"/><circle cx=\"24\" cy=\"19\" r=\"1.4\"/>", "bite": "<path d=\"M10 30h28\"/><path d=\"M12 30c0-7 5.4-12 12-12s12 5 12 12\"/><path d=\"M24 18v-3M21 15h6\"/><path d=\"M11 34h26\"/>"};
+const KIND = {"frappes": "frappe", "classic-coffees": "coffee", "matchas": "matcha", "lattes": "latte", "refreshers": "smoothie", "smoothies": "smoothie", "breakfast-bites": "bite", "crepes": "dessert", "waffles": "dessert", "desserts": "dessert"};
 export function menuPage() {
   const trail = [{ name: 'Home', url: '/' }, { name: 'Menu', url: '/menu' }];
   const tabs = ROWS.map(r => `<li><a href="#${r.slug}" data-tab><b>${esc(r.code)}</b><span>${esc(plain(r.category).replace(/^The /, ''))}</span></a></li>`).join('');
@@ -84,7 +91,9 @@ export function menuPage() {
     const list = items.length ? `<ul class="mlist">${items.map(it => {
       const price = typeof it.price === 'number' && it.price > 0 ? '$' + it.price.toFixed(2).replace(/\.00$/, '') : '';
       const [w, h] = it.photo ? imgSize(it.photo) : [0, 0];
-      return `<li class="mitem${it.photo ? ' has-photo' : ''}">${it.photo ? img(it.photo, it.alt || it.name, w, h, { cls: 'mitem__img' }) : ''}<span class="mitem__name">${esc(it.name)}</span>${price ? `<span class="mitem__lead" aria-hidden="true"></span><span class="mitem__price">${price}</span>` : ''}</li>`;
+      const pic = it.photo ? img(it.photo, it.alt || it.name, w, h, { cls: 'mitem__img' })
+        : `<span class="mitem__ph" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">${GLYPH[KIND[r.slug]] || GLYPH.dessert}</svg><i>Photo soon</i></span>`;
+      return `<li class="mitem${it.photo ? ' has-photo' : ''}"><span class="mitem__pic">${pic}</span><span class="mitem__txt"><span class="mitem__name">${esc(it.name)}</span>${price ? `<span class="mitem__price">${price}</span>` : ''}</span></li>`;
     }).join('')}</ul>` : `<p class="route__soon">The full list for this route is on the boards in the shop. <a href="/visit/clear-lake">Come and see it</a>.</p>`;
     const status = r.status === 'sold-out' ? '<span class="route__tag">Sold out today</span>' : r.status === 'seasonal' ? '<span class="route__tag">Seasonal</span>' : '';
     return `<section class="route" id="${esc(r.slug)}" aria-labelledby="route-${esc(r.slug)}">
@@ -121,11 +130,7 @@ ${routes}
     <p>Prices are on the boards above the counter. Ask at the counter about what goes into anything on the menu.</p>
   </div>
 </section>
-${connections([
-    ['/catering', 'GRP', 'Feeding a crowd?', 'Frappes, coffee and desserts for the whole group.'],
-    ['/visit/clear-lake', 'HOU', 'Come see the case', 'Dubai &amp; Dips Clear Lake: hours, parking and directions.'],
-    ['/blog', 'LOG', 'Read the flight log', 'Guides to Dubai chocolate, frappes and late-night dessert.']
-  ])}`;
+${flightsSection()}`;
   const menuLd = {
     '@type': 'Menu', '@id': SITE + '/menu#menu', name: 'Dubai & Dips menu', url: SITE + '/menu', inLanguage: 'en-US',
     hasMenuSection: ROWS.map(r => ({
@@ -176,44 +181,73 @@ const faqBlock = (faqs, id = 'faq') => `<section class="faq" aria-labelledby="${
 
 export function cateringPage() {
   const trail = [{ name: 'Home', url: '/' }, { name: 'Catering', url: '/catering' }];
-  const faqs = cateringFaqs();
+  const faqs = cateringFaqs().slice(0, 4);
   const C = CFG.CATERING || {};
-  const offer = ['frappes', 'classic-coffees', 'matchas', 'desserts'].map(slug => ROWS.find(r => r.slug === slug)).filter(Boolean);
-  const passes = ['dubai', 'italy', 'turkey', 'europe'].map((n, i) => `<img class="fan__p fan__p--${i}" src="/public/brand/boarding-pass/bpass-${n}.svg" width="131" height="158" alt="" ${i ? 'loading="lazy" ' : ''}decoding="async">`).join('');
+  const live = !!(String(C.web3formsKey || '').trim() || String(C.formEndpoint || '').trim());
   const chips = ROWS.map(r => `<label class="chip"><input type="checkbox" name="interests" value="${esc(r.category)}"><span><b>${esc(r.code)}</b>${esc(plain(r.category).replace(/^The /, ''))}</span></label>`).join('');
-  const body = hero({
-    trail, cls: 'phero--split', eyebrow: 'Group bookings &middot; Offices, parties, events',
-    h1: 'Catering that *arrives together.*',
-    lead: `Frappes, espresso, matcha and desserts for the office, the party or the event, from our dessert shop in Clear Lake, Houston. Tell us the date and headcount and we will plan the flight with you.`,
-    actions: `<a class="btn btn--primary" href="#request">Request catering</a>${telLink(PH, 'btn btn--line', 'catering-hero').replace('>' + esc(PH.display), '>Call ' + esc(PH.display))}`,
-    strip: ticketStrip([['Delivery', `Up to ${CFG.DELIVERY_RADIUS_MILES} miles`], ['Group orders', `From $${CFG.GROUP_ORDER_MINIMUM}`], ['Pickup', 'Clear Lake']]),
-    media: `<div class="fan rv" aria-hidden="true">${passes}</div>`
-  }) + `
-<section class="offer" aria-labelledby="offer-title">
-  <div class="shell">
-    <div class="sechead rv"><p class="eyebrow">${star()}<span>What flies for groups</span></p><h2 id="offer-title">The same menu, <em>for the whole team.</em></h2>
-    <p>Everything a group order can carry comes off the boards in the shop. Start with these four routes; <a href="/menu">the full menu</a> has the rest.</p></div>
-    <ul class="offer__list">${offer.map((r, i) => `
-      <li class="offer__card rv" style="--i:${i}"><a href="/menu#${r.slug}">
-        <span class="offer__code" aria-hidden="true">${esc(r.code)}</span>
-        <h3>${esc(r.category)}</h3>
-        <p>${(r.items || []).slice(0, 3).map(it => esc(it.name)).join(' &middot; ') || esc(r.description)}</p>
-        <span class="offer__go">See the route <i aria-hidden="true">&rarr;</i></span></a></li>`).join('')}
-    </ul>
+  /* the kataifi strand that draws itself around each number, once */
+  const ring = `<svg class="itin__ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="itin__ring-a" cx="24" cy="24" r="21" pathLength="100"/><circle class="itin__ring-b" cx="24.7" cy="23.4" r="22.4" pathLength="100"/></svg>`;
+  const form = live ? `<form class="bform rv" id="cateringForm" novalidate data-endpoint="${esc(String(C.formEndpoint || '').trim())}" data-key="${esc(String(C.web3formsKey || '').trim())}" aria-describedby="bformNote">
+      <div class="bform__head" aria-hidden="true"><span>D&amp;D Airlines</span><span>Group booking</span></div>
+      <p class="bform__note" id="bformNote">Fields marked with a star are required.${C.email ? ` Requests go to ${esc(C.email)}.` : ''}</p>
+      <div class="bform__errors" id="bformErrors" tabindex="-1" hidden></div>
+      <!-- honeypot: people never see it, robots fill it -->
+      <div class="bform__hp" aria-hidden="true"><label for="cWebsite">Leave this empty</label><input id="cWebsite" name="botcheck" type="text" tabindex="-1" autocomplete="off"></div>
+      <fieldset><legend>Flight details</legend>
+        <div class="bform__row bform__row--3">
+          <div class="fl"><input id="cDate" name="date" type="date" required placeholder=" " autocomplete="off"><label for="cDate">Date <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cDate-err"></p></div>
+          <div class="fl"><input id="cTime" name="time" type="time" required placeholder=" "><label for="cTime">Time <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cTime-err"></p></div>
+          <div class="fl"><input id="cCount" name="headcount" type="number" inputmode="numeric" min="1" max="2000" step="1" required placeholder=" "><label for="cCount">Headcount <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cCount-err"></p></div>
+        </div>
+      </fieldset>
+      <fieldset><legend>What&rsquo;s on board</legend><div class="chips">${chips}</div></fieldset>
+      <fieldset><legend>Lead passenger</legend>
+        <div class="bform__row"><div class="fl"><input id="cName" name="name" type="text" required autocomplete="name" placeholder=" "><label for="cName">Name <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cName-err"></p></div></div>
+        <div class="bform__row bform__row--2">
+          <div class="fl"><input id="cPhone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder=" "><label for="cPhone">Phone <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cPhone-err"></p></div>
+          <div class="fl"><input id="cEmail" name="email" type="email" inputmode="email" required autocomplete="email" placeholder=" "><label for="cEmail">Email <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cEmail-err"></p></div>
+        </div>
+      </fieldset>
+      <fieldset><legend>Anything else</legend><div class="fl fl--area"><textarea id="cNotes" name="notes" rows="4" placeholder=" "></textarea><label for="cNotes">Notes: allergies, a delivery address, a budget</label></div></fieldset>
+      <div class="bform__foot"><button class="btn btn--primary bform__send" type="submit"><span>Send request</span></button><p class="bform__status" id="bformStatus" role="status" aria-live="polite"></p></div>
+    </form>`
+  : `<div class="bform bform--call rv" id="request-call">
+      <div class="bform__head" aria-hidden="true"><span>D&amp;D Airlines</span><span>Group booking</span></div>
+      <p class="eyebrow">${star()}<span>Call us to order</span></p>
+      <h3>Online requests are not switched on yet.</h3>
+      <p>Call and we will take your date, headcount and order by phone. It takes a couple of minutes.</p>
+      <p class="bform__callrow"><a class="btn btn--primary" href="tel:${PH.tel}" data-call="catering-form">Call ${esc(PH.display)}</a></p>
+    </div>`;
+  const body = `<header class="sky sky--hero">
+  <video class="sky__film" muted playsinline loop preload="none" poster="/assets/flight-poster.webp" aria-hidden="true" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
+  <div class="sky__wash" aria-hidden="true"></div>
+  <div class="shell sky__grid">
+    <div class="sky__copy">
+      ${crumbs(trail)}
+      <p class="sky__eyebrow"><span class="sky__dot"></span>Catering &middot; Offices &amp; events</p>
+      <h1 class="sky__title">Big orders, <em>cleared for takeoff.</em></h1>
+      <p class="sky__lead">Kunafa, gelato and drinks for the whole room, boxed the morning of and on their way. One call or one link, and it all lands together.</p>
+      <ul class="sky__chips" aria-label="The short version">
+        <li><b>$${CFG.GROUP_ORDER_MINIMUM}</b><span>groups start</span></li>
+        <li><b>${CFG.DELIVERY_RADIUS_MILES} mi</b><span>delivery radius</span></li>
+        <li><b>${C.noticeHours ? C.noticeHours + ' hrs' : 'Same week'}</b><span>${C.noticeHours ? 'notice' : 'turnaround'}</span></li>
+      </ul>
+      <div class="sky__actions"><a class="btn btn--primary btn--hero" href="#request" data-scroll>Start a catering order</a><a class="sky__tel" href="tel:${PH.tel}" data-call="catering-hero">or call ${esc(PH.display)}</a></div>
+    </div>
   </div>
-</section>
+</header>
 
 <section class="itin" aria-labelledby="itin-title">
   <div class="shell itin__grid">
     <div class="sechead rv"><p class="eyebrow">${star()}<span>How big orders fly</span></p><h2 id="itin-title">Three legs, <em>no layovers.</em></h2></div>
     <ol class="itin__list">
-      <li class="rv"><span class="itin__n">01</span><h3>Book the flight</h3><p>Send the date, time, headcount and what you would like with the form below, or call ${telLink(PH, 'u')}. ${C.noticeHours ? `We need at least ${C.noticeHours} hours for a large order.` : 'The earlier you ask, the more we can do.'}</p></li>
-      <li class="rv"><span class="itin__n">02</span><h3>Everyone picks</h3><p>${esc(CFG.COPY.groupText)} Group orders start at $${CFG.GROUP_ORDER_MINIMUM}.</p></li>
-      <li class="rv"><span class="itin__n">03</span><h3>Pickup or delivery</h3><p>Pick up at <a href="/visit/${READY[0].slug}">${esc(READY[0].name)}</a>, or have it delivered up to ${CFG.DELIVERY_RADIUS_MILES} miles from the shop ($${CFG.DELIVERY_MINIMUM} minimum).</p></li>
+      <li class="rv"><span class="itin__n">${ring}<b>01</b></span><h3>Book the flight</h3><p>Send the date, time, headcount and what you would like with the form below, or call ${telLink(PH, 'u')}. ${C.noticeHours ? `We need at least ${C.noticeHours} hours for a large order.` : 'The earlier you ask, the more we can do.'}</p></li>
+      <li class="rv"><span class="itin__n">${ring}<b>02</b></span><h3>Everyone picks</h3><p>${esc(CFG.COPY.groupText)} Group orders start at $${CFG.GROUP_ORDER_MINIMUM}.</p></li>
+      <li class="rv"><span class="itin__n">${ring}<b>03</b></span><h3>Pickup or delivery</h3><p>Pick up at <a href="/visit/${READY[0].slug}">${esc(READY[0].name)}</a>, or have it delivered up to ${CFG.DELIVERY_RADIUS_MILES} miles from the shop ($${CFG.DELIVERY_MINIMUM} minimum).</p></li>
     </ol>
   </div>
 </section>
-
+${faqBlock(faqs)}
 <section class="book" id="request" aria-labelledby="book-title">
   <div class="shell book__grid">
     <div class="book__intro rv">
@@ -222,45 +256,10 @@ export function cateringPage() {
       <p>Fill in what you know; we will come back to you to confirm the details. Prefer to talk it through? Call ${telLink(PH, 'u', 'catering-form')}.</p>
       ${ticketStrip([['Operated by', 'D&amp;D Airlines'], ['From', 'HOU &middot; Clear Lake']])}
     </div>
-    <form class="bform rv" id="cateringForm" novalidate data-endpoint="${esc(C.formEndpoint || '')}" aria-describedby="bformNote">
-      <div class="bform__head" aria-hidden="true"><span>D&amp;D Airlines</span><span>Group booking</span></div>
-      <p class="bform__note" id="bformNote">Fields marked with a star are required.</p>
-      <div class="bform__errors" id="bformErrors" tabindex="-1" hidden></div>
-      <fieldset><legend>Flight details</legend>
-        <div class="bform__row bform__row--3">
-          <div class="fl"><input id="cDate" name="date" type="date" required placeholder=" " autocomplete="off"><label for="cDate">Date <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cDate-err"></p></div>
-          <div class="fl"><input id="cTime" name="time" type="time" required placeholder=" "><label for="cTime">Time <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cTime-err"></p></div>
-          <div class="fl"><input id="cCount" name="headcount" type="number" inputmode="numeric" min="1" max="2000" step="1" required placeholder=" "><label for="cCount">Headcount <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cCount-err"></p></div>
-        </div>
-      </fieldset>
-      <fieldset><legend>What&rsquo;s on board</legend>
-        <div class="chips">${chips}</div>
-      </fieldset>
-      <fieldset><legend>Lead passenger</legend>
-        <div class="bform__row">
-          <div class="fl"><input id="cName" name="name" type="text" required autocomplete="name" placeholder=" "><label for="cName">Name <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cName-err"></p></div>
-        </div>
-        <div class="bform__row bform__row--2">
-          <div class="fl"><input id="cPhone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder=" "><label for="cPhone">Phone <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cPhone-err"></p></div>
-          <div class="fl"><input id="cEmail" name="email" type="email" inputmode="email" required autocomplete="email" placeholder=" "><label for="cEmail">Email <span aria-hidden="true">&#10022;</span></label><p class="fl__err" id="cEmail-err"></p></div>
-        </div>
-      </fieldset>
-      <fieldset><legend>Anything else</legend>
-        <div class="fl fl--area"><textarea id="cNotes" name="notes" rows="4" placeholder=" "></textarea><label for="cNotes">Notes: allergies, a delivery address, a budget</label></div>
-      </fieldset>
-      <div class="bform__foot">
-        <button class="btn btn--primary bform__send" type="submit"><span>Send request</span></button>
-        <p class="bform__status" id="bformStatus" role="status" aria-live="polite"></p>
-      </div>
-    </form>
+    ${form}
   </div>
 </section>
-${faqBlock(faqs)}
-${connections([
-    ['/menu', 'MENU', 'See every route', 'The full menu, category by category.'],
-    ['/visit/clear-lake', 'HOU', 'Pickup in Clear Lake', 'Hours, parking and directions for the shop.'],
-    ['/blog', 'LOG', 'Planning for the office?', 'Read our guide to ordering dessert for a team.']
-  ])}`;
+${flightsSection()}`;
   return page({
     path: '/catering', current: '/catering', bodyClass: 'p-catering',
     title: 'Dessert Catering in Clear Lake, Houston | Dubai & Dips',
@@ -296,10 +295,7 @@ export function visitIndex() {
 <section class="locs" aria-label="Our shops">
   <div class="shell"><ul class="locs__list">${cards}</ul></div>
 </section>
-${connections([
-    ['/menu', 'MENU', 'Know what you want?', 'See the whole menu before you come in.'],
-    ['/catering', 'GRP', 'Coming as a group?', 'Catering for offices, parties and events.']
-  ])}`;
+${flightsSection()}`;
   return page({
     path: '/visit', current: '/visit', bodyClass: 'p-visit',
     title: 'Visit Dubai & Dips | Dessert Shop in Clear Lake, Houston',
@@ -315,52 +311,66 @@ export function locationPage(l) {
   const [pw, ph] = imgSize(l.photo);
   const popular = [['frappes', 'Dubai Chocolate Frappe'], ['frappes', 'Pistachio Frappe'], ['frappes', 'Biscoff Frappe'], ['matchas', 'Strawberry Matcha'], ['desserts', 'Kunafa']]
     .map(([slug, name]) => ({ slug, it: itemsOf(slug).find(x => x.name === name) })).filter(x => x.it);
-  const L = CFG.LINKS || {};
-  const body = `<header class="lhero phero--wide">
-  <div class="shell lhero__grid">
-    <div class="lhero__copy">
+  const gallery = (l.gallery || []).filter(g => g && g.src);
+  const body = `<header class="vhero" id="vhero">
+  <div class="vhero__stage">
+    <figure class="vhero__photo">${img(l.photo, l.photoAlt, pw, ph, { lazy: false, sizes: '100vw' })}</figure>
+    <div class="vhero__scrim" aria-hidden="true"></div>
+    <div class="vhero__exit" aria-hidden="true"></div>
+    <div class="shell vhero__copy">
       ${crumbs(trail)}
-      <p class="eyebrow rv">${star()}<span>Gate A &middot; ${esc(l.area)}, ${esc(l.locality)}</span></p>
-      <h1 class="phero__title" data-lines>Dubai &amp; Dips <em>${esc(l.area)}</em></h1>
-      <p class="phero__lead rv">Our dessert shop in ${esc(l.area)}, ${esc(l.locality)}: Dubai chocolate frappes, matcha, coffee and kunafa, made here and served until ${H.clockText(latest * 60)} on Fridays and Saturdays.</p>
-      <div class="phero__actions rv">${orderBtn(CFG.COPY.pickupCta || 'Order ahead for pickup', 'location-hero')}<a class="btn btn--line" href="${esc(mapsDirections(l))}" target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a></div>
+      <p class="eyebrow">${star()}<span>Gate A &middot; ${esc(l.area)}, ${esc(l.locality)}</span></p>
+      <h1 class="vhero__title">Dubai &amp; Dips <em>${esc(l.area)}</em></h1>
+      <p class="vhero__lead">Walk in. Taste Dubai. Our dessert shop in ${esc(l.area)}, ${esc(l.locality)}, open until ${H.clockText(latest * 60)} on Fridays and Saturdays.</p>
+      <div class="phero__actions">${orderBtn(CFG.COPY.pickupCta || 'Order ahead for pickup', 'location-hero')}<a class="btn btn--line" href="${esc(mapsDirections(l))}" target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a></div>
     </div>
-    <figure class="lhero__photo rv">${img(l.photo, l.photoAlt, pw, ph, { lazy: false, sizes: '(min-width: 900px) 50vw, 100vw' })}</figure>
+    <p class="vhero__hint" aria-hidden="true">Scroll in <span>&darr;</span></p>
   </div>
 </header>
 
-<section class="lgrid" aria-label="Address, hours and contact">
-  <div class="shell lgrid__in">
-    <div class="lgrid__main">
-      <div class="lcard rv" id="hours">
-        <h2 class="lcard__h">Hours</h2>
-        ${statusPill(l)}
-        <p class="live__count" data-live-count></p>
-        <table class="htable">${hoursRows(null)}</table>
-        ${(l.special || []).length ? `<p class="lcard__note">Special hours: ${l.special.map(s => esc(s.date) + (s.closed ? ' closed' : ` ${H.clockText(s.open * 60)} to ${H.clockText(s.close * 60)}`)).join('; ')}</p>` : ''}
+<section class="gatep" aria-labelledby="gate-title">
+  <div class="shell">
+    <div class="gpass rv">
+      <div class="gpass__stub">
+        <p class="gpass__k">Your gate</p>
+        <p class="gpass__code">HOU</p>
+        <p class="gpass__city">${esc(l.area)}, ${esc(l.locality)}</p>
+        <dl class="gpass__meta"><div><dt>Flight</dt><dd>DD 101</dd></div><div><dt>Gate</dt><dd>A</dd></div><div><dt>Seat</dt><dd>Any</dd></div></dl>
+        <span class="gpass__bar" aria-hidden="true"></span>
       </div>
-      <div class="lcard rv">
-        <h2 class="lcard__h">Find us</h2>
-        <address class="laddr">${esc(l.name)}<br>${esc(l.street)}<br>${esc(l.locality)}, ${esc(l.region)} ${esc(l.postalCode)}</address>
-        <p class="lrow"><a class="lbtn" href="tel:${l.phone.tel}" data-call="location">${esc(l.phone.display)}</a><a class="lbtn" href="${esc(mapsDirections(l))}" target="_blank" rel="noopener">Directions<span class="vh"> (opens in a new tab)</span></a></p>
-        ${l.parking ? `<h3 class="lcard__sub">Parking</h3><p>${esc(l.parking)}</p>` : ''}
-        ${l.landmark ? `<h3 class="lcard__sub">Look for</h3><p>${esc(l.landmark)}</p>` : ''}
+      <div class="gpass__main">
+        <div class="gpass__col">
+          <h2 class="lcard__h" id="gate-title">Hours</h2>
+          ${statusPill(l)}
+          <p class="live__count" data-live-count></p>
+          <table class="htable">${hoursRows(null)}</table>
+          ${(l.special || []).length ? `<p class="lcard__note">Special hours: ${l.special.map(s => esc(s.date) + (s.closed ? ' closed' : ` ${H.clockText(s.open * 60)} to ${H.clockText(s.close * 60)}`)).join('; ')}</p>` : ''}
+        </div>
+        <div class="gpass__col">
+          <h2 class="lcard__h">Find us</h2>
+          <address class="laddr">${esc(l.name)}<br>${esc(l.street)}<br>${esc(l.locality)}, ${esc(l.region)} ${esc(l.postalCode)}</address>
+          <p class="lrow"><a class="lbtn" href="tel:${l.phone.tel}" data-call="location">${esc(l.phone.display)}</a><a class="lbtn" href="${esc(mapsDirections(l))}" target="_blank" rel="noopener">Directions<span class="vh"> (opens in a new tab)</span></a></p>
+          ${l.parking ? `<h3 class="lcard__sub">Parking</h3><p>${esc(l.parking)}</p>` : ''}
+          ${l.landmark ? `<h3 class="lcard__sub">Look for</h3><p>${esc(l.landmark)}</p>` : ''}
+          <p class="gpass__order">${orderBtn(CFG.COPY.pickupCta || 'Order ahead for pickup', 'location-gate', 'btn btn--primary')}</p>
+        </div>
       </div>
-      <figure class="lmap rv" data-map="${esc('https://www.google.com/maps?q=' + encodeURIComponent(l.mapQuery || oneLine(l)) + '&output=embed')}">
-        <div class="lmap__facade" aria-hidden="true">${star('lmap__pin')}<span>${esc(l.area)}</span></div>
-        <figcaption><a href="${esc(mapsSearch(l))}" target="_blank" rel="noopener">Open in Google Maps<span class="vh">: ${esc(l.name)} (opens in a new tab)</span></a></figcaption>
-      </figure>
     </div>
-    <aside class="lside" aria-label="Order ahead">
-      <div class="lside__card on-green">
-        <p class="lside__k">Skip the line</p>
-        <p class="lside__t">Order ahead and it is ready when you walk in.</p>
-        ${orderBtn(CFG.COPY.pickupCta || 'Order ahead for pickup', 'location-side', 'btn btn--primary lside__btn')}
-        <a class="lside__tel" href="tel:${l.phone.tel}" data-call="location-side">or call ${esc(l.phone.display)}</a>
-      </div>
-    </aside>
+    <figure class="lmap rv" data-map="${esc('https://www.google.com/maps?q=' + encodeURIComponent(l.mapQuery || oneLine(l)) + '&output=embed')}">
+      <div class="lmap__facade" aria-hidden="true">${star('lmap__pin')}<span>${esc(l.area)}</span></div>
+      <figcaption><a href="${esc(mapsSearch(l))}" target="_blank" rel="noopener">Open in Google Maps<span class="vh">: ${esc(l.name)} (opens in a new tab)</span></a></figcaption>
+    </figure>
   </div>
 </section>
+
+${gallery.length ? `<section class="gal" aria-labelledby="gal-title">
+  <div class="shell">
+    <div class="sechead rv"><p class="eyebrow">${star()}<span>The room</span></p><h2 id="gal-title">Come in and <em>look around.</em></h2></div>
+    <ul class="gal__grid">${gallery.map((g, i) => { const [w, h] = imgSize(g.src); return `
+      <li class="gal__item rv${g.big ? ' gal__item--big' : ''}${g.tall ? ' gal__item--tall' : ''}" style="--i:${i}"><figure>${img(g.src, g.alt, w, h, { sizes: g.big ? '(min-width: 900px) 66vw, 100vw' : '(min-width: 900px) 33vw, 50vw' })}</figure></li>`; }).join('')}
+    </ul>
+  </div>
+</section>` : ''}
 
 <section class="popular" aria-labelledby="pop-title">
   <div class="shell">
@@ -371,19 +381,7 @@ export function locationPage(l) {
     </ul>
   </div>
 </section>
-
-${REVIEWS.length ? `<section class="rstrip" aria-labelledby="rv-title">
-  <div class="shell">
-    <div class="sechead rv"><p class="eyebrow">${star()}<span>Passenger notes</span></p><h2 id="rv-title">Sample <em>reviews.</em></h2>
-    <p>These are the same sample reviews as on our homepage, until the shop's real Google reviews are connected.${isHttp(L.googleReviews) ? ` <a href="${esc(L.googleReviews)}" target="_blank" rel="noopener">Leave us a review<span class="vh"> (opens in a new tab)</span></a>.` : ''}</p></div>
-    <ul class="rstrip__list">${REVIEWS.map((r, i) => `<li class="rv" style="--i:${i}"><blockquote>&ldquo;${r.text}&rdquo;</blockquote><p>${esc(r.who)}</p></li>`).join('')}</ul>
-  </div>
-</section>` : ''}
-${connections([
-    ['/menu', 'MENU', 'The whole menu', 'Ten routes, from Dubai chocolate to kunafa.'],
-    ['/catering', 'GRP', 'Catering', 'Frappes and desserts for the office or the party.'],
-    ['/visit', 'ALL', 'All our shops', 'Every Dubai &amp; Dips location.']
-  ])}`;
+${flightsSection()}`;
   return page({
     path: '/visit/' + l.slug, current: '/visit', bodyClass: 'p-location',
     title: `Dubai & Dips ${l.area} | Desserts in ${l.area}, ${l.locality}`.slice(0, 60),
@@ -391,6 +389,151 @@ ${connections([
     image: l.photo, imageAlt: l.photoAlt, preloadImage: l.photo,
     jsonld: [restaurant(l), breadcrumbs(trail)], body
   });
+}
+
+/* ============================================ /gelato, /team, /feed
+   Finished designs with clearly marked placeholder content. noindex, and
+   the build keeps them out of the sitemap, until the owner fills the
+   configs (config/gelato.js, config/team.js, config/feed.js). */
+const GELATO = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(readRoot('config/gelato.js'), sb); return sb.window.DD_GELATO; })();
+const TEAM = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(readRoot('config/team.js'), sb); return sb.window.DD_TEAM; })();
+const FEED = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(readRoot('config/feed.js'), sb); return sb.window.DD_FEED; })();
+const draftNote = what => `<p class="placeholder rv"><b>Placeholder.</b> ${what}</p>`;
+
+export function gelatoPage() {
+  const trail = [{ name: 'Home', url: '/' }, { name: 'Gelato', url: '/gelato' }];
+  const G = GELATO, T = G.tabs;
+  const W = 14, clean = s => String(s || '').toUpperCase().replace(/[^A-Z0-9 :\-&.\/]/g, '').slice(0, W);
+  const flaps = w => { const t = clean(w), left = Math.floor((W - t.length) / 2), padded = (' '.repeat(left) + t + ' '.repeat(W)).slice(0, W);
+    return [...padded].map(ch => `<span class="flap"><span class="flap__ch">${ch === ' ' ? '&nbsp;' : esc(ch)}</span><span class="flap__leaf"><span>${ch === ' ' ? '&nbsp;' : esc(ch)}</span></span></span>`).join(''); };
+  const status = { 'on-time': 'On the board', seasonal: 'Seasonal', 'sold-out': 'Sold out today' };
+  const panel = (id, t) => `<section class="gtab" id="tab-${id}" role="tabpanel" aria-labelledby="tabbtn-${id}" hidden><h2 class="gtab__h">${esc(t.title)}</h2>${t.lines.map(x => `<p class="gtab__p">${esc(x)}</p>`).join('')}</section>`;
+  /* The hero: a full-bleed photo of a sunlit gelateria (Higgsfield,
+     assets/gelato-hero.webp + gelato-hero-mobile.webp), the text on the
+     cream wall. Until those files are committed it falls back to the shop
+     photo. OWNER NOTE: the copy on this page is being written with the
+     owner; the tabs below hold placeholders (config/gelato.js). */
+  const has = f => fs.existsSync(path.join(ROOT_DIR, 'assets', f));
+  const heroD = has('gelato-hero.webp') ? '/assets/gelato-hero.webp' : '/assets/blog-gelato.webp';
+  const heroM = has('gelato-hero-mobile.webp') ? '/assets/gelato-hero-mobile.webp' : heroD;
+  const lqip = fs.existsSync(path.join(ROOT_DIR, 'source/gelato-hero-lqip.txt')) ? fs.readFileSync(path.join(ROOT_DIR, 'source/gelato-hero-lqip.txt'), 'utf8').trim() : '';
+  const body = `<header class="ghero" id="ghero">
+  <div class="ghero__media"${lqip ? ` style="background-image:url(${lqip})"` : ''}>
+    <picture><source media="(max-width: 899px)" srcset="${heroM}" width="1080" height="1350"><img class="ghero__img" src="${heroD}" alt="Gelato display case in a sunlit café." width="2560" height="1440" fetchpriority="high"></picture>
+    <span class="ghero__glint" aria-hidden="true"></span>
+  </div>
+  <div class="ghero__wash" aria-hidden="true"></div>
+  <div class="shell ghero__copy">
+    ${crumbs(trail)}
+    <p class="ghero__label"><span class="ghero__dia" aria-hidden="true">&#9670;</span>FCO &middot; Rome &middot; DD 102</p>
+    <h1 class="ghero__title"><span>Gelato, made</span> <em>the slow way.</em></h1>
+    <p class="ghero__lead">Dense, smooth and served a few degrees warmer than ice cream, so the flavor arrives first.</p>
+  </div>
+</header>
+<section class="gtabs" aria-label="About the gelato">
+  <div class="shell">
+    <div class="gtabs__bar" role="tablist" aria-label="Gelato">
+      <button class="gtabs__btn" role="tab" id="tabbtn-quality" aria-controls="tab-quality" aria-selected="true">The Quality</button>
+      <button class="gtabs__btn" role="tab" id="tabbtn-fresh" aria-controls="tab-fresh" aria-selected="false" tabindex="-1">Made Fresh Daily</button>
+      <button class="gtabs__btn" role="tab" id="tabbtn-flavors" aria-controls="tab-flavors" aria-selected="false" tabindex="-1">Today&rsquo;s Flavors</button>
+      <button class="gtabs__btn" role="tab" id="tabbtn-science" aria-controls="tab-science" aria-selected="false" tabindex="-1">The Science</button>
+      <span class="gtabs__ink" aria-hidden="true"></span>
+    </div>
+    <div class="gtabs__panels">
+      ${panel('quality', T.quality)}
+      ${panel('fresh', T.fresh)}
+      <section class="gtab" id="tab-flavors" role="tabpanel" aria-labelledby="tabbtn-flavors" hidden>
+        <h2 class="gtab__h">Today&rsquo;s Flavors</h2>
+        <p class="board__line">${star()} Departures &middot; Updated daily</p>
+        <ul class="gboard" aria-label="Today's flavors">${G.flavors.map((f, i) => `
+          <li class="gflap" data-status="${esc(f.status || 'on-time')}" style="--i:${i}"><span class="gflap__n">${String(i + 1).padStart(2, '0')}</span><span class="flaps" aria-hidden="true" style="--n:${W}">${flaps(f.name)}</span><span class="gflap__name">${esc(f.name)}<span class="vh">, ${status[f.status] || status['on-time']}</span></span><span class="gflap__st" aria-hidden="true">${status[f.status] || status['on-time']}</span></li>`).join('')}
+        </ul>
+        <p class="gtab__p">${esc(G.flavorsNote)}</p>
+      </section>
+      ${panel('science', T.science)}
+    </div>
+  </div>
+</section>
+${flightsSection()}`;
+  return page({ path: '/gelato', current: '/gelato', bodyClass: 'p-gelato', noindex: true, preloads: [{ href: heroM, media: '(max-width: 899px)' }, { href: heroD, media: '(min-width: 900px)' }], title: 'Gelato | Dubai & Dips, Clear Lake, Houston',
+    description: 'Gelato at Dubai & Dips in Clear Lake, Houston: the quality, made fresh daily, today\'s flavors and the science.', image: '/assets/blog-gelato.webp',
+    jsonld: [breadcrumbs(trail)], body });
+}
+
+export function teamPage() {
+  const trail = [{ name: 'Home', url: '/' }, { name: 'Meet the Crew', url: '/team' }];
+  const sil = `<svg class="crew__sil" viewBox="0 0 120 150" aria-hidden="true"><circle cx="60" cy="52" r="30"/><path d="M12 150c4-34 24-52 48-52s44 18 48 52z"/></svg>`;
+  const cards = TEAM.map((m, i) => `<li class="crew rv" style="--i:${i}">
+      <figure class="crew__photo">${m.photo ? img(m.photo, m.name, 600, 750) : sil}</figure>
+      <div class="crew__stub">
+        <p class="crew__role">${esc(m.role)}</p>
+        <h2 class="crew__name">${esc(m.name)}</h2>
+        <p class="crew__line">${esc(m.line)}</p>
+        <dl class="crew__meta"><div><dt>Favorite</dt><dd>${esc(m.favorite)}</dd></div><div><dt>Seat</dt><dd>${esc(m.seat || '')}</dd></div><div><dt>Crew</dt><dd>D&amp;D</dd></div></dl>
+      </div>
+    </li>`).join('');
+  /* The header is a night scene: the sky, tsParticles stars over it
+     (pages.js loads /vendor/stars.js when the header is on screen), a
+     horizon line with a small cluster of sparkles under the headline, and
+     the arches and pool at the bottom. The photo is optional: until
+     assets/crew-night.webp is committed the sky runs to the bottom.
+     OWNER NOTE: the crew cards below are placeholders (config/team.js). */
+  const hasNight = fs.existsSync(path.join(ROOT_DIR, 'assets/crew-night.webp'));
+  const hasNightM = fs.existsSync(path.join(ROOT_DIR, 'assets/crew-night-mobile.webp'));
+  const scene = hasNight ? `<picture class="night__scene">${hasNightM ? '<source media="(max-width: 899px)" srcset="/assets/crew-night-mobile.webp">' : ''}<img src="/assets/crew-night.webp" alt="Moorish arches lit by lanterns beside an infinity pool at night." width="2400" height="875" decoding="async" fetchpriority="high"></picture>` : '';
+  const body = `<header class="night${hasNight ? ' has-scene' : ''}" id="night">
+  <div class="night__stars" id="nightStars" aria-hidden="true"></div>
+  ${scene}
+  <div class="shell night__copy">
+    ${crumbs(trail)}
+    <p class="eyebrow">${star()}<span>CAI &middot; Cairo &middot; DD 105</span></p>
+    <h1 class="night__title">Meet <em>the crew.</em></h1>
+    <div class="night__horizon" aria-hidden="true"><i></i><div class="night__spark" id="nightSpark"></div></div>
+    <p class="night__lead">The people behind the counter.</p>
+  </div>
+</header>
+` + `
+<section class="crewgrid" aria-label="The crew">
+  <div class="shell"><ul class="crew__list">${cards}</ul></div>
+</section>
+${flightsSection()}`;
+  return page({ path: '/team', current: '/team', bodyClass: 'p-team', noindex: true, title: 'Meet the Crew | Dubai & Dips, Clear Lake, Houston',
+    description: 'The people behind the counter at Dubai & Dips in Clear Lake, Houston.', jsonld: [breadcrumbs(trail)], body });
+}
+
+export function feedPage() {
+  /* The Feed is the NOW BOARDING wall that used to sit on the homepage:
+     the split-flap title, the pinned shearing wall of boarding-pass cards
+     (site.js builds them from config/feed.js) and the post viewer. */
+  const trail = [{ name: 'Home', url: '/' }, { name: 'The Feed', url: '/feed' }];
+  const body = `<section class="social" id="social" aria-labelledby="social-title">
+  <div class="shell social__head">
+    ${crumbs(trail)}<span class="label">Follow the route</span>
+    <h1 class="social__title" id="social-title" aria-label="Now boarding: @dubai.dips on TikTok, @dubaianddips on Instagram"><span class="social__flap" data-flap="NOW BOARDING" aria-hidden="true">NOW BOARDING</span><span class="social__handles" data-flap="&mdash; @dubai.dips / @dubaianddips" aria-hidden="true">&mdash; @dubai.dips / @dubaianddips</span></h1>
+    <p class="social__line">10k+ travelers follow <em>the route.</em></p>
+  </div>
+  <div class="social__pin" id="socialPin">
+    <div class="social__stage">
+      <ul class="social__wall" id="socialWall" aria-label="Posts from TikTok and Instagram"></ul>
+    </div>
+  </div>
+  <p class="social__hint" aria-hidden="true">swipe &rarr;</p>
+  <noscript><p class="shell social__noscript"><a href="https://www.tiktok.com/@dubai.dips" target="_blank" rel="noopener">@dubai.dips on TikTok</a> &middot; <a href="https://www.instagram.com/dubaianddips/" target="_blank" rel="noopener">@dubaianddips on Instagram</a></p></noscript>
+</section>
+${flightsSection()}
+<div class="swm" id="swm" hidden>
+  <div class="swm__backdrop" data-swm-close></div>
+  <div class="swm__panel" role="dialog" aria-modal="true" aria-labelledby="swmTitle">
+    <div class="swm__bar">
+      <p class="swm__title" id="swmTitle"></p>
+      <button class="swm__close" type="button" data-swm-close aria-label="Close">&times;</button>
+    </div>
+    <div class="swm__body" id="swmBody"></div>
+  </div>
+</div>`;
+  return page({ path: '/feed', current: '/feed', bodyClass: 'p-feed', title: 'The Feed | Dubai & Dips on TikTok and Instagram',
+    description: 'Now boarding: our TikToks and Instagram Reels from Dubai & Dips in Clear Lake, Houston. @dubai.dips on TikTok, @dubaianddips on Instagram.',
+    jsonld: [breadcrumbs(trail)], body });
 }
 
 /* ================================================================= 404 */

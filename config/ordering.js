@@ -81,8 +81,19 @@ window.DD_CONFIG = {
       mapQuery: "Dubai and Dips Clear Lake Houston TX",
       parking: "Free lot right out front, and more spaces around the side of the building.",
       landmark: "",            /* MISSING: a landmark to look for, e.g. the shopping centre name */
-      photo: "/assets/visit-clear-lake.webp",
-      photoAlt: "Inside Dubai & Dips Clear Lake: the deep green wall with the gold DUBAI & DIPS sign over the pastry counter, white chairs and marble tables."
+      photo: "/assets/inside-room.webp",
+      photoAlt: "Inside Dubai & Dips Clear Lake: marble tables and cream chairs under the light rails, the walnut slat column, and the gold DUBAI & DIPS sign on the green wall above the counter.",
+      /* The gallery on /visit/clear-lake. Real photos only; the two of the
+         room are all there are so far, the rest are the food photographed
+         here. Add more of the space as they are shot: { src, alt, big }. */
+      gallery: [
+        { src: "/assets/inside-room.webp", alt: "The room from the door: marble tables, cream chairs, the walnut column and the counter under the gold sign.", big: true },
+        { src: "/assets/visit-clear-lake.webp", alt: "The green wall: the gold DUBAI & DIPS sign over the pastry counter, white chairs and marble tables." },
+        { src: "/assets/social/social-05-720.webp", alt: "At the counter: a cup of pistachio gelato beside a layered latte in a Dubai & Dips cup, the paper takeout bag behind them.", tall: true },
+        { src: "/assets/menu-dubai-frappe.webp", alt: "The Dubai Chocolate Frappe on marble, pistachio and dark chocolate pulled down the inside of the cup." },
+        { src: "/assets/menu-kunafa.webp", alt: "A round golden kunafa topped with crushed pistachio on a gold board." },
+        { src: "/assets/blog-lineup.webp", alt: "Six drinks lined up on marble, from a pistachio-drizzled frappe to a strawberry cup." }
+      ]
     },
     {
       /* MISSING: the second shop. Fill these in and its page, card and
@@ -135,6 +146,10 @@ window.DD_CONFIG = {
     instagram: "https://www.instagram.com/dubaianddips/",
     tiktok: "https://www.tiktok.com/@dubai.dips",
     catering: "/catering",
+    journal: "/blog",
+    feed: "/feed",
+    gelato: "/gelato",
+    team: "/team",
     googleReviews: "",   /* MISSING: the Google Business "Leave a review" link (g.page/r/.../review) */
     privacyPolicy: ""    /* MISSING: there is no privacy policy page yet */
   },
@@ -144,9 +159,14 @@ window.DD_CONFIG = {
      anything that answers 2xx). While it is empty the form never pretends
      to send: it says so and offers the phone instead. */
   CATERING: {
-    formEndpoint: "",        /* MISSING: where catering requests go */
-    noticeHours: null,       /* MISSING: how much notice a large order needs, e.g. 48 */
-    email: ""                /* MISSING: an inbox for catering questions */
+    /* Web3Forms (web3forms.com): make a free access key for the inbox that
+       should receive requests and paste it here. The form posts to
+       Web3Forms with a spam honeypot; with no key it shows "Call us to
+       order" instead, and never pretends to send. */
+    web3formsKey: "",        /* MISSING: the Web3Forms access key */
+    email: "",               /* MISSING: the inbox the key delivers to (shown on the page) */
+    formEndpoint: "",        /* optional: your own endpoint instead of Web3Forms */
+    noticeHours: null        /* MISSING: how much notice a large order needs, e.g. 48 */
   },
 
   /* ---- Delivery ------------------------------------------------------ */

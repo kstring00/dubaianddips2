@@ -1,0 +1,70 @@
+/* ---- Connecting Flights: the route map. Deep Bark ground with the star
+   pattern at guide opacity; the map on a canvas; the film over it for the
+   opening; HTML gates on top for hover, focus and click; the destinations
+   again as cards. Motion is transform/opacity only. ---- */
+.fl{position:relative;background:var(--bark-deep);color:var(--off-white);overflow:hidden;padding:clamp(2.8rem,5vw,4rem) 0 clamp(2.4rem,4vw,3.2rem)}
+.fl::before{content:"";position:absolute;inset:0;background:url("/public/brand/pattern/pattern-light.svg") 0 0/62.8px 64.61px;opacity:.28;pointer-events:none}
+.fl__head{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:.6rem 3rem;margin-bottom:clamp(1rem,2vw,1.5rem)}
+.fl .eyebrow{display:inline-flex;align-items:center;gap:.7rem;margin:0 0 .6rem;font-family:var(--mono);font-weight:600;font-size:clamp(.98rem,1.3vw,1.18rem);letter-spacing:.22em;text-transform:uppercase;color:var(--mint)}
+.fl .eyebrow .logo--star{--logo-h:.95em;--logo-accent:var(--browned-sugar)}
+.fl__title{font-size:clamp(1.9rem,3.4vw,2.8rem);line-height:1.02;letter-spacing:-.03em;color:var(--off-white)}
+.fl__title em{color:var(--mint)}
+.fl__lead{max-width:34ch;font-size:.98rem;line-height:1.55;color:var(--natural)}
+.fl__stage{position:relative;z-index:1;height:clamp(300px,25vw,360px);border-radius:16px;overflow:hidden;background:rgb(var(--black-rgb)/.18);box-shadow:inset 0 0 0 1px rgb(var(--off-white-rgb)/.08)}
+.fl__canvas{position:absolute;inset:0;display:block;opacity:0;transition:opacity .9s var(--ease)}
+.fl.is-map .fl__canvas{opacity:1}
+.fl__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;transition:opacity .9s var(--ease);pointer-events:none;background:var(--bark-deep)}
+.fl.is-map .fl__video{opacity:0}
+.fl__video--v{display:none}
+.fl__gates{position:absolute;inset:0;margin:0;padding:0;list-style:none;opacity:0;transition:opacity .6s .4s var(--ease)}
+.fl.is-map .fl__gates{opacity:1}
+.fl__gate,.fl__origin{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fl__origin{pointer-events:none}
+.fl__gate:focus-visible{outline:2px solid var(--mint);outline-offset:-8px}
+.fl__gate span{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:transparent}
+.fl__gate b{position:absolute;left:50%;top:calc(50% + 9px);transform:translateX(-50%);font-family:var(--data);font-weight:500;font-size:.7rem;letter-spacing:.14em;color:var(--natural);opacity:.75;transition:opacity .3s var(--ease),color .3s var(--ease);pointer-events:none;white-space:nowrap}
+.fl__gate.is-on b{opacity:1;color:var(--mint)}
+.fl__label{position:absolute;left:0;top:0;z-index:2;display:grid;grid-template-columns:auto 1fr;gap:.1rem .7rem;min-width:11rem;padding:.55rem .75rem .6rem;border-radius:8px;background:var(--natural);color:var(--bark);box-shadow:var(--lift-2);pointer-events:none;transform-origin:0 50%;animation:flLabel .5s var(--ease-out)}
+.fl__label[hidden]{display:none}
+@keyframes flLabel{from{opacity:0}}
+.fl__label::before{content:"";position:absolute;left:-1px;right:-1px;top:0;height:3px;border-radius:8px 8px 0 0;background:var(--courtyard)}
+.fl__lcode{grid-row:1/3;align-self:center;font-family:var(--display);font-weight:500;font-size:1.6rem;letter-spacing:-.02em;line-height:1}
+.fl__lcity{font-family:var(--mono);font-weight:600;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--courtyard)}
+.fl__lpage{font-weight:500;font-size:.95rem;line-height:1.2}
+.fl__lflight{grid-column:1/-1;margin-top:.3rem;padding-top:.35rem;border-top:1px dashed rgb(var(--bark-rgb)/.3);font-family:var(--data);font-size:.72rem;letter-spacing:.12em;color:var(--bark-soft)}
+.fl__legend{position:absolute;left:1rem;bottom:.8rem;z-index:2;display:flex;align-items:center;margin:0;font-family:var(--mono);font-weight:600;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--natural);opacity:0;transition:opacity .6s .6s var(--ease)}
+.fl.is-map .fl__legend{opacity:.85}
+.fl__legend i{display:inline-block;width:.45rem;height:.45rem;margin-right:.55rem;border-radius:50%;box-shadow:0 0 0 3px rgb(var(--mint-rgb)/.18)}
+.fl__legend i.mint{background:var(--mint)}
+/* the destinations as real links: one row of slim tickets, the code on
+   the stub, a perforation, then the city and the page it flies to */
+.fl__cards{position:relative;z-index:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.6rem;margin:.6rem 0 0;padding:0;list-style:none}
+.fl__cards>li{display:grid;min-width:0}
+/* each ticket is a button: a light card on the dark ground, the page it goes
+   to in large type, a filled arrow disc, and a lift on hover */
+.fl__card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;column-gap:.7rem;row-gap:.3rem;min-height:5.6rem;padding:.9rem .9rem .9rem 1.05rem;border-radius:14px;background:var(--natural);box-shadow:0 1px 0 rgb(var(--off-white-rgb)/.35) inset,0 10px 26px rgb(var(--black-rgb)/.28);color:var(--bark);text-decoration:none;cursor:pointer;transition:transform .5s var(--ease-out),box-shadow .5s var(--ease),background .4s var(--ease)}
+.fl__card:hover,.fl__card:focus-visible,.fl__card.is-on{background:var(--off-white);transform:translate3d(0,-4px,0);box-shadow:0 0 0 2px var(--mint),0 16px 34px rgb(var(--black-rgb)/.34)}
+.fl__card:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.fl__cmeta{grid-column:1;font-family:var(--mono);font-weight:600;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--courtyard);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl__cmeta b{color:var(--browned-sugar-deep);letter-spacing:.12em}
+.fl__cpage{grid-column:1;font-family:var(--display);font-weight:600;font-size:clamp(1.05rem,1.3vw,1.25rem);letter-spacing:-.01em;line-height:1.15;color:var(--bark)}
+.fl__cgo{grid-column:2;grid-row:1/3;display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;background:var(--courtyard);color:var(--off-white);font-size:1.05rem;transition:transform .45s var(--ease-out),background .4s var(--ease)}
+.fl__card:hover .fl__cgo,.fl__card:focus-visible .fl__cgo,.fl__card.is-on .fl__cgo{transform:translateX(3px);background:var(--browned-sugar-deep)}
+.fl__pick{position:relative;z-index:1;display:flex;align-items:center;gap:.5rem;margin:clamp(1rem,2vw,1.4rem) 0 0;font-family:var(--mono);font-weight:600;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mint)}
+@media(max-width:1199px){.fl__cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:899px){
+  .fl__stage{height:220px;border-radius:12px}
+  .fl__video{display:none}.fl__video--v{display:block}
+  .fl__legend{display:none}
+  /* one swipe row that snaps ticket by ticket; it bleeds to the screen's
+     edges inside the section, which clips it, so the page never scrolls sideways */
+  .fl__cards{display:flex;gap:.5rem;margin:.7rem calc(-1 * var(--gutter)) 0;padding:0 var(--gutter) .3rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gutter);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .fl__cards::-webkit-scrollbar{display:none}
+  .fl__cards>li{flex:0 0 min(62vw,14rem);scroll-snap-align:start}
+}
+@media(prefers-reduced-motion:reduce){
+  .fl__canvas,.fl__video,.fl__gates,.fl__legend,.fl__card,.fl__cgo,.fl__gate b{transition:none}
+  .fl__label{animation:none}
+  .fl__video{display:none!important}
+  .fl .fl__canvas,.fl .fl__gates,.fl .fl__legend{opacity:1}
+}
