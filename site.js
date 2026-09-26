@@ -373,6 +373,41 @@
   function hoursGroups() { return shop.groups(); }
   var minuteFns = [];
   function onShopMinute(fn) { minuteFns.push(fn); fn(shopState()); }
+  /* ---- the map card in Visit: open and close, tilt toward the pointer,
+     and the live status in its pill ---- */
+  var xmap = document.getElementById('xmap');
+  if (xmap) (function () {
+    var card = xmap.querySelector('.xmap__card'), hint = xmap.querySelector('.xmap__hint');
+    var status = xmap.querySelector('[data-xmap-status]');
+    xmap.addEventListener('click', function () {
+      var open = xmap.getAttribute('aria-expanded') !== 'true';
+      xmap.setAttribute('aria-expanded', open ? 'true' : 'false');
+      xmap.setAttribute('aria-label', 'Dubai & Dips, 1131 Clear Lake City Blvd, Houston. ' + (open ? 'Hide the map' : 'Show the map'));
+      if (hint) hint.textContent = open ? 'Tap to close' : 'Tap to open the map';
+    });
+    /* the tilt: at most 8 degrees, eased toward the pointer, flat again on leave */
+    if (!reduce && window.matchMedia('(hover: hover)').matches) {
+      var tx = 0, ty = 0, cx = 0, cy = 0, traf = 0;
+      var ttick = function () {
+        traf = 0; cx += (tx - cx) * .18; cy += (ty - cy) * .18;
+        if (Math.abs(tx - cx) < .01 && Math.abs(ty - cy) < .01) { cx = tx; cy = ty; }
+        card.style.setProperty('--rx', cy.toFixed(2) + 'deg'); card.style.setProperty('--ry', cx.toFixed(2) + 'deg');
+        if (cx !== tx || cy !== ty) traf = requestAnimationFrame(ttick);
+      };
+      var twake = function () { if (!traf) traf = requestAnimationFrame(ttick); };
+      xmap.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        var dx = Math.max(-50, Math.min(50, e.clientX - (r.left + r.width / 2))), dy = Math.max(-50, Math.min(50, e.clientY - (r.top + r.height / 2)));
+        tx = dx / 50 * 8; ty = -dy / 50 * 8; twake();
+      });
+      xmap.addEventListener('pointerleave', function () { tx = 0; ty = 0; twake(); });
+    }
+    if (status) onShopMinute(function (st) {
+      status.classList.toggle('is-closed', !st.open);
+      status.lastChild.textContent = st.open ? 'Open now' : 'Closed';
+    });
+  })();
+
   (function minuteTick() {
     var st = shopState();
     minuteFns.forEach(function (fn) { fn(st); });
