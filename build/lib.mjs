@@ -173,7 +173,7 @@ ${o.image ? '' : '<meta property="og:image:width" content="1200">\n<meta propert
 <meta name="twitter:description" content="${esc(o.description)}">
 <meta name="twitter:image" content="${img}">
 <meta name="twitter:image:alt" content="${esc(imgAlt)}">
-${o.preloadImage ? `<link rel="preload" as="image" href="${o.preloadImage}" fetchpriority="high">\n` : ''}<link rel="preload" as="font" type="font/woff2" href="/public/fonts/albert-sans.woff2" crossorigin>
+${o.preloadImage ? `<link rel="preload" as="image" href="${o.preloadImage}" fetchpriority="high">\n` : ''}${(o.preloads || []).map(p => `<link rel="preload" as="image" href="${p.href}"${p.media ? ` media="${p.media}"` : ''} fetchpriority="high">\n`).join('')}<link rel="preload" as="font" type="font/woff2" href="/public/fonts/albert-sans.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/public/fonts/encode-sans.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/public/fonts/playfair-display-italic.woff2" crossorigin>
 <style>${INLINE_CSS}</style>
@@ -215,8 +215,8 @@ export function flightsSection({ heading = 'Where to *next?*', lead = 'Explore t
     </div>
     <div class="fl__stage" aria-hidden="true">
       <canvas class="fl__canvas"></canvas>
-      <video class="fl__video" muted playsinline preload="none" poster="/assets/flight-poster.webp" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
-      <video class="fl__video fl__video--v" muted playsinline preload="none" poster="/assets/flight-poster-9x16.webp" tabindex="-1"><source data-src="/assets/flight-9x16.webm" type="video/webm"><source data-src="/assets/flight-9x16.mp4" type="video/mp4"></video>
+      <video class="fl__video" muted playsinline preload="none" data-poster="/assets/flight-poster.webp" tabindex="-1"><source data-src="/assets/flight.webm" type="video/webm"><source data-src="/assets/flight.mp4" type="video/mp4"></video>
+      <video class="fl__video fl__video--v" muted playsinline preload="none" data-poster="/assets/flight-poster-9x16.webp" tabindex="-1"><source data-src="/assets/flight-9x16.webm" type="video/webm"><source data-src="/assets/flight-9x16.mp4" type="video/mp4"></video>
       <ul class="fl__gates">
         <li><span class="fl__origin"></span></li>${gates.map((g, i) => `
         <li><a class="fl__gate" href="${g.href}" data-gate="${i}" tabindex="-1"><span></span><b>${esc(g.code)}</b></a></li>`).join('')}

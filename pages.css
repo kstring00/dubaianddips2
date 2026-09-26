@@ -581,7 +581,6 @@
   .gal__item--big{grid-column:span 2}
   .jgrid{grid-template-columns:1fr}
   .jcard:nth-child(odd){border-right:0}
-  .phero--gelato .phero__grid{grid-template-columns:1fr}
   .gflap{grid-template-columns:minmax(0,1fr);gap:.4rem}
   .gflap__n{display:none}
   .gflap .flaps{display:grid;grid-template-columns:repeat(var(--n,14),minmax(0,1fr));width:100%}
@@ -840,4 +839,61 @@ html.swm-open{overflow:hidden}
   .night__stars,.night__spark{transition:none}
   .js .night__copy>*{opacity:1;transform:none}
   .night.is-lit .night__copy>*{animation:none}
+}
+
+/* the upright Playfair, for the gelato headline's first line (the site otherwise uses only its italic) */
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:500;font-display:swap;src:url(/public/fonts/playfair-display-500.woff2) format("woff2")}
+
+/* ---- /gelato: the hero. A full-bleed photo right under the nav, the text
+   on the cream wall at the left, a cream wash behind it for contrast. On
+   load the photo settles from 1.04, the lines rise 120ms apart, and once a
+   soft glint crosses the glass of the case. The photo drifts on scroll
+   (pages.js, transform only, 40px at most). ---- */
+.ghero{--cream:248 241 228;position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:min(92vh,960px);background:#efe4d0;color:var(--bark)}
+.ghero__media{position:absolute;inset:-40px 0 0;z-index:-2;background:#e9dcc4 50% 50%/cover no-repeat;will-change:transform}
+.ghero__media picture,.ghero__img{display:block;width:100%;height:100%}
+.ghero__img{object-fit:cover;object-position:0 50%;transform-origin:0 50%}
+.js .ghero__img{animation:gheroIn 1.6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes gheroIn{from{transform:scale(1.04)}}
+.ghero__wash{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgb(var(--cream)/.55) 0%,rgb(var(--cream)/.38) 24%,rgb(var(--cream)/0) 45%)}
+/* one pass of light over the glass: a narrow diagonal band, clipped to the case */
+.ghero__glint{position:absolute;left:34%;top:27%;width:66%;height:42%;overflow:hidden;pointer-events:none;clip-path:polygon(0 100%,14% 0,100% 0,100% 100%);opacity:0}
+.ghero__glint::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-30%;width:22%;background:linear-gradient(100deg,transparent,rgb(255 250 235/.55),transparent);transform:translateX(0) skewX(-18deg)}
+.js .ghero.is-glint .ghero__glint{opacity:.55}
+.js .ghero.is-glint .ghero__glint::before{animation:gheroGlint 1.2s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes gheroGlint{to{transform:translateX(620%) skewX(-18deg)}}
+.ghero__copy{position:relative;width:100%;padding:clamp(1.5rem,4vh,3rem) var(--gutter) clamp(8rem,22vh,15rem) max(var(--gutter),6.5vw)}
+.ghero .crumbs ol{margin-bottom:.9rem}
+.ghero .crumbs a,.ghero .crumbs [aria-current]{color:rgb(var(--bark-rgb)/.78)}
+.ghero .crumbs [aria-current]{color:rgb(var(--bark-rgb)/.9)}
+.ghero__label{display:flex;align-items:center;gap:.7rem;margin:0 0 1.3rem;font-family:var(--mono);font-weight:600;font-size:clamp(.9rem,1.1vw,1.02rem);letter-spacing:.24em;text-transform:uppercase;color:var(--bark)}
+.ghero__dia{color:var(--browned-sugar);font-size:.9em;letter-spacing:0}
+.ghero__title{margin:0;max-width:11ch;font-family:"Playfair Display",Georgia,serif;font-weight:500;font-style:normal;font-size:clamp(3.2rem,6.7vw,6rem);line-height:1;letter-spacing:-.025em;color:var(--bark)}
+.ghero__title span{display:block}
+.ghero__title em{display:block;font-family:var(--italic);font-style:italic;font-weight:400;color:var(--courtyard)}
+.ghero__lead{max-width:440px;margin-top:1.5rem;font-size:clamp(1.02rem,.96rem + .3vw,1.18rem);line-height:1.65;color:rgb(var(--bark-rgb)/.82)}
+/* the lines rise one after another, 120ms apart */
+.js .ghero__copy>*,.js .ghero__title span,.js .ghero__title em{opacity:0;transform:translate3d(0,14px,0);animation:gheroUp .8s cubic-bezier(.2,.7,.2,1) forwards}
+.js .ghero__title{opacity:1;transform:none;animation:none}
+.js .ghero__copy>.crumbs{animation-delay:.1s}
+.js .ghero__label{animation-delay:.22s}
+.js .ghero__title span{animation-delay:.34s}
+.js .ghero__title em{animation-delay:.46s}
+.js .ghero__lead{animation-delay:.58s}
+@keyframes gheroUp{to{opacity:1;transform:none}}
+@media(max-width:899px){
+  .ghero{align-items:flex-start;min-height:calc(100svh - var(--nav-h) - var(--thumb,0px))}
+  .ghero__media{inset:0 0 -40px}
+  .ghero__img{object-position:50% 100%;transform-origin:50% 100%}
+  .ghero__wash{background:linear-gradient(180deg,rgb(var(--cream)/.62) 0%,rgb(var(--cream)/.45) 30%,rgb(var(--cream)/0) 55%)}
+  .ghero__glint{left:8%;top:40%;width:92%;height:30%;clip-path:polygon(0 100%,18% 0,100% 0,100% 100%)}
+  .ghero__copy{padding:1.3rem var(--gutter) 2rem}
+  .ghero__title{font-size:clamp(2.6rem,12.4vw,3.1rem)}
+  .ghero__label{margin-bottom:1rem}
+  .ghero__lead{margin-top:1rem;font-size:1rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .js .ghero__img,.js .ghero.is-glint .ghero__glint::before{animation:none}
+  .js .ghero__copy>*,.js .ghero__title span,.js .ghero__title em{opacity:1;transform:none;animation:none}
+  .ghero__glint{display:none}
 }

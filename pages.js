@@ -321,6 +321,22 @@
     } else { loadStars(); }
   }
 
+  /* ---- /gelato: the hero. One glint across the glass a second after the
+     photo settles; the photo drifts up a little slower than the page. ---- */
+  var ghero = document.getElementById('ghero');
+  if (ghero && !reduce) {
+    var gmedia = ghero.querySelector('.ghero__media');
+    setTimeout(function () { ghero.classList.add('is-glint'); }, 2600);
+    var graf = 0, gcur = 0;
+    var gtick = function () {
+      graf = 0;
+      var top = ghero.getBoundingClientRect().top, h = ghero.offsetHeight || 1;
+      var p = Math.min(1, Math.max(0, -top / h)), y = -40 * p;
+      if (Math.abs(y - gcur) > .1) { gcur = y; gmedia.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0)'; }
+    };
+    window.addEventListener('scroll', function () { if (!graf) graf = requestAnimationFrame(gtick); }, { passive: true });
+  }
+
   /* ---- /gelato: the tabs ---- */
   var tabbar = document.querySelector('.gtabs__bar');
   var flapsDone = false;

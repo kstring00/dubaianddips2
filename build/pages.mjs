@@ -408,15 +408,26 @@ export function gelatoPage() {
     return [...padded].map(ch => `<span class="flap"><span class="flap__ch">${ch === ' ' ? '&nbsp;' : esc(ch)}</span><span class="flap__leaf"><span>${ch === ' ' ? '&nbsp;' : esc(ch)}</span></span></span>`).join(''); };
   const status = { 'on-time': 'On the board', seasonal: 'Seasonal', 'sold-out': 'Sold out today' };
   const panel = (id, t) => `<section class="gtab" id="tab-${id}" role="tabpanel" aria-labelledby="tabbtn-${id}" hidden><h2 class="gtab__h">${esc(t.title)}</h2>${t.lines.map(x => `<p class="gtab__p">${esc(x)}</p>`).join('')}</section>`;
-  const body = `<header class="phero phero--gelato">
-  <div class="shell phero__grid phero--split">
-    <div class="phero__copy">
-      ${crumbs(trail)}
-      <p class="eyebrow rv">${star()}<span>FCO &middot; Rome &middot; DD 102</span></p>
-      <h1 class="phero__title" data-lines>Gelato, made <em>the slow way.</em></h1>
-      <p class="phero__lead rv">Dense, smooth and served a few degrees warmer than ice cream, so the flavor arrives first. This page is being written with the owner; what is here is a placeholder.</p>
-    </div>
-    <figure class="phero__media rv">${img('/assets/blog-gelato.webp', 'A scoop of pistachio gelato held up at the counter beside a layered latte in a Dubai & Dips cup', 765, 478, { lazy: false, sizes: '(min-width: 900px) 40vw, 100vw' })}</figure>
+  /* The hero: a full-bleed photo of a sunlit gelateria (Higgsfield,
+     assets/gelato-hero.webp + gelato-hero-mobile.webp), the text on the
+     cream wall. Until those files are committed it falls back to the shop
+     photo. OWNER NOTE: the copy on this page is being written with the
+     owner; the tabs below hold placeholders (config/gelato.js). */
+  const has = f => fs.existsSync(path.join(ROOT_DIR, 'assets', f));
+  const heroD = has('gelato-hero.webp') ? '/assets/gelato-hero.webp' : '/assets/blog-gelato.webp';
+  const heroM = has('gelato-hero-mobile.webp') ? '/assets/gelato-hero-mobile.webp' : heroD;
+  const lqip = fs.existsSync(path.join(ROOT_DIR, 'source/gelato-hero-lqip.txt')) ? fs.readFileSync(path.join(ROOT_DIR, 'source/gelato-hero-lqip.txt'), 'utf8').trim() : '';
+  const body = `<header class="ghero" id="ghero">
+  <div class="ghero__media"${lqip ? ` style="background-image:url(${lqip})"` : ''}>
+    <picture><source media="(max-width: 899px)" srcset="${heroM}" width="1080" height="1350"><img class="ghero__img" src="${heroD}" alt="Gelato display case in a sunlit café." width="2560" height="1440" fetchpriority="high"></picture>
+    <span class="ghero__glint" aria-hidden="true"></span>
+  </div>
+  <div class="ghero__wash" aria-hidden="true"></div>
+  <div class="shell ghero__copy">
+    ${crumbs(trail)}
+    <p class="ghero__label"><span class="ghero__dia" aria-hidden="true">&#9670;</span>FCO &middot; Rome &middot; DD 102</p>
+    <h1 class="ghero__title"><span>Gelato, made</span> <em>the slow way.</em></h1>
+    <p class="ghero__lead">Dense, smooth and served a few degrees warmer than ice cream, so the flavor arrives first.</p>
   </div>
 </header>
 <section class="gtabs" aria-label="About the gelato">
@@ -444,7 +455,7 @@ export function gelatoPage() {
   </div>
 </section>
 ${flightsSection()}`;
-  return page({ path: '/gelato', current: '/gelato', bodyClass: 'p-gelato', noindex: true, title: 'Gelato | Dubai & Dips, Clear Lake, Houston',
+  return page({ path: '/gelato', current: '/gelato', bodyClass: 'p-gelato', noindex: true, preloads: [{ href: heroM, media: '(max-width: 899px)' }, { href: heroD, media: '(min-width: 900px)' }], title: 'Gelato | Dubai & Dips, Clear Lake, Houston',
     description: 'Gelato at Dubai & Dips in Clear Lake, Houston: the quality, made fresh daily, today\'s flavors and the science.', image: '/assets/blog-gelato.webp',
     jsonld: [breadcrumbs(trail)], body });
 }

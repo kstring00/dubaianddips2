@@ -259,7 +259,11 @@
   /* ---- on screen or not ---- */
   new IntersectionObserver(function (es) {
     var e = es[es.length - 1];
-    if (e.isIntersecting) { load().then(function () { opening(); }); }
+    if (e.isIntersecting) {
+      /* the posters wait too: nothing of this section loads until it is near */
+      root.querySelectorAll('.fl__video[data-poster]').forEach(function (v) { v.poster = v.getAttribute('data-poster'); v.removeAttribute('data-poster'); });
+      load().then(function () { opening(); });
+    }
   }, { rootMargin: '600px 0px' }).observe(root);
   new IntersectionObserver(function (es) {
     seen = es[es.length - 1].isIntersecting;
