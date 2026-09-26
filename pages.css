@@ -765,24 +765,6 @@ html.swm-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){.sky__dot{animation:none}.sky__film{display:none}.sky{background:var(--courtyard-deep) url("/assets/flight-poster.webp") 62% 50%/cover}}
 
-/* ---- /team: the title centred and high, an arcade of pointed arches
-   rising behind it in stone tones, fading out at the sides ---- */
-.phero--crew{--arc-h:clamp(120px,14vw,200px);padding:clamp(1.4rem,3vw,2.4rem) 0 calc(var(--arc-h) + clamp(1.5rem,3vw,2.5rem));text-align:center}
-.phero--crew::after{display:none}
-.phero--crew .phero__grid{display:block;position:static}
-.phero--crew .phero__copy{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;max-width:44rem;margin-inline:auto}
-.phero--crew .crumbs ol{justify-content:center}
-.phero--crew .phero__title{max-width:none}
-.phero--crew .phero__lead{margin-top:1.2rem}
-.arcade{position:absolute;left:0;right:0;bottom:0;z-index:0;width:100%;height:var(--arc-h);-webkit-mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent),linear-gradient(#000,#000);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);pointer-events:none}
-.arcade__void{fill:rgb(var(--mint-rgb)/.22)}
-.arcade__line{fill:none;stroke:rgb(var(--browned-sugar-rgb,156 119 79)/.42);stroke-width:1.5;vector-effect:non-scaling-stroke}
-.arcade__dentil{fill:rgb(var(--browned-sugar-rgb,156 119 79)/.32)}
-.js .arcade{animation:ddRise 1.2s .2s var(--ease-out) both}
-@media(max-width:899px){.phero--crew{--arc-h:110px}}
-@media(prefers-reduced-motion:reduce){.js .arcade{animation:none}}
-/* the arcade stands on a floor line, and the crew start a step below it */
-.phero--crew::before{content:"";position:absolute;left:8%;right:8%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgb(var(--browned-sugar-rgb)/.5) 20%,rgb(var(--browned-sugar-rgb)/.5) 80%,transparent);z-index:1}
 .p-team .crewgrid{padding-top:clamp(2.5rem,5vw,4rem)}
 
 /* the flight band as the catering hero: right under the nav, full height of
@@ -809,3 +791,52 @@ html.swm-open{overflow:hidden}
 .itin .itin__n::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--browned-sugar);opacity:0;transform:scale(.7);transition:opacity .8s var(--ease),transform 1s cubic-bezier(.3,.7,.2,1)}
 .itin__list li.is-in .itin__n::before{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.itin .itin__n::before{opacity:1;transform:none;transition:none}}
+
+/* ---- /team: the night scene. Back to front: the sky (a gradient on the
+   header), the stars (a tsParticles canvas, faded out before the arches),
+   the photo of the arches and pool anchored to the bottom with its top edge
+   faded into the sky, and the text over the sky. ---- */
+.night{--sky-top:#0F1712;--sky-low:#1A241D;--star:#FCFBF9;--mint-c:#D1E3D2;--sugar-c:#C2835F;position:relative;isolation:isolate;overflow:hidden;min-height:min(90vh,900px);display:flex;flex-direction:column;align-items:center;background:radial-gradient(42% 30% at 50% 26%,rgb(209 227 210/.07),transparent 72%),linear-gradient(180deg,var(--sky-top) 0%,var(--sky-low) 48%,#0B1310 100%);color:var(--star);text-align:center}
+.night__stars{position:absolute;left:0;right:0;top:0;height:62%;z-index:1;pointer-events:none;opacity:0;transition:opacity 1s ease-out;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%)}
+.night__stars.is-on,.night__spark.is-on{opacity:1}
+.night__stars canvas,.night__spark canvas{display:block;pointer-events:none}
+.night__scene{position:absolute;left:0;right:0;bottom:0;z-index:0;margin:0;height:58%}
+.night__scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 100%;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 26%);mask-image:linear-gradient(180deg,transparent 0%,#000 26%)}
+.night__copy{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding-top:clamp(1.2rem,3vw,2.4rem)}
+.night .crumbs ol{justify-content:center}
+.night .crumbs a{color:rgb(252 251 249/.78)}
+.night .crumbs a:hover,.night .crumbs [aria-current]{color:var(--star)}
+.night .crumbs li+li::before{color:rgb(252 251 249/.4)}
+.night .eyebrow{color:var(--mint-c)}
+.night .eyebrow .logo--star{--logo-accent:var(--sugar-c)}
+.night__title{margin:.2rem 0 0;font-size:clamp(3rem,7.4vw,6.6rem);line-height:.98;letter-spacing:-.035em;color:var(--star);text-shadow:0 10px 40px rgb(0 0 0/.35)}
+.night__title em{color:var(--mint-c)}
+/* the horizon, borrowed from the component's demo: a thin glowing line
+   fading at both ends, a small cluster of sparkles just under it */
+.night__horizon{position:relative;width:min(40rem,86vw);height:5.5rem;margin-top:.9rem}
+.night__horizon i{position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--mint-c) 22%,var(--sugar-c) 50%,var(--mint-c) 78%,transparent)}
+.night__horizon i::before{content:"";position:absolute;left:18%;right:18%;top:-2px;height:5px;background:linear-gradient(90deg,transparent,var(--sugar-c),transparent);filter:blur(4px);opacity:.8}
+.night__spark{position:absolute;inset:0;opacity:0;transition:opacity 1s ease-out;-webkit-mask-image:radial-gradient(50% 100% at 50% 0%,#000 20%,transparent 75%);mask-image:radial-gradient(50% 100% at 50% 0%,#000 20%,transparent 75%)}
+.night__lead{margin-top:-3.6rem;font-size:clamp(1.08rem,1rem + .45vw,1.35rem);line-height:1.5;color:rgb(252 251 249/.86)}
+/* the text rises one line at a time once the stars are up */
+.js .night__copy>*{opacity:0;transform:translate3d(0,14px,0)}
+.night.is-lit .night__copy>*{animation:nightUp .9s cubic-bezier(.2,.7,.2,1) forwards}
+.night.is-lit .night__copy>:nth-child(2){animation-delay:.15s}
+.night.is-lit .night__copy>:nth-child(3){animation-delay:.3s}
+.night.is-lit .night__copy>:nth-child(4){animation-delay:.5s}
+.night.is-lit .night__copy>:nth-child(5){animation-delay:.65s}
+@keyframes nightUp{to{opacity:1;transform:none}}
+@media(max-width:899px){
+  .night{min-height:85vh}
+  .night__stars{height:58%}
+  .night__scene{height:50%}
+  .night__scene img{object-position:50% 100%}
+  .night__title{font-size:clamp(2.6rem,12vw,3.6rem)}
+  .night__horizon{height:4.5rem}
+  .night__lead{margin-top:-2.8rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .night__stars,.night__spark{transition:none}
+  .js .night__copy>*{opacity:1;transform:none}
+  .night.is-lit .night__copy>*{animation:none}
+}

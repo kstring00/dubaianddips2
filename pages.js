@@ -272,6 +272,55 @@
     document.addEventListener('visibilitychange', function () { if (document.hidden) sky.pause(); else if (skyOn) { var pr = sky.play(); if (pr && pr.catch) pr.catch(function () {}); } });
   }
 
+  /* ---- /team: the night sky. /vendor/stars.js (tsParticles, bundled by the
+     build) loads only once the header is on screen; the stars pause when it
+     scrolls away and play again on return. The text rises once the stars
+     are up (or after a moment if they never come). ---- */
+  var night = document.getElementById('night');
+  if (night) {
+    var skyEl = document.getElementById('nightStars'), sparkEl = document.getElementById('nightSpark');
+    var skies = [], lit = false, seen = false, asked = false;
+    var light = function () { if (!lit) { lit = true; night.classList.add('is-lit'); } };
+    var phoneQ = window.matchMedia('(max-width: 899px)').matches;
+    /* the stars wait for the page to finish loading and the browser to be
+       idle, so the photo and the headline paint first */
+    var whenCalm = function (fn) {
+      var go = function () { if ('requestIdleCallback' in window) requestIdleCallback(fn, { timeout: 1200 }); else setTimeout(fn, 200); };
+      if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
+    };
+    var loadStars = function () {
+      if (asked) return; asked = true;
+      whenCalm(function () {
+      var s = document.createElement('script'); s.src = '/vendor/stars.js'; s.async = true;
+      s.onload = function () {
+        if (!window.DDStars) { light(); return; }
+        Promise.all([
+          window.DDStars.start(skyEl, { kind: 'sky', reduce: reduce, phone: phoneQ }),
+          sparkEl ? window.DDStars.start(sparkEl, { kind: 'spark', reduce: reduce, phone: phoneQ }) : null
+        ]).then(function (cs) {
+          skies = cs.filter(Boolean);
+          skyEl.classList.add('is-on'); if (sparkEl) sparkEl.classList.add('is-on');
+          setTimeout(light, reduce ? 0 : 350);
+          if (!seen && !reduce) skies.forEach(function (c) { c.pause(); });
+        }).catch(light);
+      };
+      s.onerror = light;
+      document.head.appendChild(s);
+      });
+    };
+    setTimeout(light, 2200);
+    if (IO) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          seen = e.isIntersecting;
+          if (seen) loadStars();
+          if (reduce) return;
+          skies.forEach(function (c) { if (seen) c.play(); else c.pause(); });
+        });
+      }, { threshold: 0 }).observe(night);
+    } else { loadStars(); }
+  }
+
   /* ---- /gelato: the tabs ---- */
   var tabbar = document.querySelector('.gtabs__bar');
   var flapsDone = false;

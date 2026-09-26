@@ -33,6 +33,14 @@ fs.mkdirSync(DIST, { recursive: true });
   }
 })('');
 
+/* the night sky on /team: tsParticles (engine + slim), bundled into one
+   file of ours so nothing loads from a CDN */
+{
+  const { buildSync } = await import('esbuild');
+  buildSync({ entryPoints: [path.join(ROOT, 'build/stars.entry.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2019',
+    legalComments: 'none', outfile: path.join(DIST, 'vendor/stars.js'), logLevel: 'warning' });
+}
+
 /* the homepage: structured data into <head>, nothing else */
 const home = read('index.html');
 const MARK = '<!-- build:jsonld (structured data is generated from config at build time) -->';

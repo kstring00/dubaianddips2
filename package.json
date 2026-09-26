@@ -12,7 +12,10 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@tsparticles/engine": "^4.4.0",
+    "@tsparticles/slim": "^4.4.0",
     "d3-geo": "^3.1.1",
+    "esbuild": "^0.28.2",
     "marked": "^18.0.14",
     "topojson-client": "^3.1.0",
     "world-atlas": "^2.0.2"
