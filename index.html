@@ -166,6 +166,10 @@ p{margin:0}
 .nav__links{display:flex;gap:1.5rem;align-items:center}
 .nav__links a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;font-size:.95rem;font-weight:400;text-decoration:none;color:var(--bark);transition:color .3s var(--ease)}
 .nav__links a:hover{color:var(--courtyard)}
+/* eight links: they tighten on laptop widths and never wrap */
+.nav__links a{white-space:nowrap}
+@media(max-width:1279px){.nav__links{gap:1.05rem}.nav__links a{font-size:.9rem}}
+@media(min-width:900px) and (max-width:1149px){.nav__links{gap:.7rem}.nav__links a{min-width:0;font-size:.86rem}.nav__right{gap:.9rem}}
 .nav__right{display:flex;align-items:center;gap:1.4rem}
 .nav__call{display:inline-flex;align-items:center;min-height:44px;font-size:.95rem;font-weight:500;text-decoration:none;color:var(--bark);border-bottom:1px solid rgb(var(--bark-rgb)/.35)}
 .nav__hours{font-family:var(--mono);font-weight:600;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--courtyard)}
@@ -903,7 +907,7 @@ body.sheet-open{overflow:hidden}
 <header class="nav nav--intro" id="nav">
   <a class="nav__brand" href="/"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg><svg class="logo logo--mark" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-mark"/></svg></a>
   <nav class="nav__links" aria-label="Primary">
-    <a href="/">Home</a><a href="/menu">Menu</a><a href="/visit">Visit</a><a href="/catering">Catering</a><a href="/blog">Journal</a><a href="/feed">The Feed</a>
+    <a href="/">Home</a><a href="/menu">Menu</a><a href="/gelato">Gelato</a><a href="/visit">Visit</a><a href="/catering">Catering</a><a href="/blog">Journal</a><a href="/team">The Crew</a><a href="/feed">The Feed</a>
   </nav>
   <div class="nav__right">
     <span class="nav__meta">
@@ -921,7 +925,7 @@ body.sheet-open{overflow:hidden}
 <div class="navsheet on-green" id="navSheet" hidden>
   <nav class="navsheet__in" aria-label="Menu">
     <p class="navsheet__eyebrow" aria-hidden="true">Departures &middot; Clear Lake</p>
-    <ol class="navsheet__list" id="navSheetList" data-more="Gelato=/gelato|Meet the Crew=/team"></ol>
+    <ol class="navsheet__list" id="navSheetList"></ol>
     <div class="navsheet__foot"></div>
   </nav>
 </div>
