@@ -217,14 +217,14 @@ for (const v of VIEWS) {
     const w = await sp.evaluate(() => ({
       cards: document.querySelectorAll('#socialWall .bp').length,
       follow: [...document.querySelectorAll('#socialWall .bp--follow')].map(a => a.href + '|' + a.target + '|' + a.rel),
-      links: [...document.querySelectorAll('#socialWall a.bp')].every(a => /^https:\/\/www\.(tiktok\.com\/@dubai\.dips|instagram\.com\/dubaianddips\/)$/.test(a.href) && a.target === '_blank' && /noopener/.test(a.rel)),
+      links: [...document.querySelectorAll('#socialWall a.bp')].every(a => /^https:\/\/www\.(tiktok\.com\/@dubai\.dips|instagram\.com\/dubaianddips)$/.test(a.href) && a.target === '_blank' && /noopener/.test(a.rel)),
       imgs: [...document.querySelectorAll('#socialWall img')].every((i, k) => i.alt.length > 10 && (k < 3 ? i.loading !== 'lazy' : i.loading === 'lazy') && i.decoding === 'async' && i.width && i.height),
       over: document.documentElement.scrollWidth - innerWidth,
       nav: ![...document.querySelectorAll('.nav__links a')].some(a => a.getAttribute('href').startsWith('#')),
       h2: document.getElementById('social-title').tagName
     }));
     ok(w.cards === 10, 'social: 8 posts + 2 follow tickets (' + w.cards + ')');
-    ok(w.follow.join() === 'https://www.tiktok.com/@dubai.dips|_blank|noopener,https://www.instagram.com/dubaianddips/|_blank|noopener', 'social: follow tickets link the right profiles in a new tab');
+    ok(w.follow.join() === 'https://www.tiktok.com/@dubai.dips|_blank|noopener,https://www.instagram.com/dubaianddips|_blank|noopener', 'social: follow tickets link the right profiles in a new tab');
     ok(w.links && w.imgs, 'social: every card link opens a profile in a new tab; every image has alt, async, size; lazy after the first three');
     ok(w.over <= 0, 'social: no horizontal overflow (' + w.over + ')');
     ok(w.nav && w.h2 === 'H1', 'nav has page links only (no scroll-to-section links); the Feed title is the h1');
