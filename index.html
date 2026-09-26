@@ -776,8 +776,18 @@ body.sheet-open{overflow:hidden}
 .bpanel{background:var(--courtyard-deep)}
 .bpanel__in{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:1.1rem 2rem;padding:.2rem clamp(1rem,2.2vw,1.8rem) 1.6rem calc(clamp(1rem,2.2vw,1.8rem) + 3px)}
 .bpanel__desc{grid-column:1/-1;max-width:62ch;font-size:1.02rem;color:var(--off-white)}
-.bitems{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:0 2rem}
-.bitem{display:flex;align-items:baseline;gap:.8rem;padding:.5rem 0;border-bottom:1px dashed rgb(var(--off-white-rgb)/.2);font-size:1rem;font-weight:400;color:var(--off-white)}
+/* the open row: every item a small card, its photo on top (or a placeholder
+   tile drawn for the kind of item), the name and price under it */
+.bitems{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:1rem 1rem}
+.bitem{display:flex;flex-direction:column;gap:.6rem;min-width:0;font-size:1rem;font-weight:400;color:var(--off-white)}
+.bitem__pic{position:relative;display:block;aspect-ratio:1;border-radius:14px;overflow:hidden;background:var(--courtyard-deep);box-shadow:inset 0 0 0 1px rgb(var(--off-white-rgb)/.1),0 8px 20px rgb(var(--black-rgb)/.18)}
+.bitem__pic img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease-out)}
+.bitem:hover .bitem__pic img{transform:scale(1.04)}
+.bitem__ph{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:.5rem;background:radial-gradient(80% 80% at 50% 40%,rgb(var(--mint-rgb)/.14),transparent 70%),url("/public/brand/pattern/pattern-light.svg") 0 0/31.4px 32.3px;background-color:var(--courtyard-deep)}
+.bitem__ph svg{width:44%;height:auto;fill:none;stroke:var(--mint);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.bitem__ph i{font-style:normal;font-family:var(--mono);font-weight:600;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgb(var(--off-white-rgb)/.6)}
+.bitem__txt{display:flex;align-items:baseline;gap:.6rem;padding-bottom:.45rem;border-bottom:1px dashed rgb(var(--off-white-rgb)/.2)}
+.bitem__name{min-width:0;font-size:.98rem;line-height:1.3}
 .bitem__price{margin-left:auto;font-family:var(--data);font-size:.88rem;color:var(--mint)}
 .bpanel__soon{font-size:.98rem;color:var(--off-white)}
 .bpanel__order{margin:0}
@@ -830,7 +840,8 @@ body.sheet-open{overflow:hidden}
   .flaps{display:grid;grid-template-columns:repeat(var(--n,12),minmax(0,1fr));gap:2px;width:100%;max-width:calc(var(--n,12) * 2.3rem);margin-inline:auto}
   .flap{width:auto;height:1.8em;line-height:1.8em;font-size:clamp(.7rem,calc((100cqi - (var(--n,12) - 1) * 2px) / var(--n,12) * .9),1.25rem)}
   .bpanel__in{grid-template-columns:1fr;padding:1.1rem 1rem 1.3rem}
-  .bitems{grid-template-columns:1fr}
+  .bitems{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem .75rem}
+  .bitem__name{font-size:.92rem}
   .board__foot{margin-top:.85rem;border:0;border-radius:14px;background:var(--courtyard)}
 }
 
@@ -870,7 +881,7 @@ body.sheet-open{overflow:hidden}
   .ticket__paper:hover,.ticket:focus-within .ticket__paper{transform:none}
   .rail__end{align-self:flex-start;padding:.6rem var(--gutter) 0}
   .js .sheet.is-open .sheet__card{animation:none}
-  .bitem__order,.hero__alt{transition:none}
+  .bitem__order,.hero__alt,.bitem__pic img{transition:none}
   .feature,.feature__go i{transition:none}
   .flap__leaf{display:none}
   .flap__ch{transition:opacity .18s linear}

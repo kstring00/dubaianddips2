@@ -110,11 +110,19 @@
 .route__title{font-size:clamp(2.4rem,5vw,4.2rem);line-height:1;letter-spacing:-.035em;color:var(--bark)}
 .route__desc{margin-top:1rem;font-family:var(--italic);font-style:italic;font-size:clamp(1.25rem,1.1rem + .6vw,1.6rem);color:var(--ink-soft)}
 .route__soon{margin-top:2rem;padding:1.3rem 1.4rem;border-radius:14px;border:1.5px dashed rgb(var(--bark-rgb)/.25);color:var(--ink-soft)}
-.mlist{margin:2rem 0 0;padding:0;list-style:none;border-top:1px solid rgb(var(--bark-rgb)/.14)}
-.mitem{display:flex;align-items:center;gap:1rem;min-height:64px;padding:.7rem 0;border-bottom:1px dashed rgb(var(--bark-rgb)/.22);font-size:clamp(1.08rem,1rem + .3vw,1.25rem);color:var(--bark)}
-.mitem__img{flex:0 0 auto;width:52px;height:52px;border-radius:12px;object-fit:cover;box-shadow:var(--lift-1)}
-.mitem__lead{flex:1;align-self:flex-end;margin-bottom:.45em;border-bottom:2px dotted rgb(var(--bark-rgb)/.3)}
-.mitem__price{font-family:var(--data);font-size:.95rem;color:var(--courtyard)}
+/* each item a card: its photo (or a placeholder tile drawn for the kind of
+   item) on top, the name and price on a dotted rule under it */
+.mlist{margin:2rem 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));gap:1.4rem 1.1rem}
+.mitem{display:flex;flex-direction:column;gap:.7rem;min-width:0;color:var(--bark)}
+.mitem__pic{position:relative;display:block;aspect-ratio:1;border-radius:16px;overflow:hidden;background:var(--courtyard);box-shadow:var(--lift-1)}
+.mitem__img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease-out)}
+.mitem:hover .mitem__img{transform:scale(1.04)}
+.mitem__ph{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:.55rem;background:radial-gradient(80% 80% at 50% 40%,rgb(var(--mint-rgb)/.16),transparent 70%),url("/public/brand/pattern/pattern-on-courtyard.svg") 0 0/31.4px 32.3px;background-color:var(--courtyard)}
+.mitem__ph svg{width:42%;height:auto;fill:none;stroke:var(--mint);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.mitem__ph i{font-style:normal;font-family:var(--mono);font-weight:600;font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:rgb(var(--off-white-rgb)/.7)}
+.mitem__txt{display:flex;align-items:baseline;gap:.6rem;padding-bottom:.55rem;border-bottom:1px dashed rgb(var(--bark-rgb)/.22)}
+.mitem__name{min-width:0;font-size:clamp(1rem,.96rem + .2vw,1.1rem);line-height:1.3}
+.mitem__price{margin-left:auto;font-family:var(--data);font-size:.95rem;color:var(--courtyard)}
 .route__order{margin-top:1.8rem}
 .route__go{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;font-weight:500;color:var(--courtyard);text-decoration:none;border-bottom:1.5px solid rgb(var(--accent-rgb)/.8)}
 .route__go i{font-style:normal;transition:transform .4s var(--ease-out)}
@@ -384,7 +392,7 @@
   .bform__done dl{grid-template-columns:1fr 1fr}
   .offer__list,.pgrid{grid-template-columns:1fr}
   .popular__list{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .mitem{min-height:58px}
+  .mlist{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.1rem .8rem}
   .faq__a{padding-right:0}
   .mtabs{padding:0}
   .mtabs__in{padding:0 var(--gutter)}

@@ -78,6 +78,9 @@ function pass(r, i, { photo = true } = {}) {
 }
 
 /* ================================================================ /menu */
+/* line drawings for the placeholder photo tiles, by the kind of item (same set as the homepage board in site.js) */
+const GLYPH = {"frappe": "<path d=\"M16 20h16l-2 22H18z\"/><path d=\"M14.5 20h19M17 20c0-4 3.2-7 7-7s7 3 7 7\"/><path d=\"M27 13l3-7\"/><path d=\"M19.5 28h9\"/>", "coffee": "<path d=\"M12 22h20v7a10 10 0 0 1-10 10 10 10 0 0 1-10-10z\"/><path d=\"M32 24h2.5a4 4 0 0 1 0 8H31\"/><path d=\"M10 42h24\"/><path d=\"M18 17c0-2 2-2 2-4M24 17c0-2 2-2 2-4\"/>", "matcha": "<path d=\"M13 20h22l-2.5 20.5a3 3 0 0 1-3 2.5h-11a3 3 0 0 1-3-2.5z\"/><path d=\"M14 27h20\"/><path d=\"M29 12c-5 0-8 3-8 7 5 0 8-3 8-7z\"/><path d=\"M21 19l4-4\"/>", "latte": "<path d=\"M14 14h20l-2 27a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2z\"/><path d=\"M15 24h18\"/><path d=\"M20 30c2-2 6-2 8 0M20 34c2-2 6-2 8 0\"/>", "smoothie": "<path d=\"M15 19h18l-2.5 23h-13z\"/><path d=\"M13.5 19h21\"/><path d=\"M26 19l3-12h3\"/><circle cx=\"20\" cy=\"14.5\" r=\"3\"/>", "dessert": "<ellipse cx=\"24\" cy=\"33\" rx=\"16\" ry=\"5\"/><path d=\"M12 30c0-5 5.5-9 12-9s12 4 12 9\"/><path d=\"M18 24c1.5-2 3.5-3 6-3s4.5 1 6 3\"/><circle cx=\"24\" cy=\"19\" r=\"1.4\"/>", "bite": "<path d=\"M10 30h28\"/><path d=\"M12 30c0-7 5.4-12 12-12s12 5 12 12\"/><path d=\"M24 18v-3M21 15h6\"/><path d=\"M11 34h26\"/>"};
+const KIND = {"frappes": "frappe", "classic-coffees": "coffee", "matchas": "matcha", "lattes": "latte", "refreshers": "smoothie", "smoothies": "smoothie", "breakfast-bites": "bite", "crepes": "dessert", "waffles": "dessert", "desserts": "dessert"};
 export function menuPage() {
   const trail = [{ name: 'Home', url: '/' }, { name: 'Menu', url: '/menu' }];
   const tabs = ROWS.map(r => `<li><a href="#${r.slug}" data-tab><b>${esc(r.code)}</b><span>${esc(plain(r.category).replace(/^The /, ''))}</span></a></li>`).join('');
@@ -86,7 +89,9 @@ export function menuPage() {
     const list = items.length ? `<ul class="mlist">${items.map(it => {
       const price = typeof it.price === 'number' && it.price > 0 ? '$' + it.price.toFixed(2).replace(/\.00$/, '') : '';
       const [w, h] = it.photo ? imgSize(it.photo) : [0, 0];
-      return `<li class="mitem${it.photo ? ' has-photo' : ''}">${it.photo ? img(it.photo, it.alt || it.name, w, h, { cls: 'mitem__img' }) : ''}<span class="mitem__name">${esc(it.name)}</span>${price ? `<span class="mitem__lead" aria-hidden="true"></span><span class="mitem__price">${price}</span>` : ''}</li>`;
+      const pic = it.photo ? img(it.photo, it.alt || it.name, w, h, { cls: 'mitem__img' })
+        : `<span class="mitem__ph" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">${GLYPH[KIND[r.slug]] || GLYPH.dessert}</svg><i>Photo soon</i></span>`;
+      return `<li class="mitem${it.photo ? ' has-photo' : ''}"><span class="mitem__pic">${pic}</span><span class="mitem__txt"><span class="mitem__name">${esc(it.name)}</span>${price ? `<span class="mitem__price">${price}</span>` : ''}</span></li>`;
     }).join('')}</ul>` : `<p class="route__soon">The full list for this route is on the boards in the shop. <a href="/visit/clear-lake">Come and see it</a>.</p>`;
     const status = r.status === 'sold-out' ? '<span class="route__tag">Sold out today</span>' : r.status === 'seasonal' ? '<span class="route__tag">Seasonal</span>' : '';
     return `<section class="route" id="${esc(r.slug)}" aria-labelledby="route-${esc(r.slug)}">
