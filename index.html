@@ -407,8 +407,60 @@ body.sheet-open{overflow:hidden}
 
 /* ============================== VISIT ============================== */
 .visit{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(1.6rem,4vw,3.2rem);align-items:start}
-.visit__map{position:relative;width:100%;aspect-ratio:4/3;border-radius:4px;overflow:hidden;border:1px solid rgb(var(--accent-rgb)/.35);background:var(--surface-sunk);box-shadow:var(--lift-1)}
-.visit__map iframe{width:100%;height:100%;border:0}
+.visit__map{position:relative;width:100%;min-height:clamp(15rem,24vw,20rem)}
+/* ---- the shop on a map (after 21st.dev's expand map). Collapsed: a small
+   Courtyard card with the brand pattern, the address and the live status,
+   tilting toward the pointer. Open: it grows to the full column and a
+   street map draws itself in, blocks rise, the pin drops on Clear Lake
+   City Blvd. The size change is a spring; everything else is transform and
+   opacity. ---- */
+.xmap{--w-closed:min(100%,26rem);--h-closed:clamp(11rem,14vw,12.5rem);--h-open:min(34rem,calc(100vw * .62));position:relative;display:block;width:100%;margin:0;padding:0 0 1.8rem;border:0;background:none;color:var(--off-white);font:inherit;text-align:left;cursor:pointer;perspective:1000px;-webkit-tap-highlight-color:transparent}
+.xmap__card{position:relative;display:block;width:var(--w-closed);height:var(--h-closed);border-radius:18px;overflow:hidden;background:var(--courtyard-deep);box-shadow:inset 0 0 0 1px rgb(var(--off-white-rgb)/.1),0 18px 40px rgb(var(--bark-rgb)/.18);transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-style:preserve-3d;transition:width .7s cubic-bezier(.34,1.32,.5,1),height .7s cubic-bezier(.34,1.32,.5,1),box-shadow .4s var(--ease)}
+.xmap[aria-expanded="true"] .xmap__card{width:100%;height:var(--h-open)}
+.xmap:focus-visible{outline:none}
+.xmap:focus-visible .xmap__card{box-shadow:0 0 0 3px var(--mint),0 18px 40px rgb(var(--bark-rgb)/.18)}
+.xmap__card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgb(var(--mint-rgb)/.1),transparent 45%,rgb(var(--browned-sugar-rgb)/.14));pointer-events:none}
+.xmap__grid{position:absolute;inset:0;background:url("/public/brand/pattern/pattern-on-courtyard.svg") 0 0/31.4px 32.3px;opacity:.55;transition:opacity .4s var(--ease)}
+.xmap[aria-expanded="true"] .xmap__grid{opacity:0}
+/* the drawn map */
+.xmap__map{position:absolute;inset:0;opacity:0;transition:opacity .45s .1s var(--ease)}
+.xmap[aria-expanded="true"] .xmap__map{opacity:1}
+.xmap__streets{position:absolute;inset:0;width:100%;height:100%}
+.xmap__road{fill:none;stroke:rgb(var(--off-white-rgb)/.14);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .7s var(--d,0s) cubic-bezier(.3,.7,.2,1)}
+.xmap__road--main{stroke:rgb(var(--browned-sugar-rgb)/.75);stroke-width:7}
+.xmap__road--2{stroke:rgb(var(--off-white-rgb)/.26);stroke-width:3.5}
+.xmap[aria-expanded="true"] .xmap__road{stroke-dashoffset:0}
+.xmap__street{font-family:var(--mono);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;fill:rgb(var(--off-white-rgb)/.72);opacity:0;transition:opacity .4s .7s var(--ease)}
+.xmap[aria-expanded="true"] .xmap__street{opacity:1}
+.xmap__block{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);border-radius:4px;background:rgb(var(--off-white-rgb)/.09);box-shadow:inset 0 0 0 1px rgb(var(--off-white-rgb)/.1);opacity:0;transform:scale(.8);transition:opacity .4s var(--d) var(--ease),transform .5s var(--d) cubic-bezier(.34,1.4,.5,1)}
+.xmap[aria-expanded="true"] .xmap__block{opacity:1;transform:none}
+.xmap__pin{position:absolute;left:50%;top:56%;width:40px;height:40px;margin:-38px 0 0 -20px;opacity:0;transform:translate3d(0,-22px,0) scale(0);transform-origin:50% 100%;transition:opacity .2s .3s,transform .55s .3s cubic-bezier(.34,1.6,.5,1)}
+.xmap__pin svg{width:100%;height:100%;filter:drop-shadow(0 0 10px rgb(var(--browned-sugar-rgb)/.65)) drop-shadow(0 4px 6px rgb(0 0 0/.3))}
+.xmap__pin path{fill:var(--browned-sugar)}
+.xmap__pin .xmap__pin-star{fill:var(--off-white)}
+.xmap[aria-expanded="true"] .xmap__pin{opacity:1;transform:none}
+.xmap__fade{position:absolute;inset:0;background:linear-gradient(0deg,var(--courtyard-deep) 0%,rgb(var(--courtyard-deep-rgb,60 75 56)/.4) 26%,transparent 50%)}
+/* the words on the card */
+.xmap__body{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:space-between;height:100%;padding:1.3rem 1.4rem}
+.xmap__top{display:flex;align-items:flex-start;justify-content:space-between}
+.xmap__icon{width:22px;height:22px;fill:none;stroke:var(--mint);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgb(var(--mint-rgb)/.35));transition:opacity .3s var(--ease),filter .3s var(--ease)}
+.xmap:hover .xmap__icon{filter:drop-shadow(0 0 8px rgb(var(--mint-rgb)/.6))}
+.xmap[aria-expanded="true"] .xmap__icon{opacity:0}
+.xmap__status{display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .65rem;border-radius:999px;background:rgb(var(--off-white-rgb)/.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-family:var(--mono);font-weight:600;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--natural);transition:transform .25s var(--ease),background .25s var(--ease)}
+.xmap:hover .xmap__status{transform:scale(1.05);background:rgb(var(--off-white-rgb)/.16)}
+.xmap__status i{width:.45rem;height:.45rem;border-radius:50%;background:var(--mint);box-shadow:0 0 0 3px rgb(var(--mint-rgb)/.22)}
+.xmap__status.is-closed i{background:var(--browned-sugar);box-shadow:0 0 0 3px rgb(var(--browned-sugar-rgb)/.25)}
+.xmap__bottom{display:flex;flex-direction:column;gap:.3rem}
+.xmap__name{font-family:var(--display);font-weight:500;font-size:clamp(1.15rem,1.5vw,1.35rem);letter-spacing:-.01em;color:var(--off-white);transition:transform .35s cubic-bezier(.34,1.4,.5,1)}
+.xmap:hover .xmap__name{transform:translateX(4px)}
+.xmap__addr{font-family:var(--data);font-size:.82rem;letter-spacing:.02em;color:rgb(var(--off-white-rgb)/.78)}
+.xmap__rule{display:block;height:1px;margin-top:.35rem;background:linear-gradient(90deg,rgb(var(--mint-rgb)/.7),rgb(var(--browned-sugar-rgb)/.45),transparent);transform:scaleX(.3);transform-origin:0 50%;transition:transform .45s var(--ease-out)}
+.xmap:hover .xmap__rule,.xmap[aria-expanded="true"] .xmap__rule{transform:none}
+.xmap__hint{position:absolute;left:0;bottom:0;font-family:var(--mono);font-weight:600;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);opacity:.75;transition:opacity .3s var(--ease)}
+.xmap[aria-expanded="true"] .xmap__hint{opacity:0}
+@media(hover:hover){.xmap .xmap__hint{opacity:0;transform:translate3d(0,4px,0);transition:opacity .2s var(--ease),transform .2s var(--ease)}.xmap:hover:not([aria-expanded="true"]) .xmap__hint{opacity:.8;transform:none}}
+@media(max-width:899px){.xmap{--w-closed:100%;--h-open:min(24rem,110vw)}}
+@media(prefers-reduced-motion:reduce){.xmap__card,.xmap__road,.xmap__block,.xmap__pin,.xmap__map,.xmap__name,.xmap__rule,.xmap__street,.xmap__status{transition:none}}
 .visit__facts{display:flex;flex-direction:column;gap:1.7rem}
 .fact{display:flex;flex-direction:column;gap:.45rem}
 .fact h3{font-size:.95rem;font-family:var(--mono);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
@@ -1085,8 +1137,51 @@ body.sheet-open{overflow:hidden}
       <p>Can&rsquo;t decide? Come in for a sample. We&rsquo;ll help you pick.</p>
     </div>
     <div class="visit">
+      <!-- The shop on a map: the 21st.dev "expand map" card, rebuilt without
+           React for this static site. It tilts toward the pointer; a tap opens
+           it into a drawn street map with the pin on Clear Lake City Blvd. The
+           streets are illustrative, not survey-accurate; the address, the live
+           hours and the directions link are the real ones. -->
       <div class="visit__map rise">
-        <iframe src="https://www.google.com/maps?q=Clear+Lake,+Houston,+TX&amp;output=embed" title="Map showing Dubai and Dips in Clear Lake, Houston" loading="lazy"></iframe>
+        <button class="xmap" id="xmap" type="button" aria-expanded="false" aria-controls="xmapAddr" aria-label="Dubai &amp; Dips, 1131 Clear Lake City Blvd, Houston. Show the map">
+          <span class="xmap__card">
+            <span class="xmap__grid" aria-hidden="true"></span>
+            <span class="xmap__map" aria-hidden="true">
+              <svg class="xmap__streets" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <line class="xmap__road xmap__road--main" x1="0" y1="168" x2="400" y2="168" pathLength="1" style="--d:.2s"/>
+                <line class="xmap__road xmap__road--2" x1="0" y1="92" x2="400" y2="92" pathLength="1" style="--d:.3s"/>
+                <line class="xmap__road xmap__road--2" x1="118" y1="0" x2="118" y2="300" pathLength="1" style="--d:.4s"/>
+                <line class="xmap__road xmap__road--2" x1="284" y1="0" x2="284" y2="300" pathLength="1" style="--d:.5s"/>
+                <line class="xmap__road xmap__road--3" x1="0" y1="44" x2="400" y2="44" pathLength="1" style="--d:.6s"/>
+                <line class="xmap__road xmap__road--3" x1="0" y1="236" x2="400" y2="236" pathLength="1" style="--d:.7s"/>
+                <line class="xmap__road xmap__road--3" x1="56" y1="0" x2="56" y2="300" pathLength="1" style="--d:.75s"/>
+                <line class="xmap__road xmap__road--3" x1="196" y1="0" x2="196" y2="300" pathLength="1" style="--d:.8s"/>
+                <line class="xmap__road xmap__road--3" x1="346" y1="0" x2="346" y2="300" pathLength="1" style="--d:.85s"/>
+                <text class="xmap__street" x="200" y="190" text-anchor="middle">Clear Lake City Blvd</text>
+              </svg>
+              <i class="xmap__block" style="--x:4%;--y:36%;--w:22%;--h:17%;--d:.5s"></i>
+              <i class="xmap__block" style="--x:32%;--y:6%;--w:14%;--h:20%;--d:.6s"></i>
+              <i class="xmap__block" style="--x:74%;--y:62%;--w:20%;--h:17%;--d:.7s"></i>
+              <i class="xmap__block" style="--x:74%;--y:7%;--w:13%;--h:17%;--d:.55s"></i>
+              <i class="xmap__block" style="--x:3%;--y:62%;--w:9%;--h:14%;--d:.65s"></i>
+              <i class="xmap__block" style="--x:51%;--y:64%;--w:15%;--h:12%;--d:.75s"></i>
+              <span class="xmap__pin"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/><path class="xmap__pin-star" d="M12 5.6c.3 1.6 1.1 2.4 2.7 2.7-1.6.3-2.4 1.1-2.7 2.7-.3-1.6-1.1-2.4-2.7-2.7 1.6-.3 2.4-1.1 2.7-2.7z"/></svg></span>
+              <span class="xmap__fade"></span>
+            </span>
+            <span class="xmap__body">
+              <span class="xmap__top">
+                <svg class="xmap__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+                <span class="xmap__status" data-xmap-status><i></i><span>Clear Lake</span></span>
+              </span>
+              <span class="xmap__bottom">
+                <span class="xmap__name">Dubai &amp; Dips &middot; Clear Lake</span>
+                <span class="xmap__addr" id="xmapAddr">1131 Clear Lake City Blvd &middot; Houston, TX 77062</span>
+                <span class="xmap__rule"></span>
+              </span>
+            </span>
+          </span>
+          <span class="xmap__hint" aria-hidden="true">Tap to open the map</span>
+        </button>
       </div>
       <div class="visit__facts rise">
         <div class="fact"><h3>Address</h3><address>1131 Clear Lake City Blvd<br>Houston, TX 77062</address></div>
@@ -1097,7 +1192,7 @@ body.sheet-open{overflow:hidden}
         <div class="fact"><h3>Parking</h3><p>Free lot right out front, and more spaces around the side of the building.</p></div>
         <div class="fact"><h3>Phone</h3><p><a href="tel:+12817861157" data-tel>(281) 786-1157</a></p></div>
         <div class="visit__cta">
-          <a class="btn btn--line" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips+Clear+Lake+Houston+TX" data-link="directions" target="_blank" rel="noopener">Get directions</a>
+          <a class="btn btn--line" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips,+1131+Clear+Lake+City+Blvd,+Houston,+TX+77062" data-link="directions" target="_blank" rel="noopener">Get directions</a>
           <a class="tlink" href="#order" data-order="pickup" data-place="visit" data-copy="pickupCta">Order ahead for pickup</a>
         </div>
       </div>

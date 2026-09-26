@@ -141,7 +141,7 @@ window.DD_CONFIG = {
      hides its link rather than leaving a dead one - fill it in and the
      link appears. */
   LINKS: {
-    directions: "https://www.google.com/maps/dir/?api=1&destination=Dubai+and+Dips+Clear+Lake+Houston+TX",
+    directions: "https://www.google.com/maps/dir/?api=1&destination=Dubai+and+Dips,+1131+Clear+Lake+City+Blvd,+Houston,+TX+77062",
     instagram: "https://www.instagram.com/dubaianddips",
     tiktok: "https://www.tiktok.com/@dubai.dips",
     catering: "/catering",
