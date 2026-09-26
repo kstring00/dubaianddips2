@@ -205,12 +205,12 @@ ${footer()}
    config/flights.js; this is the markup around it, the film for the opening
    and the destinations as real links. ---- */
 const FLIGHTS = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(read('config/flights.js'), sb); return sb.window.DD_FLIGHTS; })();
-export function flightsSection({ heading = 'Connecting *flights*', lead = 'Six routes out of Houston. Every one lands somewhere on this site.' } = {}) {
+export function flightsSection({ heading = 'Where to *next?*', lead = 'Explore the rest of Dubai &amp; Dips: the menu, gelato, catering, our journal, the crew and the feed. Pick a destination below.' } = {}) {
   const gates = FLIGHTS.gates;
   return `<section class="fl" id="flights" aria-labelledby="fl-title">
   <div class="shell">
     <div class="fl__head">
-      <div><p class="eyebrow rv">${star()}<span>Departures &middot; HOU Clear Lake</span></p><h2 class="fl__title rv" id="fl-title">${accent(heading)}</h2></div>
+      <div><p class="eyebrow rv">${star()}<span>Explore the site</span></p><h2 class="fl__title rv" id="fl-title">${accent(heading)}</h2></div>
       <p class="fl__lead rv">${lead}</p>
     </div>
     <div class="fl__stage" aria-hidden="true">
@@ -224,8 +224,8 @@ export function flightsSection({ heading = 'Connecting *flights*', lead = 'Six r
       <div class="fl__label" hidden><span class="fl__lcode"></span><span class="fl__lcity"></span><span class="fl__lpage"></span><span class="fl__lflight"></span></div>
       <p class="fl__legend"><i class="mint"></i><span class="fl__now">Boarding</span></p>
     </div>
-    <p class="fl__pick">Pick a gate <span aria-hidden="true">&darr;</span></p>
-    <ul class="fl__cards" aria-label="Destinations">${gates.map((g, i) => `
+    <p class="fl__pick">Choose a page <span aria-hidden="true">&darr;</span></p>
+    <ul class="fl__cards" aria-label="Explore the site">${gates.map((g, i) => `
       <li><a class="fl__card rv" href="${g.href}" data-gate="${i}" style="--i:${i}"><span class="fl__cmeta" aria-hidden="true"><b>${esc(g.code)}</b> ${esc(g.city)}</span><span class="fl__cpage">${esc(g.page)}</span><span class="fl__cgo" aria-hidden="true">&rarr;</span></a></li>`).join('')}
     </ul>
   </div>

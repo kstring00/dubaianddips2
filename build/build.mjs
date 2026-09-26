@@ -48,7 +48,7 @@ if (!home.includes(MARK)) throw new Error('index.html is missing the build:jsonl
 const FL = '<!-- build:flights (the Connecting Flights map, generated from config/flights.js) -->';
 if (!home.includes(FL) || !home.includes('/* build:flights-css */')) throw new Error('index.html is missing the build:flights markers');
 write('index.html', home.replace(MARK, jsonldTag([organization(), website(), ...READY.map(restaurant)]))
-  .replace(FL, flightsSection({ heading: 'Connecting *flights*', lead: 'Six routes out of Houston. Every one lands somewhere on this site.' }))
+  .replace(FL, flightsSection())
   .replace('/* build:flights-css */', FLIGHTS_CSS));
 write(HOME_CSS_FILE.path.slice(1), HOME_CSS_FILE.body);
 
