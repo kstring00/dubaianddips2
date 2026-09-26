@@ -796,12 +796,13 @@ html.swm-open{overflow:hidden}
    header), the stars (a tsParticles canvas, faded out before the arches),
    the photo of the arches and pool anchored to the bottom with its top edge
    faded into the sky, and the text over the sky. ---- */
-.night{--sky-top:#0F1712;--sky-low:#1A241D;--star:#FCFBF9;--mint-c:#D1E3D2;--sugar-c:#C2835F;position:relative;isolation:isolate;overflow:hidden;min-height:min(90vh,900px);display:flex;flex-direction:column;align-items:center;background:radial-gradient(42% 30% at 50% 26%,rgb(209 227 210/.07),transparent 72%),linear-gradient(180deg,var(--sky-top) 0%,var(--sky-low) 48%,#0B1310 100%);color:var(--star);text-align:center}
+.night{--sky-top:#0F1712;--sky-low:#1A241D;--star:#FCFBF9;--mint-c:#D1E3D2;--sugar-c:#C2835F;position:relative;isolation:isolate;overflow:hidden;min-height:min(90vh,900px);display:flex;flex-direction:column;align-items:center;background:radial-gradient(42% 30% at 50% 26%,rgb(209 227 210/.07),transparent 72%),linear-gradient(180deg,var(--sky-top) 0%,var(--sky-low) 40%,#0A1512 56%,#041210 100%);color:var(--star);text-align:center}
 .night__stars{position:absolute;left:0;right:0;top:0;height:62%;z-index:1;pointer-events:none;opacity:0;transition:opacity 1s ease-out;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%)}
 .night__stars.is-on,.night__spark.is-on{opacity:1}
 .night__stars canvas,.night__spark canvas{display:block;pointer-events:none}
 .night__scene{position:absolute;left:0;right:0;bottom:0;z-index:0;margin:0;height:58%}
-.night__scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 100%;-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 26%);mask-image:linear-gradient(180deg,transparent 0%,#000 26%)}
+/* anchored at the top: on wide screens the crop comes off the bottom of the pool, never the arches */
+.night__scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 0;-webkit-mask-image:linear-gradient(180deg,transparent 0%,rgb(0 0 0/.3) 7%,rgb(0 0 0/.8) 13%,#000 18%);mask-image:linear-gradient(180deg,transparent 0%,rgb(0 0 0/.3) 7%,rgb(0 0 0/.8) 13%,#000 18%)}
 .night__copy{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding-top:clamp(1.2rem,3vw,2.4rem)}
 .night .crumbs ol{justify-content:center}
 .night .crumbs a{color:rgb(252 251 249/.78)}
@@ -830,7 +831,7 @@ html.swm-open{overflow:hidden}
   .night{min-height:85vh}
   .night__stars{height:58%}
   .night__scene{height:50%}
-  .night__scene img{object-position:50% 100%}
+  .night__scene img{object-position:50% 0}
   .night__title{font-size:clamp(2.6rem,12vw,3.6rem)}
   .night__horizon{height:4.5rem}
   .night__lead{margin-top:-2.8rem}
