@@ -518,7 +518,7 @@ export function feedPage() {
     </div>
   </div>
   <p class="social__hint" aria-hidden="true">swipe &rarr;</p>
-  <noscript><p class="shell social__noscript"><a href="https://www.tiktok.com/@dubai.dips" target="_blank" rel="noopener">@dubai.dips on TikTok</a> &middot; <a href="https://www.instagram.com/dubaianddips/" target="_blank" rel="noopener">@dubaianddips on Instagram</a></p></noscript>
+  <noscript><p class="shell social__noscript"><a href="https://www.tiktok.com/@dubai.dips" target="_blank" rel="noopener">@dubai.dips on TikTok</a> &middot; <a href="https://www.instagram.com/dubaianddips" target="_blank" rel="noopener">@dubaianddips on Instagram</a></p></noscript>
 </section>
 ${flightsSection()}
 <div class="swm" id="swm" hidden>

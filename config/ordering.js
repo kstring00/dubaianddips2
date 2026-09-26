@@ -50,15 +50,14 @@ window.DD_CONFIG = {
     name: "Dubai & Dips",
     area: "Clear Lake",
     city: "Houston",
-    /* PLACEHOLDER: the street address below was already on the site and is
-       not confirmed. Every page, the footer and the structured data read it
-       from here, so fixing it once fixes it everywhere. */
-    street: "1234 Bay Area Blvd, Suite 100",
+    /* Confirmed by the owner. Every page, the footer and the structured
+       data read it from here, so a change here changes it everywhere. */
+    street: "1131 Clear Lake City Blvd",
     locality: "Houston",
     region: "TX",
-    postalCode: "77058",
+    postalCode: "77062",
     country: "US",
-    address: "1234 Bay Area Blvd, Suite 100, Houston, TX 77058",
+    address: "1131 Clear Lake City Blvd, Houston, TX 77062",
     timezone: "America/Chicago",
     /* For structured data. Empty values are left out, never guessed. */
     priceRange: "",          /* MISSING: e.g. "$" or "$$" */
@@ -78,7 +77,7 @@ window.DD_CONFIG = {
       primary: true,           /* address, phone and hours come from SHOP, PHONE, HOURS */
       geo: null,               /* MISSING: { lat: 29.xxxx, lng: -95.xxxx } from the Google profile */
       googleProfile: "",       /* MISSING: the shop's Google Business Profile link */
-      mapQuery: "Dubai and Dips Clear Lake Houston TX",
+      mapQuery: "Dubai and Dips, 1131 Clear Lake City Blvd, Houston, TX 77062",
       parking: "Free lot right out front, and more spaces around the side of the building.",
       landmark: "",            /* MISSING: a landmark to look for, e.g. the shopping centre name */
       photo: "/assets/inside-room.webp",
@@ -143,7 +142,7 @@ window.DD_CONFIG = {
      link appears. */
   LINKS: {
     directions: "https://www.google.com/maps/dir/?api=1&destination=Dubai+and+Dips+Clear+Lake+Houston+TX",
-    instagram: "https://www.instagram.com/dubaianddips/",
+    instagram: "https://www.instagram.com/dubaianddips",
     tiktok: "https://www.tiktok.com/@dubai.dips",
     catering: "/catering",
     journal: "/blog",
