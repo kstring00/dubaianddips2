@@ -9,7 +9,7 @@ category: Guides
 targetKeyword: dubai chocolate houston
 heroImage: /assets/hero-poster.webp
 heroAlt: Dubai chocolate in Houston, a chocolate bar cut open to show its green pistachio filling and crisp shredded kunafa
-draft: true
+draft: false
 featured: true
 related: [dubai-chocolate-clear-lake, pistachio-frappe-houston-which-to-order, dessert-gifts-houston]
 ---
@@ -50,7 +50,7 @@ It is rich. Most people find a few pieces is plenty, which is part of why sharin
 
 At Dubai & Dips we take the flavors of Dubai chocolate and fly them in a cup. The **Dubai Chocolate Frappe** is the first drink on [our menu of frappes](/menu#frappes): a blended, cold drink finished with whipped cream and both a pistachio and a dark chocolate drizzle. It is chocolate and pistachio together, the two flavors that make Dubai chocolate what it is, built to be drunk rather than snapped.
 
-[OWNER TO CONFIRM: whether the Dubai Chocolate Frappe includes kunafa or kataifi pieces, and anything else that goes into it.]
+<!-- OWNER TO CONFIRM: whether the Dubai Chocolate Frappe includes kunafa or kataifi pieces, and anything else that goes into it. -->
 
 If you would rather have the pastry half of the story on its own, our [D&D Desserts route](/menu#desserts) includes **kunafa**: a round of crisp golden pastry topped with crushed pistachio. Order a Dubai Chocolate Frappe with a kunafa on the side and you have every element of Dubai chocolate on one table.
 
@@ -86,4 +86,4 @@ At [Dubai & Dips Clear Lake](/visit/clear-lake). Our Dubai Chocolate Frappe brin
 
 ### Does Dubai chocolate contain nuts?
 
-The classic version is built on pistachio, so yes. If you have a nut allergy, ask at the counter before ordering anything with pistachio in the name. [OWNER TO CONFIRM: allergen information for the Dubai Chocolate Frappe and the kunafa.]
+The classic version is built on pistachio, so yes. If you have a nut allergy, ask at the counter before ordering anything with pistachio in the name. <!-- OWNER TO CONFIRM: allergen information for the Dubai Chocolate Frappe and the kunafa. -->

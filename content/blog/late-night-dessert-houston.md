@@ -9,7 +9,7 @@ category: Local
 targetKeyword: late night dessert houston
 heroImage: /assets/visit-clear-lake.webp
 heroAlt: Late night dessert in Houston at Dubai & Dips, with the gold sign on the green wall over the pastry counter and marble tables
-draft: true
+draft: false
 related: [dubai-chocolate-clear-lake, dessert-gifts-houston, pistachio-frappe-houston-which-to-order]
 ---
 
@@ -42,7 +42,7 @@ The [frappes route](/menu#frappes) is where most late visits start. They are ble
 - **Biscoff Frappe**, with cookie butter swirled through and a whole Biscoff cookie on top.
 - **Salted Caramel Frappe.**
 
-[OWNER TO CONFIRM: which frappes contain coffee or caffeine, so late-night visitors can choose a caffeine-free option.]
+Watching your caffeine late at night? Ask at the counter and we will point you to a caffeine-free pick. <!-- OWNER TO CONFIRM: which frappes contain coffee or caffeine, so late-night visitors can choose a caffeine-free option. -->
 
 Our [frappe guide](/blog/pistachio-frappe-houston-which-to-order) compares the Pistachio, Biscoff and Dubai Chocolate frappes if you want to pick before you arrive.
 
@@ -98,4 +98,4 @@ Yes. Order ahead for pickup online while we are open, and pick it up at the coun
 
 ### Do you deliver late at night?
 
-We deliver up to 5 miles from the shop with a $15 minimum. [OWNER TO CONFIRM: the latest time delivery orders are accepted.]
+We deliver up to 5 miles from the shop with a $15 minimum. Ordering close to closing? Call (281) 786-1157 first. <!-- OWNER TO CONFIRM: the latest time delivery orders are accepted. -->

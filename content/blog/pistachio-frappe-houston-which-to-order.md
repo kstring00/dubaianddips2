@@ -9,7 +9,7 @@ category: Guides
 targetKeyword: pistachio frappe houston
 heroImage: /assets/blog-lineup.webp
 heroAlt: A pistachio frappe in Houston lined up with five more drinks on marble, including pistachio drizzled cups and a Biscoff frappe with a cookie on top
-draft: true
+draft: false
 related: [dubai-chocolate-houston-explained, dubai-chocolate-clear-lake, late-night-dessert-houston]
 ---
 
@@ -33,7 +33,7 @@ If pistachio is the flavor you are chasing, start here. The Pistachio Frappe is 
 
 **Choose it if** you already love pistachio lattes or pistachio gelato and want that flavor front and center, without chocolate getting in the way.
 
-[OWNER TO CONFIRM: what goes into the Pistachio Frappe, and whether it contains coffee.]
+<!-- OWNER TO CONFIRM: what goes into the Pistachio Frappe, and whether it contains coffee. -->
 
 ## The Biscoff Frappe
 
@@ -41,7 +41,7 @@ The Biscoff Frappe is the most dessert-like of the three. Cookie butter is swirl
 
 **Choose it if** you like caramel, cinnamon-warm cookie flavors and a drink that feels like a treat from the first sip. It is also the easiest pick for anyone who is not sure about pistachio.
 
-[OWNER TO CONFIRM: what goes into the Biscoff Frappe, and whether it contains coffee.]
+<!-- OWNER TO CONFIRM: what goes into the Biscoff Frappe, and whether it contains coffee. -->
 
 ## The Dubai Chocolate Frappe
 
@@ -49,7 +49,7 @@ The Dubai Chocolate Frappe brings together the two flavors behind the Dubai choc
 
 **Choose it if** you want the flavor everyone is talking about, or you cannot decide between chocolate and pistachio. It is the drink on our feature board. New to the trend? Our [Dubai chocolate explainer](/blog/dubai-chocolate-houston-explained) covers the story.
 
-[OWNER TO CONFIRM: what goes into the Dubai Chocolate Frappe, and whether it contains coffee or kunafa pieces.]
+<!-- OWNER TO CONFIRM: what goes into the Dubai Chocolate Frappe, and whether it contains coffee or kunafa pieces. -->
 
 ## Pistachio frappe in Houston: how to pick in ten seconds
 
@@ -87,7 +87,7 @@ Already decided? Order ahead for pickup and it will be ready when you walk in. F
 
 If you are still stuck between pistachio, Biscoff and Dubai chocolate, come in and ask at the counter. We will help you pick.
 
-[OWNER TO CONFIRM: sizes and prices for each frappe.]
+Ask at the counter for sizes and today's prices. <!-- OWNER TO CONFIRM: sizes and prices for each frappe. -->
 
 ## Frequently asked questions
 
