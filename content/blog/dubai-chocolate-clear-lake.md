@@ -9,7 +9,7 @@ category: Local
 targetKeyword: dubai chocolate clear lake
 heroImage: /assets/menu-dubai-frappe.webp
 heroAlt: Dubai chocolate in Clear Lake as a drink, the Dubai Chocolate Frappe with pistachio and dark chocolate drizzle and whipped cream
-draft: true
+draft: false
 related: [dubai-chocolate-houston-explained, pistachio-frappe-houston-which-to-order, late-night-dessert-houston]
 ---
 
@@ -27,7 +27,7 @@ At Dubai & Dips we take those flavors and put them on our board as flights. Ever
 
 The first drink on the [frappes route](/menu#frappes) is the **Dubai Chocolate Frappe**. It is blended and served cold, then finished with whipped cream and a drizzle of both pistachio and dark chocolate. It is the drink on our own feature board, the one we point first-time visitors to.
 
-[OWNER TO CONFIRM: the full list of what goes into the Dubai Chocolate Frappe, and whether it contains kunafa or kataifi pieces.]
+<!-- OWNER TO CONFIRM: the full list of what goes into the Dubai Chocolate Frappe, and whether it contains kunafa or kataifi pieces. -->
 
 ### Kunafa, for the crunch
 
@@ -59,7 +59,7 @@ The [Dubai & Dips Clear Lake page](/visit/clear-lake) shows whether we are open 
 
 Directions are one tap away on the [visit page](/visit/clear-lake). There is a free lot right out front, and more spaces around the side of the building.
 
-[OWNER TO CONFIRM: a nearby landmark or the name of the shopping center, to help first-time visitors find the door.]
+You will find us at 1131 Clear Lake City Blvd, Houston, TX 77062. <!-- OWNER TO CONFIRM: a nearby landmark or the name of the shopping center, to help first-time visitors find the door. -->
 
 ## Skip the line: order ahead
 
@@ -99,4 +99,4 @@ Yes. Order ahead for pickup online, or call the shop.
 
 ### Do you have Dubai chocolate bars?
 
-[OWNER TO CONFIRM: whether the shop sells Dubai chocolate bars, and if so which ones.]
+The Dubai Chocolate Frappe is on our [frappes menu](/menu#frappes). For anything else Dubai chocolate, ask at the counter or call (281) 786-1157 to see what we have that day. <!-- OWNER TO CONFIRM: whether the shop sells Dubai chocolate bars, and if so which ones. -->

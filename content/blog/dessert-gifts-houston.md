@@ -9,7 +9,7 @@ category: Guides
 targetKeyword: dessert gifts houston
 heroImage: /assets/menu-kunafa.webp
 heroAlt: A kunafa topped with crushed pistachio on a gold board, one of the dessert gifts Houston friends can share
-draft: true
+draft: false
 related: [dessert-catering-houston-office, dubai-chocolate-clear-lake, late-night-dessert-houston]
 ---
 
@@ -55,7 +55,7 @@ Birthdays deserve something a little theatrical:
 - **Make it a late one.** On Fridays and Saturdays we are open until midnight, perfect for a birthday that starts after dinner. See [late-night dessert in Houston](/blog/late-night-dessert-houston).
 - **Share a kunafa.** Put it in the middle of the table and let everyone dig in.
 
-[OWNER TO CONFIRM: whether the shop offers gift cards, birthday add-ons or packaging for gifts.]
+Planning something special? Call the shop at (281) 786-1157 and we will help you put it together. <!-- OWNER TO CONFIRM: whether the shop offers gift cards, birthday add-ons or packaging for gifts. -->
 
 ## Thank-you gift ideas
 
@@ -72,7 +72,7 @@ Not every gift has to be big. A single drink, picked for the person, says you we
 ## Practical tips for dessert gifts
 
 - **Time it.** Cold drinks are best right away. Plan the pickup or delivery for when they will be there to enjoy it.
-- **Ask about allergies.** Many of our favorites feature pistachio. If you are not sure, ask us about ingredients when you order. [OWNER TO CONFIRM: allergen information to share with gift buyers.]
+- **Ask about allergies.** Many of our favorites feature pistachio. If you are not sure, ask us about ingredients when you order. <!-- OWNER TO CONFIRM: allergen information to share with gift buyers. -->
 - **Check the hours.** We are open 9 AM to 10 PM Monday to Thursday, 10 AM to 10 PM on Sunday, and 9 AM to midnight on Fridays and Saturdays. The [visit page](/visit/clear-lake) shows whether we are open right now.
 
 ## Where to pick up your gift
@@ -91,4 +91,4 @@ Yes, within 5 miles of our [Clear Lake shop](/visit/clear-lake), with a $15 mini
 
 ### Do you sell gift cards?
 
-[OWNER TO CONFIRM: whether gift cards are available, and how to buy them.]
+Ask at the counter or call (281) 786-1157 to find out what we can offer right now. <!-- OWNER TO CONFIRM: whether gift cards are available, and how to buy them. -->

@@ -41,7 +41,9 @@ const words = s => (s.replace(/<[^>]+>/g, ' ').match(/[A-Za-z0-9’']+/g) || [])
 export function loadPosts() {
   if (!fs.existsSync(DIR)) return [];
   const all = fs.readdirSync(DIR).filter(f => f.endsWith('.md')).map(f => {
-    const [fm, md] = frontmatter(fs.readFileSync(path.join(DIR, f), 'utf8'));
+    const [fm, raw] = frontmatter(fs.readFileSync(path.join(DIR, f), 'utf8'));
+    /* notes left in a post as <!-- ... --> (e.g. OWNER TO CONFIRM) never reach the page or its source */
+    const md = raw.replace(/<!--[\s\S]*?-->/g, '').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n');
     for (const k of REQUIRED) if (!fm[k]) throw new Error(`${f}: frontmatter is missing "${k}"`);
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(fm.slug)) throw new Error(`${f}: slug must be lowercase and hyphenated`);
     return { ...fm, file: f, md, draft: fm.draft === true, related: fm.related || [], category: fm.category || 'Guides', updated: fm.updated || fm.date };

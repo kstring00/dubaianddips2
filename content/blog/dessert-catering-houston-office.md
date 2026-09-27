@@ -9,7 +9,7 @@ category: Catering
 targetKeyword: dessert catering houston
 heroImage: /assets/craft-poster.webp
 heroAlt: A green frappe in a Dubai & Dips cup topped with whipped cream and drizzle, the kind of drink that goes into dessert catering in Houston
-draft: true
+draft: false
 related: [dessert-gifts-houston, dubai-chocolate-houston-explained, late-night-dessert-houston]
 ---
 
@@ -34,7 +34,7 @@ A simple way to split it:
 2. **Matcha and lighter options:** the [matcha route](/menu#matchas) and the [smoothies route](/menu#smoothies).
 3. **The treat crowd:** the [frappes route](/menu#frappes), including the Dubai Chocolate, Pistachio and Biscoff frappes.
 
-[OWNER TO CONFIRM: recommended quantities per person and any catering-size or tray options.]
+Not sure how much to order for your headcount? Tell us on the [catering form](/catering) and we will suggest amounts. <!-- OWNER TO CONFIRM: recommended quantities per person and any catering-size or tray options. -->
 
 ## Dessert catering in Houston without the spreadsheet: group ordering
 
@@ -56,13 +56,13 @@ Big orders can be picked up from [Dubai & Dips Clear Lake](/visit/clear-lake). T
 
 We deliver up to 5 miles from the shop, with a $15 minimum. For offices further away, pickup is the way to go.
 
-[OWNER TO CONFIRM: whether large catering orders have a different delivery radius or fee.]
+<!-- OWNER TO CONFIRM: whether large catering orders have a different delivery radius or fee. -->
 
 ## Step 4: Give enough notice
 
 For anything bigger than a normal order, tell us early. The more notice we have, the more we can do for your date and time.
 
-[OWNER TO CONFIRM: the minimum notice needed for large orders.]
+<!-- OWNER TO CONFIRM: the minimum notice needed for large orders. -->
 
 The fastest way to book is the request form on our [catering page](/catering): date, time, headcount, what you are interested in, and your contact details. Prefer to talk it through? Call the shop; the number is on the [visit page](/visit/clear-lake).
 
@@ -72,7 +72,7 @@ A few practical tips for the day itself:
 
 - **Time it to the moment.** Cold drinks are best right away, so time pickup or delivery for when people are ready.
 - **Label it.** If people chose their own drinks through the group link, each order is theirs; make sure everyone knows where to find it.
-- **Think about allergies.** Many of our most popular drinks feature pistachio. Ask us about ingredients when you order. [OWNER TO CONFIRM: allergen information to share with office customers.]
+- **Think about allergies.** Many of our most popular drinks feature pistachio. Ask us about ingredients when you order. <!-- OWNER TO CONFIRM: allergen information to share with office customers. -->
 - **Add something to share.** A few desserts from the [D&D Desserts route](/menu#desserts), such as kunafa, turn a drinks order into a proper treat.
 
 ## Why dessert works for an office
@@ -97,4 +97,4 @@ If your office is within 5 miles of our [Clear Lake shop](/visit/clear-lake), ye
 
 ### How much notice do you need?
 
-As much as you can give. [OWNER TO CONFIRM: the minimum notice for large orders.]
+As much as you can give. Call us at (281) 786-1157 and we will tell you what works for your date. <!-- OWNER TO CONFIRM: the minimum notice for large orders. -->

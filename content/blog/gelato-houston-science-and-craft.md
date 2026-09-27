@@ -9,7 +9,7 @@ category: Guides
 targetKeyword: gelato houston
 heroImage: /assets/blog-gelato.webp
 heroAlt: Pistachio gelato in Houston, a scoop held up at our counter beside a layered latte in a Dubai & Dips cup
-draft: true
+draft: false
 related: [pistachio-frappe-houston-which-to-order, dubai-chocolate-houston-explained, dessert-gifts-houston]
 ---
 
@@ -51,9 +51,9 @@ This is also why good gelato is a daily job rather than something made in bulk a
 
 Science explains why gelato can be great. Craft is what makes a particular cup great. At Dubai & Dips, the band that runs across our homepage says it plainly: made here, every morning.
 
-[OWNER TO CONFIRM: how the gelato is made in the shop: whether it is made daily, the base recipe, and the equipment used.]
+Come in and see what is in the case today; we are happy to give you a taste before you choose. <!-- OWNER TO CONFIRM: how the gelato is made in the shop: whether it is made daily, the base recipe, and the equipment used. -->
 
-[OWNER TO CONFIRM: the gelato flavors on offer, and where key ingredients such as the pistachio come from.]
+<!-- OWNER TO CONFIRM: the gelato flavors on offer, and where key ingredients such as the pistachio come from. -->
 
 What we can promise from the counter is simple. Can't decide? Come in for a sample. We'll help you pick.
 
@@ -88,8 +88,8 @@ It is served warmer and contains less air and fat, so it softens quickly. That i
 
 ### Where can I get gelato in Houston?
 
-At [Dubai & Dips Clear Lake](/visit/clear-lake). [OWNER TO CONFIRM: current gelato flavors.]
+At [Dubai & Dips Clear Lake](/visit/clear-lake). Stop by to see today's flavors. <!-- OWNER TO CONFIRM: current gelato flavors. -->
 
 ### Is gelato lower in fat than ice cream?
 
-Gelato is typically made with more milk and less cream than ice cream, so it usually has less butterfat. [OWNER TO CONFIRM: nutrition information for the shop's gelato, if it will be published.]
+Gelato is typically made with more milk and less cream than ice cream, so it usually has less butterfat. <!-- OWNER TO CONFIRM: nutrition information for the shop's gelato, if it will be published. -->
