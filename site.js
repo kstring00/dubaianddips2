@@ -571,7 +571,7 @@
                says a photo is coming, drawn for the kind of item it is */
             var pic = it.photo
               ? '<img src="' + esc(it.photo) + '" alt="' + esc(it.alt || it.name) + '" width="260" height="260" loading="lazy" decoding="async">'
-              : '<span class="bitem__ph" aria-hidden="true">' + glyph + '<i>Photo soon</i></span>';
+              : '<span class="bitem__ph" aria-hidden="true">' + glyph + '</span>';
             return '<li class="bitem"><span class="bitem__pic">' + pic + '</span><span class="bitem__txt"><span class="bitem__name">' + esc(it.name) + '</span>' + (p ? '<span class="bitem__price">' + p + '</span>' : '') + '</span></li>';
           }).join('') + '</ul>'
         : '<p class="bpanel__soon">The full list is on the boards in the shop.</p>';
@@ -865,7 +865,9 @@
           if (phone.matches) { btns[b].removeAttribute('target'); btns[b].removeAttribute('rel'); }
           else { btns[b].setAttribute('target', '_blank'); btns[b].setAttribute('rel', 'noopener'); }
         } else {
-          btns[b].setAttribute('href', '#order');
+          /* no online ordering: the click opens the "Order by phone" sheet, and the
+             link itself is the phone, so it is never a dead anchor */
+          btns[b].setAttribute('href', (CFG.PHONE && CFG.PHONE.tel) ? 'tel:' + CFG.PHONE.tel : '#order');
           btns[b].setAttribute('data-order-soon', '');
         }
       }
@@ -1336,7 +1338,6 @@
         '<span class="bp__follow">' + star() +
         '<span class="bp__big">Board on <em>' + NAME[pl] + '</em></span>' +
         '<span class="bp__handle">' + HANDLE[pl] + '</span>' +
-        '<span class="bp__count">10k+ travelers</span>' +
         '<span class="bp__go" aria-hidden="true">Follow &nearr;</span><span class="vh"> (opens in a new tab)</span>' +
         '</span><span class="bp__frow bp__frow--bot" aria-hidden="true"><span>D&amp;D Airlines</span><span class="bp__code"></span></span></a>';
     }

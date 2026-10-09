@@ -205,7 +205,7 @@ ${footer()}
    config/flights.js; this is the markup around it, the film for the opening
    and the destinations as real links. ---- */
 const FLIGHTS = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(read('config/flights.js'), sb); return sb.window.DD_FLIGHTS; })();
-export function flightsSection({ heading = 'Where to *next?*', lead = 'Explore the rest of Dubai &amp; Dips: the menu, gelato, catering, our journal, the crew and the feed. Pick a destination below.' } = {}) {
+export function flightsSection({ heading = 'Where to *next?*', lead = 'Explore the rest of Dubai &amp; Dips: the menu, gelato, catering, our journal and the feed. Pick a destination below.' } = {}) {
   const gates = FLIGHTS.gates;
   return `<section class="fl" id="flights" aria-labelledby="fl-title">
   <div class="shell">

@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  ROOT as ROOT_DIR, CFG, MENU, H, SITE, READY, REVIEWS, esc, abs, page, ticketStrip, crumbs, star, accent, plain, flightsSection, read as readRoot,
+  ROOT as ROOT_DIR, CFG, MENU, H, SITE, READY, esc, abs, page, ticketStrip, crumbs, star, accent, plain, flightsSection, read as readRoot,
   restaurant, breadcrumbs, faqPage, organization, website, oneLine, mapsSearch, mapsDirections, orderUrl, restaurantId, isHttp
 } from './lib.mjs';
 
@@ -26,7 +26,7 @@ const IMG = {
   '/assets/rev-strawberry-matcha.webp': [260, 260], '/assets/rev-kunafa.webp': [260, 260],
   '/assets/visit-clear-lake.webp': [1360, 765], '/assets/blog-lineup.webp': [1360, 765], '/assets/blog-gelato.webp': [765, 478], '/assets/visit-clear-lake-800.webp': [800, 450],
   '/assets/hero-poster.webp': [1280, 704], '/assets/craft-poster.webp': [1280, 714], '/assets/flight-poster.webp': [1280, 720],
-  '/assets/inside-room.webp': [1600, 1067], '/assets/inside-room-900.webp': [900, 600],
+  '/assets/inside-room.webp': [1600, 1067], '/assets/inside-room-900.webp': [900, 600], '/assets/inside-room-800.webp': [800, 534],
   '/assets/social/social-01-720.webp': [430, 765], '/assets/social/social-02-720.webp': [430, 765], '/assets/social/social-03-720.webp': [430, 765],
   '/assets/social/social-04-720.webp': [430, 765], '/assets/social/social-05-720.webp': [574, 1020], '/assets/social/social-06-720.webp': [430, 765]
 };
@@ -92,7 +92,7 @@ export function menuPage() {
       const price = typeof it.price === 'number' && it.price > 0 ? '$' + it.price.toFixed(2).replace(/\.00$/, '') : '';
       const [w, h] = it.photo ? imgSize(it.photo) : [0, 0];
       const pic = it.photo ? img(it.photo, it.alt || it.name, w, h, { cls: 'mitem__img' })
-        : `<span class="mitem__ph" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">${GLYPH[KIND[r.slug]] || GLYPH.dessert}</svg><i>Photo soon</i></span>`;
+        : `<span class="mitem__ph" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">${GLYPH[KIND[r.slug]] || GLYPH.dessert}</svg></span>`;
       return `<li class="mitem${it.photo ? ' has-photo' : ''}"><span class="mitem__pic">${pic}</span><span class="mitem__txt"><span class="mitem__name">${esc(it.name)}</span>${price ? `<span class="mitem__price">${price}</span>` : ''}</span></li>`;
     }).join('')}</ul>` : `<p class="route__soon">The full list for this route is on the boards in the shop. <a href="/visit/clear-lake">Come and see it</a>.</p>`;
     const status = r.status === 'sold-out' ? '<span class="route__tag">Sold out today</span>' : r.status === 'seasonal' ? '<span class="route__tag">Seasonal</span>' : '';
@@ -153,11 +153,13 @@ ${flightsSection()}`;
 /* ============================================================ /catering */
 export function cateringFaqs() {
   const C = CFG.CATERING || {}, L = READY[0];
+  /* the request form only counts once it can really send */
+  const FORM_LIVE = !!(String(C.web3formsKey || '').trim() || String(C.formEndpoint || '').trim());
   const notice = C.noticeHours ? `We need at least ${C.noticeHours} hours for a large order.` : 'Send your request as early as you can, with the date and headcount, and we will confirm what we can do for that day.';
   return [
     { q: 'Do you cater offices, parties and events in Houston?',
-      a: `Yes. Send the date, time and headcount with the form on this page, or call <a href="tel:${PH.tel}">${esc(PH.display)}</a>. Group orders come from the same menu as the shop: frappes, espresso drinks, matcha, lattes, smoothies, crepes, waffles and desserts, kunafa included.`,
-      aText: `Yes. Send the date, time and headcount with the catering request form, or call ${PH.display}. Group orders come from the same menu as the shop: frappes, espresso drinks, matcha, lattes, smoothies, crepes, waffles and desserts, kunafa included.` },
+      a: `Yes. ${FORM_LIVE ? 'Send the date, time and headcount with the form on this page, or call' : 'Call'} <a href="tel:${PH.tel}">${esc(PH.display)}</a>${FORM_LIVE ? '' : ' with the date, time and headcount'}. Group orders come from the same menu as the shop: frappes, espresso drinks, matcha, lattes, smoothies, crepes, waffles and desserts, kunafa included.`,
+      aText: `Yes. ${FORM_LIVE ? 'Send the date, time and headcount with the catering request form, or call ' + PH.display : 'Call ' + PH.display + ' with the date, time and headcount'}. Group orders come from the same menu as the shop: frappes, espresso drinks, matcha, lattes, smoothies, crepes, waffles and desserts, kunafa included.` },
     { q: 'How much notice do you need for a large order?', a: notice, aText: notice },
     { q: 'Can everyone in the office pick their own drink?',
       a: `Yes. ${esc(CFG.COPY.groupText)} Group orders start at $${CFG.GROUP_ORDER_MINIMUM}.`,
@@ -226,11 +228,11 @@ export function cateringPage() {
       ${crumbs(trail)}
       <p class="sky__eyebrow"><span class="sky__dot"></span>Catering &middot; Offices &amp; events</p>
       <h1 class="sky__title">Big orders, <em>cleared for takeoff.</em></h1>
-      <p class="sky__lead">Kunafa, gelato and drinks for the whole room, boxed the morning of and on their way. One call or one link, and it all lands together.</p>
+      <p class="sky__lead">Kunafa, gelato and drinks for the whole room, planned with you. Tell us the date and headcount, and it all lands together.</p>
       <ul class="sky__chips" aria-label="The short version">
         <li><b>$${CFG.GROUP_ORDER_MINIMUM}</b><span>groups start</span></li>
-        <li><b>${CFG.DELIVERY_RADIUS_MILES} mi</b><span>delivery radius</span></li>
-        <li><b>${C.noticeHours ? C.noticeHours + ' hrs' : 'Same week'}</b><span>${C.noticeHours ? 'notice' : 'turnaround'}</span></li>
+        <li><b>${CFG.DELIVERY_RADIUS_MILES} mi</b><span>delivery radius</span></li>${C.noticeHours ? `
+        <li><b>${C.noticeHours} hrs</b><span>notice</span></li>` : ''}
       </ul>
       <div class="sky__actions"><a class="btn btn--primary btn--hero" href="#request" data-scroll>Start a catering order</a><a class="sky__tel" href="tel:${PH.tel}" data-call="catering-hero">or call ${esc(PH.display)}</a></div>
     </div>
@@ -241,7 +243,7 @@ export function cateringPage() {
   <div class="shell itin__grid">
     <div class="sechead rv"><p class="eyebrow">${star()}<span>How big orders fly</span></p><h2 id="itin-title">Three legs, <em>no layovers.</em></h2></div>
     <ol class="itin__list">
-      <li class="rv"><span class="itin__n">${ring}<b>01</b></span><h3>Book the flight</h3><p>Send the date, time, headcount and what you would like with the form below, or call ${telLink(PH, 'u')}. ${C.noticeHours ? `We need at least ${C.noticeHours} hours for a large order.` : 'The earlier you ask, the more we can do.'}</p></li>
+      <li class="rv"><span class="itin__n">${ring}<b>01</b></span><h3>Book the flight</h3><p>${live ? `Send the date, time, headcount and what you would like with the form below, or call ${telLink(PH, 'u')}.` : `Call ${telLink(PH, 'u')} with the date, time, headcount and what you would like.`} ${C.noticeHours ? `We need at least ${C.noticeHours} hours for a large order.` : 'The earlier you ask, the more we can do.'}</p></li>
       <li class="rv"><span class="itin__n">${ring}<b>02</b></span><h3>Everyone picks</h3><p>${esc(CFG.COPY.groupText)} Group orders start at $${CFG.GROUP_ORDER_MINIMUM}.</p></li>
       <li class="rv"><span class="itin__n">${ring}<b>03</b></span><h3>Pickup or delivery</h3><p>Pick up at <a href="/visit/${READY[0].slug}">${esc(READY[0].name)}</a>, or have it delivered up to ${CFG.DELIVERY_RADIUS_MILES} miles from the shop ($${CFG.DELIVERY_MINIMUM} minimum).</p></li>
     </ol>
@@ -397,6 +399,8 @@ ${flightsSection()}`;
    configs (config/gelato.js, config/team.js, config/feed.js). */
 const GELATO = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(readRoot('config/gelato.js'), sb); return sb.window.DD_GELATO; })();
 const TEAM = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(readRoot('config/team.js'), sb); return sb.window.DD_TEAM; })();
+/* the crew page goes up only when at least one person is confirmed (no OWNER TO CONFIRM in the name) */
+export const TEAM_READY = TEAM.some(m => m.name && !/OWNER TO CONFIRM/i.test(m.name));
 const FEED = (() => { const sb = { window: {} }; vm.createContext(sb); vm.runInContext(readRoot('config/feed.js'), sb); return sb.window.DD_FEED; })();
 const draftNote = what => `<p class="placeholder rv"><b>Placeholder.</b> ${what}</p>`;
 
@@ -430,28 +434,18 @@ export function gelatoPage() {
     <p class="ghero__lead">Dense, smooth and served a few degrees warmer than ice cream, so the flavor arrives first.</p>
   </div>
 </header>
-<section class="gtabs" aria-label="About the gelato">
+<!-- The tabs (quality, made fresh, today's flavors, the science) wait in
+     config/gelato.js until the owner supplies the facts. What follows is
+     general gelato science, the same as the published Journal guide. -->
+<section class="gwhy" aria-labelledby="gwhy-title">
   <div class="shell">
-    <div class="gtabs__bar" role="tablist" aria-label="Gelato">
-      <button class="gtabs__btn" role="tab" id="tabbtn-quality" aria-controls="tab-quality" aria-selected="true">The Quality</button>
-      <button class="gtabs__btn" role="tab" id="tabbtn-fresh" aria-controls="tab-fresh" aria-selected="false" tabindex="-1">Made Fresh Daily</button>
-      <button class="gtabs__btn" role="tab" id="tabbtn-flavors" aria-controls="tab-flavors" aria-selected="false" tabindex="-1">Today&rsquo;s Flavors</button>
-      <button class="gtabs__btn" role="tab" id="tabbtn-science" aria-controls="tab-science" aria-selected="false" tabindex="-1">The Science</button>
-      <span class="gtabs__ink" aria-hidden="true"></span>
-    </div>
-    <div class="gtabs__panels">
-      ${panel('quality', T.quality)}
-      ${panel('fresh', T.fresh)}
-      <section class="gtab" id="tab-flavors" role="tabpanel" aria-labelledby="tabbtn-flavors" hidden>
-        <h2 class="gtab__h">Today&rsquo;s Flavors</h2>
-        <p class="board__line">${star()} Departures &middot; Updated daily</p>
-        <ul class="gboard" aria-label="Today's flavors">${G.flavors.map((f, i) => `
-          <li class="gflap" data-status="${esc(f.status || 'on-time')}" style="--i:${i}"><span class="gflap__n">${String(i + 1).padStart(2, '0')}</span><span class="flaps" aria-hidden="true" style="--n:${W}">${flaps(f.name)}</span><span class="gflap__name">${esc(f.name)}<span class="vh">, ${status[f.status] || status['on-time']}</span></span><span class="gflap__st" aria-hidden="true">${status[f.status] || status['on-time']}</span></li>`).join('')}
-        </ul>
-        <p class="gtab__p">${esc(G.flavorsNote)}</p>
-      </section>
-      ${panel('science', T.science)}
-    </div>
+    <div class="sechead rv"><p class="eyebrow">${star()}<span>The science, briefly</span></p><h2 id="gwhy-title">Why gelato tastes <em>different.</em></h2></div>
+    <ol class="gwhy__list">
+      <li class="rv"><b>01</b><h3>Less air</h3><p>Gelato is churned slowly, so less air is folded in. Every spoonful is denser and silkier.</p></li>
+      <li class="rv"><b>02</b><h3>Less cream</h3><p>More milk and less cream than ice cream, so less fat coats the tongue and more flavor comes through.</p></li>
+      <li class="rv"><b>03</b><h3>A warmer serve</h3><p>Served a few degrees warmer than ice cream, so it stays soft and the flavor arrives first.</p></li>
+    </ol>
+    <div class="gwhy__ctas rv"><a class="btn btn--primary" href="/blog/gelato-houston-science-and-craft">Read the full guide</a><a class="btn btn--line" href="tel:${PH.tel}" data-call="gelato">Ask what&rsquo;s in the case today</a></div>
   </div>
 </section>
 ${flightsSection()}`;
@@ -510,7 +504,7 @@ export function feedPage() {
   <div class="shell social__head">
     ${crumbs(trail)}<span class="label">Follow the route</span>
     <h1 class="social__title" id="social-title" aria-label="Now boarding: @dubai.dips on TikTok, @dubaianddips on Instagram"><span class="social__flap" data-flap="NOW BOARDING" aria-hidden="true">NOW BOARDING</span><span class="social__handles" data-flap="&mdash; @dubai.dips / @dubaianddips" aria-hidden="true">&mdash; @dubai.dips / @dubaianddips</span></h1>
-    <p class="social__line">10k+ travelers follow <em>the route.</em></p>
+    <p class="social__line">Follow <em>the route</em> on TikTok and Instagram.</p>
   </div>
   <div class="social__pin" id="socialPin">
     <div class="social__stage">

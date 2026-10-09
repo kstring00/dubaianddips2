@@ -12,11 +12,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, DIST, PROD, CFG, SITE, READY, MISSING_LOCATIONS, HOME_CSS_FILE, FLIGHTS_CSS, flightsSection, read, write, jsonldTag, restaurant, organization, website, lastmod } from './lib.mjs';
-import { menuPage, cateringPage, visitIndex, locationPage, notFoundPage, gelatoPage, teamPage, feedPage } from './pages.mjs';
+import { menuPage, cateringPage, visitIndex, locationPage, notFoundPage, gelatoPage, teamPage, feedPage, TEAM_READY } from './pages.mjs';
 import { buildBlog } from './blog.mjs';
 
 const t0 = Date.now();
-const SKIP = new Set(['.git', 'node_modules', 'dist', 'build', 'scripts', 'source', 'content', '.vercel',
+/* order-demo.html + demo.js: the pitch's mock checkout, kept in the repo but not
+   deployed while online ordering is not connected. */
+const SKIP = new Set(['.git', 'node_modules', 'dist', 'build', 'scripts', 'source', 'content', '.vercel', 'order-demo.html', 'demo.js', 'ORDERING.md', 'undefined',
   'package.json', 'package-lock.json', '.gitignore', '.vercelignore', 'vercel.json', 'ORDERING.md', '404.html']);
 
 fs.rmSync(DIST, { recursive: true, force: true });
@@ -60,7 +62,8 @@ const pages = {
   'feed/index.html': feedPage(),
   /* ready for content: built, noindex, and kept out of the sitemap */
   'gelato/index.html': gelatoPage(),
-  'team/index.html': teamPage(),
+  /* /team is built only once config/team.js holds confirmed people */
+  ...(TEAM_READY ? { 'team/index.html': teamPage() } : {}),
   '404.html': notFoundPage()
 };
 for (const l of READY) pages[`visit/${l.slug}/index.html`] = locationPage(l);
@@ -86,7 +89,7 @@ ${urls.map(([u, d]) => `  <url><loc>${SITE}${u === '/' ? '/' : u}</loc><lastmod>
 </urlset>
 `);
 write('robots.txt', PROD
-  ? `User-agent: *\nAllow: /\nDisallow: /order-demo\n\nSitemap: ${SITE}/sitemap.xml\n`
+  ? `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`
   : `# Preview build: not for search engines.\nUser-agent: *\nDisallow: /\n`);
 
 const n = Object.keys(pages).length;

@@ -38,7 +38,7 @@
 .fl__legend i.mint{background:var(--mint)}
 /* the destinations as real links: one row of slim tickets, the code on
    the stub, a perforation, then the city and the page it flies to */
-.fl__cards{position:relative;z-index:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.6rem;margin:.6rem 0 0;padding:0;list-style:none}
+.fl__cards{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.6rem;margin:.6rem 0 0;padding:0;list-style:none}
 .fl__cards>li{display:grid;min-width:0}
 /* each ticket is a button: a light card on the dark ground, the page it goes
    to in large type, a filled arrow disc, and a lift on hover */

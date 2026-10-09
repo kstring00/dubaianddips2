@@ -94,7 +94,7 @@ Midnight on Friday and Saturday, and 10 PM on Sunday.
 
 ### Can I order late-night dessert for pickup?
 
-Yes. Order ahead for pickup online while we are open, and pick it up at the counter.
+Yes. Call the shop while we are open to order ahead, and pick it up at the counter.
 
 ### Do you deliver late at night?
 

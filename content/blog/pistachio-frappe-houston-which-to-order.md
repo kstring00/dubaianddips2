@@ -81,7 +81,7 @@ And the Biscoff flavor shows up again too: a Biscoff Matcha and a Biscoff Latte 
 
 Our [Clear Lake shop](/visit/clear-lake) is open 9 AM to 10 PM Monday to Thursday, 10 AM to 10 PM on Sunday, and until midnight on Fridays and Saturdays, so a frappe run fits after dinner too. See [late-night dessert in Houston](/blog/late-night-dessert-houston) for the weekend plan.
 
-Already decided? Order ahead for pickup and it will be ready when you walk in. For a group, our [catering page](/catering) explains how everyone can pick their own frappe from one link.
+Already decided? Order ahead for pickup and it will be ready when you walk in. For a group, our [catering page](/catering) explains how to put together an order where everyone picks their own frappe.
 
 ## Can't decide? Come in for a sample
 

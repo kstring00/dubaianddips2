@@ -5,7 +5,7 @@
    node scripts/serve.mjs 4173 & node scripts/crawl-links.mjs */
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 const base = process.argv[2] || 'http://localhost:4173';
-const start = ['/', '/menu', '/catering', '/visit', '/blog', '/order-demo', '/definitely-missing'];
+const start = ['/', '/menu', '/catering', '/visit', '/blog', '/gelato', '/feed', '/definitely-missing'];
 const b = await chromium.launch();
 const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
 const seen = new Set(), queue = [...start], external = new Map(), dead = [], ids = {};

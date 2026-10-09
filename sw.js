@@ -7,16 +7,16 @@
 
    Never cached: anything off this origin (so never a Toast page), the two
    films, and any non-GET request. Bump VERSION to drop old caches. */
-var VERSION = 'dd-2026-09-25-elevation';
+var VERSION = 'dd-2026-10-09-portfolio';
 var SHELL = [
-  '/', '/index.html', '/order-demo', '/404.html',
+  '/', '/index.html', '/404.html',
   '/site.js', '/track.js', '/demo.js', '/config/ordering.js', '/config/departures.js', '/config/flights.js', '/config/feed.js', '/hours.js', '/flights.js', '/manifest.webmanifest',
   '/brand.css', '/assets/dd-favicon.svg', '/assets/dd-apple-touch-icon.png', '/assets/dd-icon-192.png', '/assets/dd-icon-512.png', '/assets/dd-icon-maskable-512.png',
   '/public/brand/pattern/pattern-sugar.svg', '/public/brand/pattern/pattern-light.svg', '/public/brand/boarding-pass/bpass-dubai.svg', '/menu-board.json',
   '/assets/hero-poster.webp', '/assets/craft-poster.webp',
   '/public/fonts/albert-sans.woff2', '/public/fonts/encode-sans.woff2', '/public/fonts/playfair-display-italic.woff2'
 ];
-var NETWORK_FIRST = /\.(html|js|css|json|webmanifest)$|\/$|\/order-demo$|\/menu\//;
+var NETWORK_FIRST = /\.(html|js|css|json|webmanifest)$|\/$|\/menu\//;
 var NEVER = /\.(mp4|webm|mov)$/;
 
 self.addEventListener('install', function (e) {

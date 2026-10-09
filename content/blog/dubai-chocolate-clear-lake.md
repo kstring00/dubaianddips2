@@ -63,13 +63,13 @@ You will find us at 1131 Clear Lake City Blvd, Houston, TX 77062. <!-- OWNER TO 
 
 ## Skip the line: order ahead
 
-If you already know you want a Dubai Chocolate Frappe, order ahead for pickup. Pick it up at the counter when it is ready, and you are back in the car in no time. The Order button on every page of this site takes you straight to online ordering.
+If you already know you want a Dubai Chocolate Frappe, order ahead for pickup. Pick it up at the counter when it is ready, and you are back in the car in no time. Call the shop at (281) 786-1157 to place it.
 
 For delivery, we cover up to 5 miles from the shop, with a $15 minimum.
 
 ## Bringing it to the office
 
-Dubai chocolate flavors travel well to a group. If you are ordering for a team, a birthday or an event, our [catering page](/catering) explains group ordering: one link, everyone picks their own drink, one payment, and it all arrives together. Group orders start at $50.
+Dubai chocolate flavors travel well to a group. If you are ordering for a team, a birthday or an event, our [catering page](/catering) explains how to send one request for the whole group. Group orders start at $50.
 
 ## Make it an evening
 
@@ -95,7 +95,7 @@ Yes. We are open until midnight on Fridays and Saturdays, and until 10 PM the re
 
 ### Can I order Dubai chocolate drinks ahead?
 
-Yes. Order ahead for pickup online, or call the shop.
+Yes. Call the shop at (281) 786-1157 to order ahead for pickup.
 
 ### Do you have Dubai chocolate bars?
 
