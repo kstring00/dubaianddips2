@@ -19,7 +19,7 @@
 .crumbs ol{display:flex;flex-wrap:wrap;align-items:center;gap:0 .2rem;margin:0 0 1rem;padding:0;list-style:none;font-family:var(--mono);font-weight:500;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
 .crumbs li{display:inline-flex;align-items:center}
 .crumbs li+li::before{content:"/";margin:0 .55rem 0 .35rem;color:rgb(var(--bark-rgb)/.35)}
-.crumbs a{display:inline-flex;align-items:center;min-height:44px;color:var(--ink-soft);text-decoration:none}
+.crumbs a{display:inline-flex;align-items:center;min-height:44px;min-width:44px;color:var(--ink-soft);text-decoration:none}
 .crumbs a:hover{color:var(--courtyard)}
 .crumbs [aria-current]{display:inline-block;max-width:28ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;color:var(--bark)}
 .pstrip{display:flex;flex-wrap:wrap;margin:2.2rem 0 0;padding:0;border-top:1.5px dashed rgb(var(--bark-rgb)/.28);border-bottom:1.5px dashed rgb(var(--bark-rgb)/.28)}
@@ -320,7 +320,7 @@
 .ptoc{position:sticky;top:calc(var(--nav-h) + 2rem)}
 .ptoc__h{font-family:var(--mono);font-weight:600;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--courtyard)}
 .ptoc ol{margin:.8rem 0 0;padding:0 0 0 .9rem;list-style:none;border-left:1.5px solid rgb(var(--bark-rgb)/.14)}
-.ptoc a{display:block;padding:.4rem 0;font-size:.9rem;line-height:1.35;color:var(--ink-soft);text-decoration:none;transition:color .3s var(--ease)}
+.ptoc a{display:flex;align-items:center;min-height:44px;padding:.4rem 0;font-size:.9rem;line-height:1.35;color:var(--ink-soft);text-decoration:none;transition:color .3s var(--ease)}
 .ptoc a.is-active,.ptoc a:hover{color:var(--bark)}
 .ptrack{position:fixed;left:0;right:0;top:var(--nav-h);z-index:30;height:3px;pointer-events:none}
 .ptrack span{display:block;height:100%;background:var(--browned-sugar);transform-origin:0 50%;transform:scaleX(0)}
@@ -746,11 +746,11 @@ html.swm-open{overflow:hidden}
 .sky__chips{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.5rem 0 0;padding:0;list-style:none}
 .sky__chips li{display:grid;padding:.65rem 1rem .6rem;border-radius:12px;background:rgb(var(--off-white-rgb)/.1);box-shadow:inset 0 0 0 1px rgb(var(--off-white-rgb)/.16);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .sky__chips b{font-family:var(--display);font-weight:500;font-size:1.35rem;letter-spacing:-.02em;line-height:1;color:var(--off-white)}
-.sky__chips span{margin-top:.25rem;font-family:var(--mono);font-weight:600;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint)}
+.sky__chips span{margin-top:.25rem;font-family:var(--mono);font-weight:600;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mint)}
 .sky__actions{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.4rem;margin-top:1.8rem}
 .sky .btn--primary{background:var(--mint);color:var(--courtyard-deep);box-shadow:0 10px 30px rgb(var(--black-rgb)/.25)}
 .sky .btn--primary:hover,.sky .btn--primary:focus-visible{background:var(--off-white);color:var(--courtyard-deep)}
-.sky__tel{font-weight:500;color:var(--off-white);text-decoration:none;border-bottom:1.5px solid rgb(var(--mint-rgb)/.6);padding:.2rem 0;transition:border-color .3s var(--ease)}
+.sky__tel{display:inline-flex;align-items:center;min-height:44px;font-weight:500;color:var(--off-white);text-decoration:none;border-bottom:1.5px solid rgb(var(--mint-rgb)/.6);padding:.2rem 0;transition:border-color .3s var(--ease)}
 .sky__tel:hover{border-color:var(--mint)}
 @media(max-width:899px){
   .sky{min-height:0;padding:clamp(3rem,10vw,4rem) 0 clamp(3rem,10vw,4rem)}
@@ -850,7 +850,7 @@ html.swm-open{overflow:hidden}
    soft glint crosses the glass of the case. The photo drifts on scroll
    (pages.js, transform only, 40px at most). ---- */
 .ghero{--cream:248 241 228;position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:min(92vh,960px);background:#efe4d0;color:var(--bark)}
-.ghero__media{position:absolute;inset:-40px 0 0;z-index:-2;background:#e9dcc4 50% 50%/cover no-repeat;will-change:transform}
+.ghero__media{position:absolute;inset:0 0 -40px;z-index:-2;background:#e9dcc4 50% 50%/cover no-repeat;will-change:transform}
 .ghero__media picture,.ghero__img{display:block;width:100%;height:100%}
 .ghero__img{object-fit:cover;object-position:0 50%;transform-origin:0 50%}
 .js .ghero__img{animation:gheroIn 1.6s cubic-bezier(.2,.7,.2,1) both}
@@ -897,3 +897,15 @@ html.swm-open{overflow:hidden}
   .js .ghero__copy>*,.js .ghero__title span,.js .ghero__title em{opacity:1;transform:none;animation:none}
   .ghero__glint{display:none}
 }
+
+/* ---- /gelato: the science, briefly. Three general facts (the same as the
+   Journal guide) and two real actions, until the owner's details arrive. ---- */
+.gwhy{padding:clamp(3.5rem,7vw,6rem) 0;background:var(--surface)}
+.gwhy__list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1rem,2.5vw,2rem);margin:0;padding:0;list-style:none}
+.gwhy__list li{display:flex;flex-direction:column;gap:.5rem;padding:1.6rem 1.5rem 1.7rem;border-radius:18px;background:var(--natural);box-shadow:inset 0 0 0 1px rgb(var(--bark-rgb)/.08)}
+.gwhy__list b{font-family:var(--data);font-weight:500;font-size:.9rem;letter-spacing:.06em;color:var(--browned-sugar-deep)}
+.gwhy__list h3{font-size:1.45rem;letter-spacing:-.02em;color:var(--bark)}
+.gwhy__list p{line-height:1.6;color:var(--ink-soft)}
+.gwhy__ctas{display:flex;flex-wrap:wrap;gap:.8rem 1rem;margin-top:clamp(1.8rem,3.5vw,2.6rem)}
+.gwhy__ctas .btn{min-height:52px}
+@media(max-width:899px){.gwhy__list{grid-template-columns:1fr}}

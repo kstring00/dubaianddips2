@@ -627,7 +627,8 @@ body.sheet-open{overflow:hidden}
 .field label{font-family:var(--mono);font-weight:600;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink)}
 .field input,.field textarea{font-family:var(--body);font-size:1rem;color:var(--ink);background:var(--surface-raised);border:1px solid rgb(var(--ink-rgb)/.25);border-radius:3px;padding:.85rem 1rem;min-height:52px;width:100%}
 .field textarea{min-height:140px;resize:vertical}
-.thanks{display:none}.thanks.is-on{display:flex}.form.is-sent{display:none}
+.contact__ways{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.4rem;align-self:center}
+.contact__ways .btn{min-height:52px}
 @media(max-width:880px){.contact{grid-template-columns:1fr}}
 
 /* ============================== FOOT ==============================
@@ -672,6 +673,8 @@ body.sheet-open{overflow:hidden}
 .boxfoot__grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,.8fr) auto;gap:clamp(1.8rem,3.4vw,3rem);align-items:start}
 .boxfoot__base{position:relative;z-index:1}
 .boxfoot__links h3+ul{margin-bottom:1.1rem}
+/* the honest status line: present on every page, quiet */
+.boxfoot__concept{margin:0;font-family:var(--mono);font-weight:500;font-size:.74rem;letter-spacing:.06em;color:rgb(var(--off-white-rgb)/.72)}
 /* each link carries a small line glyph, so the list reads as places to go */
 .boxfoot__links a{display:inline-flex;align-items:center;gap:.85rem}
 .boxfoot__ico{flex:0 0 auto;width:1.35rem;height:1.35rem;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.92;transition:transform .4s var(--ease-out)}
@@ -719,7 +722,7 @@ body.sheet-open{overflow:hidden}
 .flycard:hover .flycard__card,.flycard:focus-visible .flycard__card,.flycard:active .flycard__card{transform:translate3d(0,-6px,0) rotate(-2deg)}
 .flycard:focus-visible{outline:2px solid var(--mint);outline-offset:6px;border-radius:10px}
 .flycard__pass{position:relative;width:100%;height:auto}
-.flycard__cta{position:relative;display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:44px;margin-top:-5px;padding:.55rem .6rem;border-radius:0 0 6px 6px;border-top:1.5px dashed rgb(var(--bark-rgb)/.35);background:var(--off-white);font-family:var(--mono);font-weight:600;font-size:.64rem;line-height:1.3;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.flycard__cta{position:relative;display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:44px;margin-top:-5px;padding:.55rem .6rem;border-radius:0 0 6px 6px;border-top:1.5px dashed rgb(var(--bark-rgb)/.35);background:var(--off-white);font-family:var(--mono);font-weight:600;font-size:.72rem;line-height:1.3;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .flycard__cta i{flex:0 0 auto}
 .flycard__cta i{font-style:normal;font-size:1rem;letter-spacing:0;transition:transform .35s var(--ease-out)}
 .flycard:hover .flycard__cta i,.flycard:focus-visible .flycard__cta i{transform:translateX(4px)}
@@ -749,7 +752,7 @@ body.sheet-open{overflow:hidden}
   .boxfoot__where{order:3}
   .boxfoot__links{order:4}
   .flycard{width:min(38vw,142px)}
-  .flycard__cta{font-size:.62rem;min-height:44px}
+  .flycard__cta{font-size:.72rem;min-height:44px}
   .boxfoot__tel,.boxfoot__dir{justify-content:center;width:100%;max-width:24rem;min-height:52px;padding:0 1.2rem;border:1.5px solid rgb(var(--mint-rgb)/.6);border-radius:999px;font-size:1rem}
   .boxfoot__where address{margin-bottom:.4rem}
   .boxfoot__glow{inset:-10% -40%}
@@ -959,7 +962,7 @@ body.sheet-open{overflow:hidden}
 <header class="nav nav--intro" id="nav">
   <a class="nav__brand" href="/"><svg class="logo logo--primary" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-primary"/></svg><svg class="logo logo--mark" role="img" aria-label="Dubai &amp; Dips logo"><title>Dubai &amp; Dips logo</title><use href="#dd-mark"/></svg></a>
   <nav class="nav__links" aria-label="Primary">
-    <a href="/">Home</a><a href="/gelato">Gelato</a><a href="/catering">Catering</a><a href="/blog">Journal</a><a href="/team">The Crew</a><a href="/feed">The Feed</a>
+    <a href="/">Home</a><a href="/gelato">Gelato</a><a href="/catering">Catering</a><a href="/blog">Journal</a><a href="/feed">The Feed</a>
   </nav>
   <div class="nav__right">
     <span class="nav__meta">
@@ -1001,10 +1004,10 @@ body.sheet-open{overflow:hidden}
       <p class="hero__tag"><span class="hero__tag-l">Walk in.</span> <span class="hero__tag-l">Taste Dubai.</span></p>
       <p class="hero__place">Dessert shop &middot; Clear Lake, Houston</p>
       <!-- Pickup first. The primary is the most visible thing on the page
-           at load; the delivery link is the quiet alternative. -->
+           at load; directions are the quiet alternative. -->
       <div class="hero__cta" id="heroCta">
         <a class="btn btn--primary btn--hero" href="#visit" data-order="pickup" data-place="hero" data-copy="pickupCta">Order ahead for pickup</a>
-        <a class="hero__alt" href="#visit" data-order="delivery" data-place="hero" data-copy="deliveryCta">Or get it delivered</a>
+        <a class="hero__alt" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips,+1131+Clear+Lake+City+Blvd,+Houston,+TX+77062" data-link="directions" target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a>
       </div>
     </div>
     <p class="hero__hint" id="heroHint" aria-hidden="true">Scroll to open <span>&darr;</span></p>
@@ -1014,7 +1017,7 @@ body.sheet-open{overflow:hidden}
       <p>Gelato, pastries, coffee and matcha.</p>
       <div class="hero__row">
         <a class="btn btn--primary" href="#visit" data-order="pickup" data-place="hero-landing" data-copy="pickupCta">Order ahead for pickup</a>
-        <a class="tlink" href="#visit" data-order="delivery" data-place="hero-landing" data-copy="deliveryCta">Or get it delivered</a>
+        <a class="tlink" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips,+1131+Clear+Lake+City+Blvd,+Houston,+TX+77062" data-link="directions" target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a>
       </div>
     </div>
     <div class="hero__rule" aria-hidden="true"><i id="heroRule"></i></div>
@@ -1081,7 +1084,7 @@ body.sheet-open{overflow:hidden}
 
 <!-- ========================= ORDER DIRECT =========================
      Two reasons, three ways in. Every button reads its destination from
-     config/ordering.js (for the pitch, all of them land on /order-demo). -->
+     config/ordering.js (with no ordering link set, they open the Order by phone sheet). -->
 <section class="sec direct" id="order" aria-labelledby="direct-title">
   <div class="shell">
     <div class="sec__head rise">
@@ -1090,13 +1093,13 @@ body.sheet-open{overflow:hidden}
       <h2 id="direct-title">Straight from us, <em>to you.</em></h2>
     </div>
     <ul class="why rise">
-      <li><span class="why__icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="19" cy="9" r="5.2"/><path d="M19 6.4v5.2M17.4 7.6c0-.7.7-1.2 1.6-1.2s1.6.5 1.6 1.1c0 1.4-3.2.9-3.2 2.4 0 .6.7 1.1 1.6 1.1s1.6-.5 1.6-1.2"/><path d="M4 21.5h4.2l4.6-2.2c1-.5 2.2-.4 3 .3l1.2 1H21c1 0 1.6.7 1.6 1.4 0 .8-.7 1.4-1.6 1.4h-5.2"/><path d="M15.6 23.4H21l5-3c.9-.5 2-.2 2.4.6.4.7.2 1.5-.4 2L22 27.3c-.7.5-1.5.7-2.3.7H8.2H4"/></svg></span><strong>Cheaper than the apps</strong><span>No third-party markup on the menu.</span></li>
-      <li><span class="why__icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9.5 18.5c-2.8-.4-4.8-2.6-4.8-5.3 0-3 2.4-5.3 5.4-5.3.6 0 1.1.1 1.6.2C12.6 5.9 14.2 5 16 5s3.4.9 4.3 3.1c.5-.1 1-.2 1.6-.2 3 0 5.4 2.3 5.4 5.3 0 2.7-2 4.9-4.8 5.3V26H9.5z"/><path d="M9.5 22.4h13M13.2 18.5v3.9M18.8 18.5v3.9"/></svg></span><strong>Straight to our kitchen</strong><span>Your order prints on our ticket rail the second you place it.</span></li>
+      <li><span class="why__icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M11.2 5.5h-3a2 2 0 0 0-2 2.2c.9 9.9 8.2 17.2 18.1 18.1a2 2 0 0 0 2.2-2v-3a2 2 0 0 0-1.5-1.9l-3.4-.9a2 2 0 0 0-2 .6l-1.3 1.4a14.5 14.5 0 0 1-6.3-6.3l1.4-1.3a2 2 0 0 0 .6-2l-.9-3.4a2 2 0 0 0-1.9-1.5z"/></svg></span><strong>Call ahead</strong><span>Call (281) 786-1157 and your order will be ready when you walk in.</span></li>
+      <li><span class="why__icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 28s-8.5-8.6-8.5-15a8.5 8.5 0 0 1 17 0c0 6.4-8.5 15-8.5 15z"/><circle cx="16" cy="13" r="3.2"/></svg></span><strong>Pick up in Clear Lake</strong><span>1131 Clear Lake City Blvd, with a free lot right out front.</span></li>
     </ul>
     <div class="direct__ctas rise">
-      <a class="btn btn--primary" href="#visit" data-order="pickup" data-place="direct">Order online (pickup) <i class="direct__go" aria-hidden="true">&rarr;</i></a>
-      <a class="btn btn--line" href="#visit" data-order="delivery" data-place="direct">Get it delivered <i class="direct__go" aria-hidden="true">&rarr;</i></a>
-      <a class="btn btn--line" href="#visit" data-order="group" data-place="direct">Start a group order <i class="direct__go" aria-hidden="true">&rarr;</i></a>
+      <a class="btn btn--primary" href="tel:+12817861157" data-call="direct">Call to order ahead <i class="direct__go" aria-hidden="true">&rarr;</i></a>
+      <a class="btn btn--line" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips,+1131+Clear+Lake+City+Blvd,+Houston,+TX+77062" data-link="directions" target="_blank" rel="noopener">Get directions <i class="direct__go" aria-hidden="true">&rarr;</i><span class="vh"> (opens in a new tab)</span></a>
+      <a class="btn btn--line" href="/catering">Catering &amp; large orders <i class="direct__go" aria-hidden="true">&rarr;</i></a>
     </div>
   </div>
 </section>
@@ -1204,116 +1207,6 @@ body.sheet-open{overflow:hidden}
   <span class="band__track"><span class="band__set"><span class="band__item">Handmade with Love <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span><span class="band__item">Clear Lake, Houston <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span></span></span>
 </div>
 
-<!-- ============================== REVIEWS ============================== -->
-<section class="sec revs" id="reviews" aria-labelledby="revs-title">
-  <div class="shell revs__head">
-    <div class="revs__title">
-      <span class="label">Reviews</span>
-      <h2 id="revs-title">What people say <em>after.</em></h2>
-    </div>
-    <div class="revs__rating">
-      <span class="revs__row"><span class="revs__score" aria-hidden="true">5.0</span><span class="revs__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span>
-      <span class="revs__of" aria-hidden="true">Five sample reviews</span>
-      <span class="vh">Rated 5.0 out of 5, averaged across the five sample reviews below.</span>
-    </div>
-  </div>
-  <div class="revs__stage">
-    <div class="shell revs__hw">
-      <p class="revs__note">Sample reviews for now. Your real Google reviews go here, word for word.</p>
-      <div class="revs__ctrl">
-        <span class="revs__count"><span id="revCount">01</span> / 05</span>
-        <div class="revs__arrows">
-          <button type="button" data-rev="-1" aria-label="Previous review">&lsaquo;</button>
-          <button type="button" data-rev="1" aria-label="Next review">&rsaquo;</button>
-        </div>
-      </div>
-    </div>
-    <div class="revs__wire" aria-hidden="true"><i></i></div>
-    <div class="rail" id="revRail" tabindex="0" role="region" aria-label="Reviews, scroll sideways">
-      <ul class="rail__row">
-      <li class="ticket" style="--i:0;--hang:56px;--hov:2.1deg;--rot:-1.3deg">
-        <article class="ticket__paper">
-          <div class="ticket__top"><span>Sample review</span></div>
-          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
-          <blockquote>&ldquo;The pistachio is unreal. Real pistachio, you can taste it, and the texture is exactly right.&rdquo;</blockquote>
-          <p class="ticket__who">Sarah M.</p>
-          <a class="ticket__order" href="/menu/frappes" data-sheet="frappes">
-            <img src="/assets/rev-pistachio-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A pistachio frappe in a clear cup, whipped cream on top with green pistachio sauce drizzled over it.">
-            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Pistachio Frappe</span></span>
-          </a>
-        </article>
-      </li>
-      <li class="ticket" style="--i:1;--hang:78px;--hov:-2.4deg;--rot:1.6deg">
-        <article class="ticket__paper">
-          <div class="ticket__top"><span>Sample review</span></div>
-          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
-          <blockquote>&ldquo;Best matcha I have had in Houston. You can tell nothing in it is a shortcut.&rdquo;</blockquote>
-          <p class="ticket__who">James T.</p>
-          <a class="ticket__order" href="/menu/matchas" data-sheet="matchas">
-            <img src="/assets/rev-strawberry-matcha.webp" width="260" height="260" loading="lazy" decoding="async" alt="A strawberry matcha in a clear cup, a pink strawberry layer over green matcha with matcha dusted on the foam.">
-            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Strawberry Matcha</span></span>
-          </a>
-        </article>
-      </li>
-      <li class="ticket" style="--i:2;--hang:62px;--hov:1.8deg;--rot:-0.7deg">
-        <article class="ticket__paper">
-          <div class="ticket__top"><span>Sample review</span></div>
-          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
-          <blockquote>&ldquo;The staff walked us through the case and built the drink right in front of us. The room is even nicer than the photos.&rdquo;</blockquote>
-          <p class="ticket__who">Emily R.</p>
-          <a class="ticket__order" href="/menu/frappes" data-sheet="frappes">
-            <img src="/assets/rev-dubai-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="The Dubai Chocolate Frappe in a clear cup, whipped cream with pistachio and dark chocolate drizzled over the top.">
-            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Dubai Chocolate Frappe</span></span>
-          </a>
-        </article>
-      </li>
-      <li class="ticket" style="--i:3;--hang:88px;--hov:-1.9deg;--rot:1.1deg">
-        <article class="ticket__paper">
-          <div class="ticket__top"><span>Sample review</span></div>
-          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
-          <blockquote>&ldquo;The Biscoff frappe is ridiculous in the best way. Rich, cold, and somehow still balanced.&rdquo;</blockquote>
-          <p class="ticket__who">Marcus D.</p>
-          <a class="ticket__order" href="/menu/frappes" data-sheet="frappes">
-            <img src="/assets/rev-biscoff-frappe.webp" width="260" height="260" loading="lazy" decoding="async" alt="A Biscoff frappe in a clear cup, cookie butter swirled through it with whipped cream and a whole Biscoff cookie on top.">
-            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Biscoff Frappe</span></span>
-          </a>
-        </article>
-      </li>
-      <li class="ticket" style="--i:4;--hang:68px;--hov:2.3deg;--rot:-1.7deg">
-        <article class="ticket__paper">
-          <div class="ticket__top"><span>Sample review</span></div>
-          <p class="ticket__stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="vh">Rated 5 out of 5 stars</span></p>
-          <blockquote>&ldquo;The kind of place you bring someone back to because you want to see their reaction.&rdquo;</blockquote>
-          <p class="ticket__who">Nina P.</p>
-          <a class="ticket__order" href="/menu/desserts" data-sheet="desserts">
-            <img src="/assets/rev-kunafa.webp" width="260" height="260" loading="lazy" decoding="async" alt="A round kunafa on a gold board, crisp golden pastry with a mound of crushed green pistachio in the middle.">
-            <span><span class="ticket__ordered">Ordered</span><span class="ticket__item">Kunafa</span></span>
-          </a>
-        </article>
-      </li>
-        <li class="rail__end"><a href="https://www.google.com/maps/search/?api=1&amp;query=Dubai+and+Dips+Clear+Lake+Houston" target="_blank" rel="noopener">Read them all on Google <span aria-hidden="true">&rarr;</span></a></li>
-      </ul>
-    </div>
-  </div>
-  <!-- Review / AggregateRating structured data, held inert on purpose.
-       The reviews above are samples written for the pitch, and publishing
-       sample reviews as structured data would be lying to Google. Once the
-       real Google reviews are pasted in, change this script's type to
-       "application/ld+json" and fill in the real values. -->
-  <script type="text/x-jsonld-draft" id="reviewSchema">
-  {
-    "@context": "https://schema.org",
-    "@type": "CafeOrCoffeeShop",
-    "name": "Dubai & Dips",
-    "address": {"@type":"PostalAddress","streetAddress":"1131 Clear Lake City Blvd","addressLocality":"Houston","addressRegion":"TX","postalCode":"77062","addressCountry":"US"},
-    "telephone": "+1-281-786-1157",
-    "aggregateRating": {"@type":"AggregateRating","ratingValue":"REAL_AVERAGE","reviewCount":"REAL_COUNT"},
-    "review": [
-      {"@type":"Review","author":{"@type":"Person","name":"REAL_NAME"},"datePublished":"YYYY-MM-DD","reviewRating":{"@type":"Rating","ratingValue":"5","bestRating":"5"},"reviewBody":"REAL_REVIEW_TEXT"}
-    ]
-  }
-  </script>
-</section>
 
 <div class="band band--divider" aria-hidden="true">
   <span class="band__track"><span class="band__set"><span class="band__item">Made here, every morning <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span><span class="band__item">Gelato &middot; Pastries &middot; Coffee &middot; Matcha <i class="band__mark"><svg class="logo logo--star" aria-hidden="true" focusable="false"><use href="#dd-star"/></svg></i></span></span></span>
@@ -1331,13 +1224,13 @@ body.sheet-open{overflow:hidden}
         <p>Catering, a big order, or a question about what is in something.</p>
       </div>
       <div class="rise">
-        <form class="form" id="contactForm" novalidate>
-          <div class="field"><label for="cName">Name</label><input id="cName" name="name" type="text" autocomplete="name" required></div>
-          <div class="field"><label for="cEmail">Email</label><input id="cEmail" name="email" type="email" autocomplete="email" required></div>
-          <div class="field"><label for="cMsg">Message</label><textarea id="cMsg" name="message" required></textarea></div>
-          <button class="btn btn--line" type="submit">Send message</button>
-        </form>
-        <div class="thanks" id="thanks"><h3>Thanks, we'll get back to you soon.</h3></div>
+        <!-- There is no inbox behind a contact form yet, so the real ways in:
+             the phone, the catering request page and directions. -->
+        <div class="contact__ways">
+          <a class="btn btn--primary" href="tel:+12817861157" data-call="contact">Call (281) 786-1157</a>
+          <a class="btn btn--line" href="/catering">Catering request</a>
+          <a class="tlink" href="https://www.google.com/maps/dir/?api=1&amp;destination=Dubai+and+Dips,+1131+Clear+Lake+City+Blvd,+Houston,+TX+77062" data-link="directions" target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a>
+        </div>
       </div>
     </div>
   </div>
@@ -1377,7 +1270,6 @@ body.sheet-open{overflow:hidden}
           <ul>
             <li><a href="/catering" data-link="catering"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18h18M4.5 18a7.5 7.5 0 0 1 15 0"/><path d="M12 8.5V7M10.5 7h3"/><path d="M3.5 20.5h17"/></svg>Catering &amp; large orders</a></li>
             <li><a href="/gelato" data-link="gelato"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7.2 11.5 12 21l4.8-9.5"/><path d="M6.8 11.5h10.4a3.2 3.2 0 0 0 .3-6.3A5.5 5.5 0 0 0 6.5 5.2a3.2 3.2 0 0 0 .3 6.3z"/><path d="M9.3 11.5l3.8 5M14.2 11.5l-2.5 4"/></svg>Gelato</a></li>
-            <li><a href="/team" data-link="team"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="7.5" r="2.8"/><path d="M7 19.5v-1.2a5 5 0 0 1 10 0v1.2"/><circle cx="5.2" cy="9.8" r="2"/><path d="M2 18.5v-.6a3.6 3.6 0 0 1 4.2-3.6"/><circle cx="18.8" cy="9.8" r="2"/><path d="M22 18.5v-.6a3.6 3.6 0 0 0-4.2-3.6"/></svg>Meet the Crew</a></li>
             <li><a href="/blog" data-link="journal"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6.5C10.2 5 7.6 4.5 3.5 4.7v13.6c4.1-.2 6.7.3 8.5 1.8 1.8-1.5 4.4-2 8.5-1.8V4.7C16.4 4.5 13.8 5 12 6.5z"/><path d="M12 6.5v13.6"/></svg>The Journal</a></li>
             <li hidden><a href="" data-link="googleReviews" target="_blank" rel="noopener"><svg class="boxfoot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>Leave us a review<span class="vh"> (opens in a new tab)</span></a></li>
           </ul>
@@ -1396,6 +1288,7 @@ body.sheet-open{overflow:hidden}
       <div class="shell boxfoot__base" data-rise-foot>
         <span>&copy; <span id="year">2026</span> Dubai &amp; Dips<span class="tm"></span>.</span>
         <span class="boxfoot__legal"><span>Clear Lake, Houston</span><a href="" data-link="privacyPolicy" hidden>Privacy policy</a></span>
+        <p class="boxfoot__concept">Independent website concept &mdash; for portfolio demonstration.</p>
         <p class="boxfoot__tm">Dubai &amp; Dips<span class="tm"></span> is a <span class="tm-kind"></span>trademark of Dubai &amp; Dips.</p>
       </div>
     </div>
@@ -1422,7 +1315,7 @@ body.sheet-open{overflow:hidden}
   <div class="sheet__scrim" data-sheet-close></div>
   <div class="sheet__card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" tabindex="-1">
     <button class="sheet__x" type="button" aria-label="Close" data-sheet-close>&times;</button>
-    <span class="label">Online ordering</span>
+    <span class="label">Order ahead</span>
     <h2 class="sheet__title" id="sheetTitle" data-copy="soonTitle">Ordering goes live soon.</h2>
     <p class="sheet__text" data-copy="soonText"></p>
     <a class="btn btn--primary sheet__call" href="tel:+12817861157" data-tel data-tel-label data-call="sheet">Call (281) 786-1157</a>

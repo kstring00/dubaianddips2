@@ -12,8 +12,10 @@ let fails = 0, passes = 0;
 const ok = (cond, msg) => { if (cond) { passes++; } else { fails++; console.log('  FAIL ' + msg); } };
 /* the checks run against the built site: run `npm run build` first (npm run check does both) */
 const read = f => fs.readFileSync(path.join(root, 'dist', f), 'utf8');
-const PAGES = ['index.html', 'order-demo.html', '404.html', 'menu/index.html', 'catering/index.html', 'visit/index.html', 'visit/clear-lake/index.html', 'blog/index.html', ...fs.readdirSync(path.join(root, 'dist/blog')).filter(d => d !== 'index.html').map(d => 'blog/' + d + '/index.html')];
-const SERVED = ['index.html', 'order-demo.html', '404.html', 'site.js', 'demo.js', 'track.js', 'sw.js', 'manifest.webmanifest'];
+const PAGES = ['index.html', ...(fs.existsSync(path.join(root, 'dist/order-demo.html')) ? ['order-demo.html'] : []), '404.html', 'menu/index.html', 'catering/index.html', 'visit/index.html', 'visit/clear-lake/index.html', 'blog/index.html', ...fs.readdirSync(path.join(root, 'dist/blog')).filter(d => d !== 'index.html').map(d => 'blog/' + d + '/index.html')];
+/* the mock checkout (/order-demo) is deployed only when the build includes it */
+const DEMO_DEPLOYED = fs.existsSync(path.join(root, 'dist/order-demo.html'));
+const SERVED = ['index.html', '404.html', 'site.js', 'track.js', 'sw.js', 'manifest.webmanifest', ...(DEMO_DEPLOYED ? ['order-demo.html', 'demo.js'] : [])];
 
 console.log('static checks');
 /* lorem, hardcoded money outside config */
@@ -53,11 +55,18 @@ for (const i of man.icons) {
 }
 const sw = read('sw.js');
 ok(/url\.origin !== self\.location\.origin\) return/.test(sw) && /mp4/.test(sw), 'service worker skips cross-origin (Toast) and videos');
+if (DEMO_DEPLOYED) {
 ok(/order-demo/.test(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8')), 'vercel.json rewrites /order-demo');
 ok(!/<input[^>]*(cc-|card)/i.test(read('order-demo.html')) && !/cc-|card-number|cvv|cvc/i.test(read('demo.js')), 'demo has no card inputs');
 ok(!/confirmation/i.test(read('demo.js')), 'demo has no confirmation numbers');
 ok(/prefers-reduced-motion/.test(read('index.html')) && /prefers-reduced-motion/.test(read('order-demo.html')), 'reduced motion handled');
 ok(/DEMO/.test(read('demo.js')) && /demoPill/.test(read('demo.js')), 'demo pill reads the DEMO flag');
+} else {
+  ok(!fs.existsSync(path.join(root, 'dist/demo.js')), 'mock checkout not deployed');
+  ok(/"source": "\/order-demo",\s*"destination": "\/"/.test(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8')), 'vercel.json sends old /order-demo links home');
+  ok(/prefers-reduced-motion/.test(read('index.html')), 'reduced motion handled');
+  ok(!/order-demo/.test(read('sw.js')), 'service worker does not precache /order-demo');
+}
 ok(!/DoorDash|Uber/i.test(read('index.html') + cfg), 'no third-party apps named');
 console.log('  static: ' + passes + ' passed, ' + fails + ' failed');
 
@@ -155,7 +164,7 @@ for (const v of VIEWS) {
   await page.unroute('**/config/ordering.js');
 
   /* --- layout: overflow, tap targets, sticky bar, hero CTA first paint --- */
-  for (const r of ['/', '/order-demo', '/404.html', '/menu', '/catering', '/visit', '/visit/clear-lake', '/blog', '/blog/dubai-chocolate-houston-explained']) {
+  for (const r of ['/', ...(DEMO_DEPLOYED ? ['/order-demo'] : []), '/404.html', '/menu', '/catering', '/visit', '/visit/clear-lake', '/blog', '/blog/dubai-chocolate-houston-explained']) {
     await page.goto(base + r); await page.waitForTimeout(300);
     const sw = await page.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= v.w, r + ' no horizontal overflow at ' + v.w + ' (scrollWidth ' + sw + ')');
@@ -264,11 +273,9 @@ for (const v of VIEWS) {
   ok(await rp.evaluate(() => { const el = document.querySelector('#heroLand [data-order="pickup"]'); const r = el.getBoundingClientRect(); return getComputedStyle(document.getElementById('heroLand')).opacity === '1' && r.top >= 0 && r.bottom <= innerHeight; }), 'reduced motion: landing pickup CTA visible');
   await rm.close();
 
-  /* --- contact form --- */
+  /* --- contact: no form pretends to send; the real ways in are there --- */
   await page.goto(base + '/'); await page.waitForTimeout(200);
-  await page.fill('#cName', 'Test'); await page.fill('#cEmail', 't@example.com'); await page.fill('#cMsg', 'Hi');
-  await page.evaluate(() => document.getElementById('contactForm').requestSubmit());
-  ok(await page.evaluate(() => document.getElementById('thanks').classList.contains('is-on')), 'contact form submit shows the thanks state');
+  ok(await page.evaluate(() => !document.getElementById('contactForm') && !!document.querySelector('#contact a[href^="tel:"]') && !!document.querySelector('#contact a[href="/catering"]')), 'contact: no fake form; call and catering links present');
 
   /* --- service worker + manifest --- */
   const swc = await browser.newContext({ viewport: { width: v.w, height: v.h } }); const swp = await swc.newPage();
@@ -282,6 +289,7 @@ for (const v of VIEWS) {
   const manRes = await page.request.get(base + '/manifest.webmanifest');
   ok(manRes.ok() && (await manRes.json()).display === 'standalone', 'manifest served');
 
+  if (DEMO_DEPLOYED) {
   /* --- the demo --- */
   await page.goto(base + '/order-demo'); await page.waitForTimeout(300);
   const C = await page.evaluate(() => DD_CONFIG);
@@ -323,6 +331,7 @@ for (const v of VIEWS) {
   await page.goto(base + '/order-demo'); await page.waitForTimeout(200);
   ok(!(await page.isVisible('#demoPill')), 'demo pill hidden when DEMO is false');
   await page.unroute('**/config/ordering.js');
+  }
   await ctx.close();
 }
 ok(errors.length === 0, 'no page errors: ' + errors.join(' / '));

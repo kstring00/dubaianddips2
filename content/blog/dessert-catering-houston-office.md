@@ -34,13 +34,13 @@ A simple way to split it:
 2. **Matcha and lighter options:** the [matcha route](/menu#matchas) and the [smoothies route](/menu#smoothies).
 3. **The treat crowd:** the [frappes route](/menu#frappes), including the Dubai Chocolate, Pistachio and Biscoff frappes.
 
-Not sure how much to order for your headcount? Tell us on the [catering form](/catering) and we will suggest amounts. <!-- OWNER TO CONFIRM: recommended quantities per person and any catering-size or tray options. -->
+Not sure how much to order for your headcount? Call the shop at (281) 786-1157 and we will suggest amounts. <!-- OWNER TO CONFIRM: recommended quantities per person and any catering-size or tray options. -->
 
-## Dessert catering in Houston without the spreadsheet: group ordering
+## Dessert catering in Houston for a group: one list, one order
 
-The hardest part of any office order is collecting everyone's choices. Group ordering removes that step. It works like this: one link, everyone picks, one payment, and it all arrives together.
+The hardest part of any office order is collecting everyone's choices. Do that first: gather what each person wants, then send the whole list in one request.
 
-You send the link to the team, each person chooses their own drink, and the order lands at our counter as one. Group orders start at $50. Our [catering page](/catering) has the details and a request form.
+Send the list with your date, time and headcount, or call the shop, and we will put the order together. Group orders start at $50. Our [catering page](/catering) has the details.
 
 ## Step 3: Pick pickup or delivery
 
@@ -64,14 +64,14 @@ For anything bigger than a normal order, tell us early. The more notice we have,
 
 <!-- OWNER TO CONFIRM: the minimum notice needed for large orders. -->
 
-The fastest way to book is the request form on our [catering page](/catering): date, time, headcount, what you are interested in, and your contact details. Prefer to talk it through? Call the shop; the number is on the [visit page](/visit/clear-lake).
+The fastest way to book is to call the shop at (281) 786-1157 with the date, time, headcount and what you are interested in. Our [catering page](/catering) has the details.
 
 ## Step 5: Plan the drop
 
 A few practical tips for the day itself:
 
 - **Time it to the moment.** Cold drinks are best right away, so time pickup or delivery for when people are ready.
-- **Label it.** If people chose their own drinks through the group link, each order is theirs; make sure everyone knows where to find it.
+- **Label it.** If people chose their own drinks, keep your list handy at pickup so everyone finds theirs.
 - **Think about allergies.** Many of our most popular drinks feature pistachio. Ask us about ingredients when you order. <!-- OWNER TO CONFIRM: allergen information to share with office customers. -->
 - **Add something to share.** A few desserts from the [D&D Desserts route](/menu#desserts), such as kunafa, turn a drinks order into a proper treat.
 
@@ -85,7 +85,7 @@ Looking for something smaller, like a gift for one person? See our [guide to des
 
 ### How do I order dessert catering in Houston from Dubai & Dips?
 
-Use the request form on our [catering page](/catering) with the date, time and headcount, or call the shop. For group orders, everyone picks from one link and pays once.
+Call the shop at (281) 786-1157 with the date, time and headcount; our [catering page](/catering) has the details. For a group, collect everyone's picks first and send them together.
 
 ### Is there a minimum for group orders?
 

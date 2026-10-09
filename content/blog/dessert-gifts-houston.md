@@ -45,7 +45,7 @@ The [matcha route](/menu#matchas) is one of our longest: Strawberry, Pistachio, 
 
 ### For the whole team
 
-If the thank-you is for a group, make it a group order. Our [catering page](/catering) explains how it works: one link, everyone picks, one payment, and it all arrives together. Group orders start at $50. Our [office dessert guide](/blog/dessert-catering-houston-office) has tips for planning it.
+If the thank-you is for a group, make it a group order. Our [catering page](/catering) explains how to send a request for the whole group. Group orders start at $50. Our [office dessert guide](/blog/dessert-catering-houston-office) has tips for planning it.
 
 ## Birthday dessert ideas
 
@@ -77,7 +77,7 @@ Not every gift has to be big. A single drink, picked for the person, says you we
 
 ## Where to pick up your gift
 
-Gifts can be picked up at [Dubai & Dips Clear Lake](/visit/clear-lake). There is a free lot right out front, with more spaces around the side of the building. The Order button on every page takes you to online ordering for pickup.
+Gifts can be picked up at [Dubai & Dips Clear Lake](/visit/clear-lake). There is a free lot right out front, with more spaces around the side of the building. To order ahead, call the shop at (281) 786-1157.
 
 ## Frequently asked questions
 

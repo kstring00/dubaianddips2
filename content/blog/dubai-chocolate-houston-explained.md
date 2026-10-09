@@ -68,7 +68,7 @@ If you already know what you want, you can order ahead for pickup and skip the w
 
 ## Bringing Dubai chocolate to a group
 
-Dubai chocolate is a crowd-pleaser, which makes it a good choice when you are ordering for an office, a birthday or a team celebration. Our [catering page](/catering) explains how group orders work: one link, everyone picks their own drink, one payment, and it all arrives together. You can also send us a request with the date, time and headcount.
+Dubai chocolate is a crowd-pleaser, which makes it a good choice when you are ordering for an office, a birthday or a team celebration. Our [catering page](/catering) explains how to order for a group: send us a request with the date, time and headcount, or call the shop.
 
 ## Frequently asked questions
 

@@ -14,7 +14,6 @@ window.DD_FLIGHTS = {
     { code: "FCO", city: "Rome", country: "Italy", page: "Gelato", href: "/gelato", lon: 12.25, lat: 41.80, flight: "DD 102" },
     { code: "IST", city: "Istanbul", country: "Türkiye", page: "Catering", href: "/catering", lon: 28.75, lat: 41.28, flight: "DD 103" },
     { code: "CDG", city: "Paris", country: "France", page: "The Journal", href: "/blog", lon: 2.55, lat: 49.01, flight: "DD 104" },
-    { code: "CAI", city: "Cairo", country: "Egypt", page: "Meet the Crew", href: "/team", lon: 31.41, lat: 30.12, flight: "DD 105" },
     { code: "HND", city: "Tokyo", country: "Japan", page: "The Feed", href: "/feed", lon: 139.78, lat: 35.55, flight: "DD 106" }
   ],
 

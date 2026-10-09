@@ -10,14 +10,14 @@
    phones.
 
    AFTER THE MEETING, fill in:
-     TOAST_ORDER_URL   Aladdin's Toast Online Ordering link. It is set to
-                       "/order-demo" for the pitch so every Order button on
-                       the site lands on the branded demo. Swap it for the
-                       Toast link and set DEMO to false. Delete nothing.
+     TOAST_ORDER_URL   Aladdin's Toast Online Ordering link. Empty for now,
+                       so every Order button opens the "Order by phone"
+                       sheet. The /order-demo mock checkout is no longer
+                       deployed (build/build.mjs SKIP). Delete nothing.
      TOAST_PICKUP_URL  optional: a Toast deep link straight to pickup
      TOAST_DELIVERY_URL optional: a Toast deep link straight to delivery
      TOAST_GROUP_URL   optional: a Toast group-ordering link
-     SHOP.address      the real street address (also a placeholder)
+     SHOP.address      confirmed: 1131 Clear Lake City Blvd, Houston, TX 77062
      HOURS             confirm against the door sign
      LINKS             googleReviews and privacyPolicy are still empty
      REWARDS_LIVE      true once Toast loyalty is switched on
@@ -34,7 +34,11 @@ window.DD_CONFIG = {
   DEMO: true,
 
   /* ---- Toast links --------------------------------------------------- */
-  TOAST_ORDER_URL: "/order-demo",   /* "" until Aladdin's Toast link exists; "/order-demo" for the pitch */
+  /* Online ordering is not connected. With this empty every Order button
+     opens the "Order by phone" sheet (tap-to-call and the hours). The
+     /order-demo mock checkout is kept in the repo but no longer deployed;
+     see build/build.mjs SKIP to bring it back for a pitch. */
+  TOAST_ORDER_URL: "",
   TOAST_PICKUP_URL: "",             /* optional; falls back to TOAST_ORDER_URL */
   TOAST_DELIVERY_URL: "",           /* optional; falls back to TOAST_ORDER_URL */
   TOAST_GROUP_URL: "",              /* optional; falls back to TOAST_ORDER_URL */
@@ -194,10 +198,10 @@ window.DD_CONFIG = {
       { title: "Straight to our kitchen", text: "Your order prints on our ticket rail the second you place it." }
     ],
     groupTitle: "Treat your office",
-    groupText: "One link, everyone picks, one payment, and it all arrives together.",
+    groupText: "Collect everyone's picks and send them with your request, or call, and we'll put the order together.",
     groupCta: "Start a group order",
-    soonTitle: "Ordering goes live soon.",
-    soonText: "Online ordering is on its way. Until then, call and we'll have it ready when you walk in.",
+    soonTitle: "Order by phone.",
+    soonText: "Online ordering isn't connected to this site. Call the shop and we'll have your order ready when you walk in.",
     callCta: "Call"
   },
 
